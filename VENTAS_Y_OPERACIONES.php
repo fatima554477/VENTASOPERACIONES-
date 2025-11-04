@@ -36,9 +36,9 @@ fecha fatis : 01/MAYO/2025
 				inputElement.setSelectionRange(i, i);
 			}
 			// Listener para inputs tipo .tol
-                        const inputs = document.querySelectorAll(".total");
-                        inputs.forEach(input => {
-                                input.addEventListener("keydown", function(e) {
+			const inputs = document.querySelectorAll(".total");
+			inputs.forEach(input => {
+				input.addEventListener("keydown", function(e) {
 					const keyCode = e.keyCode || e.which;
 					// Teclas numéricas (teclado principal del 0 al 9 o numpad 0 al 9)
 					const isNumberKey = (keyCode >= 48 && keyCode <= 57) || // Teclado principal
@@ -53,10 +53,7 @@ fecha fatis : 01/MAYO/2025
 							let MONTO_FACTURA2 = numberNoCommas(MONTO_FACTURA_elem.value);
 					
 							let tot = 0;
-                                                        for(let i = 0; i < arr.length; i++) {
-                                                                if(arr[i].hasAttribute('disabled')) {
-                                                                        continue;
-                                                                }
+							for(let i = 0; i < arr.length; i++) {
 								const inputName = arr[i].getAttribute("name");
 								const value = parseFloat(numberNoCommas(arr[i].value)) || 0;
 								if(["TImpuestosRetenidosIVA", "TImpuestosRetenidosISR", "descuentos"].includes(inputName)) {
@@ -75,10 +72,6 @@ fecha fatis : 01/MAYO/2025
 			});
 		}
                document.addEventListener("DOMContentLoaded", calcular);
-			   
-			   
-			   
-			   
                 function toggleFacturaFields() {
                         const select = document.querySelector('select[name="VIATICOSOPRO"]');
                         if(!select) {
@@ -89,181 +82,52 @@ fecha fatis : 01/MAYO/2025
                                 'REEMBOLSO',
                                 'PAGO A PROVEEDOR CON DOS O MAS FACTURAS'
                         ].includes(select.value);
-                        const toggleConfigurations = [
-                                {
-                                        rowId: 'row-adjuntar-factura-xml',
-                                        inputSelectors: [
-                                                '#ADJUNTAR_FACTURA_XML',
-                                                'input[type="file"][name="ADJUNTAR_FACTURA_XML"]'
-                                        ]
-                                },
-                                {
-                                        rowId: 'row-adjuntar-factura-pdf',
-                                        inputSelectors: [
-                                                '#ADJUNTAR_FACTURA_PDF',
-                                                'input[type="file"][name="ADJUNTAR_FACTURA_PDF"]'
-                                        ]
-                                },
-                                {
-                                        rowId: 'row-concepto-provee',
-                                        inputSelectors: ['#CONCEPTO_PROVEE']
-                                },
-                                {
-                                        rowId: 'row-adjuntar-cotizacion',
-                                        inputSelectors: [
-                                                '#ADJUNTAR_COTIZACION',
-                                                'input[type="file"][name="ADJUNTAR_COTIZACION"]'
-                                        ]
-                                },
-                                {
-                                        rowId: 'row-monto-total-cotizacion',
-                                        inputSelectors: ['#MONTO_TOTAL_COTIZACION_ADEUDO']
-                                },
-                                {
-                                        rowId: 'row-iva',
-                                        inputSelectors: ['#IVA']
-                                },
-                                {
-                                        rowId: 'row-impuestos-ret-iva',
-                                        inputSelectors: ['#TImpuestosRetenidosIVA']
-                                },
-                                {
-                                        rowId: 'row-impuestos-ret-isr',
-                                        inputSelectors: ['#TImpuestosRetenidosISR']
-                                },
-                                {
-                                        rowId: 'row-monto-propina',
-                                        inputSelectors: ['#MONTO_PROPINA']
-                                },
-                                {
-                                        rowId: 'row-impuesto-hospedaje',
-                                        inputSelectors: ['#IMPUESTO_HOSPEDAJE']
-                                },
-                                {
-                                        rowId: 'row-descuentos',
-                                        inputSelectors: ['#descuentos']
-                                },
-                                {
-                                        rowId: 'row-tipo-cambio',
-                                        inputSelectors: ['#TIPO_CAMBIOP']
-                                },
-                                {
-                                        rowId: 'row-total-en-pesos',
-                                        inputSelectors: ['#TOTAL_ENPESOS']
-                                },
-                                {
-                                        rowId: 'row-fecha-programacion-pago',
-                                        inputSelectors: ['#FECHA_DE_PAGO']
-                                },
-                                {
-                                        rowId: 'row-fecha-efectiva-pago',
-                                        inputSelectors: ['#FECHA_A_DEPOSITAR']
-                                },
-                                {
-                                        rowId: 'row-comprobante-transferencia',
-                                        inputSelectors: ['input[type="file"][name="CONPROBANTE_TRANSFERENCIA"]']
-                                },
-                                {
-                                        rowId: 'resettabla',
-                                        inputSelectors: []
-                                }
+                        const xmlRow = document.getElementById('row-adjuntar-factura-xml');
+                        const pdfRow = document.getElementById('row-adjuntar-factura-pdf');
+                        const xmlInput = document.getElementById('ADJUNTAR_FACTURA_XML');
+                        const pdfInput = document.getElementById('ADJUNTAR_FACTURA_PDF');
+                        const xmlFileInput = document.querySelector('input[type="file"][name="ADJUNTAR_FACTURA_XML"]');
+                        const pdfFileInput = document.querySelector('input[type="file"][name="ADJUNTAR_FACTURA_PDF"]');
+
+                        const inputs = [
+                                [xmlRow, xmlInput, xmlFileInput],
+                                [pdfRow, pdfInput, pdfFileInput]
                         ];
 
-                        toggleConfigurations.forEach(({ rowId, inputSelectors }) => {
-                                const row = document.getElementById(rowId);
-                                if(row) {
-                                        row.style.display = shouldHide ? 'none' : '';
+                        inputs.forEach(([row, textInput, fileInput]) => {
+                                if(textInput && !textInput.dataset.originalRequired) {
+                                        textInput.dataset.originalRequired = textInput.hasAttribute('required') ? 'true' : 'false';
                                 }
-
-                                inputSelectors.forEach(selector => {
-                                        const input = document.querySelector(selector);
-                                        if(!input) {
-                                                return;
+                                if(shouldHide) {
+                                        if(row) row.style.display = 'none';
+                                        if(textInput) {
+                                                textInput.setAttribute('disabled', 'disabled');
+                                                textInput.removeAttribute('required');
                                         }
-
-                                        if(!input.dataset.originalRequired) {
-                                                input.dataset.originalRequired = input.hasAttribute('required') ? 'true' : 'false';
+                                        if(fileInput) {
+                                                fileInput.setAttribute('disabled', 'disabled');
                                         }
-
-                                        if(shouldHide) {
-                                                if(input.dataset.originalRequired === 'true') {
-                                                        input.removeAttribute('required');
-                                                }
-                                                input.setAttribute('disabled', 'disabled');
-                                        } else {
-                                                input.removeAttribute('disabled');
-                                                if(input.dataset.originalRequired === 'true') {
-                                                        input.setAttribute('required', '');
+                                } else {
+                                        if(row) row.style.display = '';
+                                        if(textInput) {
+                                                textInput.removeAttribute('disabled');
+                                                if(textInput.dataset.originalRequired === 'true') {
+                                                        textInput.setAttribute('required', '');
                                                 }
                                         }
-                                });
+                                        if(fileInput) {
+                                                fileInput.removeAttribute('disabled');
+                                        }
+                                }
                         });
-
-                        if(typeof calcular === 'function') {
-                                calcular();
-                        }
                 }
-				
-				
-    function updateReembolsoLabels() {
-                       const select = document.querySelector('select[name="VIATICOSOPRO"]');
-                       if(!select) {
-                               return;
-                       }
-                       const value = select.value;
-                       const nombreComercialLabel = document.getElementById('label-nombre-comercial-text');
-                       const razonSocialLabel = document.getElementById('label-razon-social-text');
-                       const rfcLabel = document.getElementById('label-rfc-text');
-                       const razonSocialInput = document.querySelector('input[name="RAZON_SOCIAL"]');
-                       const rfcInput = document.querySelector('input[name="RFC_PROVEEDOR"]');
-
-                       let nombreComercialText = 'NOMBRE COMERCIAL';
-                       let razonSocialText = 'RAZÓN SOCIAL';
-                       let rfcText = 'RFC DEL PROVEEDOR:';
-                       let razonSocialPlaceholder = 'RAZÓN SOCIAL';
-                       let rfcPlaceholder = 'RFC DEL PROVEEDOR';
-
-                       if(value === 'REEMBOLSO') {
-                               nombreComercialText = 'NOMBRE COMERCIAL DEL BENEFICIARIO DEL REEMBOLSO';
-                               razonSocialText = 'RAZÓN SOCIAL DEL BENEFICIARIO DEL REEMBOLSO';
-                               rfcText = 'RFC DEL BENEFICIARIO DEL REEMBOLSO:';
-                               razonSocialPlaceholder = 'RAZÓN SOCIAL DEL BENEFICIARIO DEL REEMBOLSO';
-                               rfcPlaceholder = 'RFC DEL BENEFICIARIO DEL REEMBOLSO';
-                       } else if(value === 'VIATICOS') {
-                               nombreComercialText = 'NOMBRE COMERCIAL DEL BENEFICIARIO DEL VIATICO';
-                               razonSocialText = 'RAZÓN SOCIAL DEL BENEFICIARIO DEL VIATICO';
-                               rfcText = 'RFC DEL BENEFICIARIO DEL VIATICO:';
-                               razonSocialPlaceholder = 'RAZÓN SOCIAL DEL BENEFICIARIO DEL VIATICO';
-                               rfcPlaceholder = 'RFC DEL BENEFICIARIO DEL VIATICO';
-                       }
-
-                       if(nombreComercialLabel) {
-                               nombreComercialLabel.textContent = nombreComercialText;
-                       }
-                       if(razonSocialLabel) {
-                               razonSocialLabel.textContent = razonSocialText;
-                       }
-                       if(rfcLabel) {
-                               rfcLabel.textContent = rfcText;
-                       }
-                       if(razonSocialInput) {
-                               razonSocialInput.placeholder = razonSocialPlaceholder;
-                       }
-                       if(rfcInput) {
-                               rfcInput.placeholder = rfcPlaceholder;
-                       }
-               }
-               document.addEventListener('DOMContentLoaded', () => {
-                       toggleFacturaFields();
-                       updateReembolsoLabels();
-                       const select = document.querySelector('select[name="VIATICOSOPRO"]');
-                       if(select) {
-                               select.addEventListener('change', () => {
-                                       toggleFacturaFields();
-                                       updateReembolsoLabels();
-                               });
-                       }
-               });
+                document.addEventListener('DOMContentLoaded', () => {
+                        toggleFacturaFields();
+                        const select = document.querySelector('select[name="VIATICOSOPRO"]');
+                        if(select) {
+                                select.addEventListener('change', toggleFacturaFields);
+                        }
+                });
                 $(document).on('change', 'input[type="checkbox"]', function(e) {
                         if(this.id == "MONTO_DEPOSITAR1") {
                                 if(this.checked) $('#FECHA_AUTORIZACION_RESPONSABLE').val(this.value);
@@ -490,33 +354,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_FACTURA_PD
 
                  <tr style="background: #d2faf1"> 
 
-                                             <th scope="row">
-                                                <?php
-                               $isReembolso = ($VIATICOSOPRO == 'REEMBOLSO');
-                                               $isViaticos = ($VIATICOSOPRO == 'VIATICOS');
-                                               if($isReembolso) {
-                                                       $labelNombreComercial = 'NOMBRE COMERCIAL DEL BENEFICIARIO DEL REEMBOLSO';
-                                                       $labelRazonSocial = 'RAZÓN SOCIAL DEL BENEFICIARIO DEL REEMBOLSO';
-                                                       $labelRfc = 'RFC DEL BENEFICIARIO DEL REEMBOLSO:';
-                                                       $placeholderRazonSocial = 'RAZÓN SOCIAL DEL BENEFICIARIO DEL REEMBOLSO';
-                                                       $placeholderRfc = 'RFC DEL BENEFICIARIO DEL REEMBOLSO';
-                                               } elseif($isViaticos) {
-                                                       $labelNombreComercial = 'NOMBRE COMERCIAL DEL BENEFICIARIO DEL VIATICO';
-                                                       $labelRazonSocial = 'RAZÓN SOCIAL DEL BENEFICIARIO DEL VIATICO';
-                                                       $labelRfc = 'RFC DEL BENEFICIARIO DEL VIATICO:';
-                                                       $placeholderRazonSocial = 'RAZÓN SOCIAL DEL BENEFICIARIO DEL VIATICO';
-                                                       $placeholderRfc = 'RFC DEL BENEFICIARIO DEL VIATICO';
-                                               } else {
-                                                       $labelNombreComercial = 'NOMBRE COMERCIAL';
-                                                       $labelRazonSocial = 'RAZÓN SOCIAL';
-                                                       $labelRfc = 'RFC DEL PROVEEDOR:';
-                                                       $placeholderRazonSocial = 'RAZÓN SOCIAL';
-                                                       $placeholderRfc = 'RFC DEL PROVEEDOR';
-                                               }
-                                               ?>
-                                               <label style="width:300px" for="validationCustom03" class="form-label"><span id="label-nombre-comercial-text"><?php echo $labelNombreComercial; ?></span>
-                                                        <br><a style="color:red;font-size:11px">OBLIGATORIO</a></label>
-                                        </th>
+               <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">NOMBRE COMERCIAL<br><a style="color:red;font-size:11px">OBLIGATORIO</a></label></th>
                  <td >
 
 
@@ -616,25 +454,24 @@ if($rfcE == true){
 				 
 				 
 <tr  style="background:#fcf3cf"> 
-<th scope="row">
-                                            <label style="width:300px" for="RAZON_SOCIAL" class="form-label"><span id="label-razon-social-text"><?php echo $labelRazonSocial; ?></span></label>
-					</th>
+
+                 <th scope="row"> <label for="validationCustom03" class="form-label">RAZÓN SOCIAL</label></th>
                  <td>
 				 
 				 <div id="RAZON_SOCIAL2">
 				 
-			 <input type="text" class="form-control" id="RAZON_SOCIAL" required=""  value="<?php echo $nombreE; ?>" name="RAZON_SOCIAL" placeholder="<?php echo $placeholderRazonSocial; ?>">
+				 <input type="text" class="form-control" id="RAZON_SOCIAL" required=""  value="<?php echo $nombreE; ?>" name="RAZON_SOCIAL" placeholder="RAZÓN SOCIAL">
 				 </div>
 				 </td>
                  </tr>
                  <tr  style="background:#fcf3cf"> 
               
 
-                 <th scope="row">   <label style="width:300px" for="validationCustom03" class="form-label"><span id="label-rfc-text"><?php echo $labelRfc; ?></span></label></th>
+                 <th scope="row"> <label for="validationCustom03" class="form-label">RFC DEL PROVEEDOR:</label></th>
                  <td>
 				 
 				 <div id="RFC_PROVEEDOR2">
-		    <input type="text" class="form-control" id="RFC_PROVEEDOR"   value="<?php echo $rfcE; ?>" name="RFC_PROVEEDOR" placeholder="<?php echo $placeholderRfc; ?>">
+			 <input type="text" class="form-control" id="RFC_PROVEEDOR"   value="<?php echo $rfcE; ?>" name="RFC_PROVEEDOR" placeholder="RFC DEL PROVEEDOR">
 				 
 				 </div>
 				 </td>
@@ -724,12 +561,12 @@ var parametros = {
 				
 				 
 				 
-    <tr style="background:#fcf3cf" id="row-concepto-provee">
+    <tr style="background:#fcf3cf"> 
 
     <th scope="row"> <label for="validationCustom03" class="form-label">CONCEPTO DE LA FACTURA:</label></th>
     <td><div id="CONCEPTO_PROVEE2"><input type="text" class="form-control" id="CONCEPTO_PROVEE" required=""  value="<?php echo $Descripcion; ?>" name="CONCEPTO_PROVEE"placeholder="CONCEPTO DE LA FACTURA"></div></td>
                  </tr>
-                <tr  style="background: #d2faf1" id="row-adjuntar-cotizacion">
+                 <tr  style="background: #d2faf1" > 
              <th scope="row"> <label for="validationCustom03" class="form-label">ADJUNTAR COTIZACIÓN O REPORTE: (CUAQUIER FORMATO)</label></th>
              <td>
 
@@ -757,10 +594,10 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
              </tr>
              
 
-                <tr style="background: #d2faf1" id="row-monto-total-cotizacion">
+                 <tr style="background: #d2faf1">  
 
-                <th scope="row"> <label for="validationCustom03" class="form-label">MONTO TOTAL DE LA COTIZACIÓN O DEL ADEUDO<br><a style="color:red;font-size:11px">OBLIGATORIO</a></label></th>
-                <td>   <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text" class="form-control" id="MONTO_TOTAL_COTIZACION_ADEUDO" required=""  value="<?php echo $MONTO_TOTAL_COTIZACION_ADEUDO; ?>" name="MONTO_TOTAL_COTIZACION_ADEUDO"placeholder="MONTO TOTAL DE LA COTIZACÓN" onkeyup="comasainput('MONTO_TOTAL_COTIZACION_ADEUDO')"></td>
+                 <th scope="row"> <label for="validationCustom03" class="form-label">MONTO TOTAL DE LA COTIZACIÓN O DEL ADEUDO<br><a style="color:red;font-size:11px">OBLIGATORIO</a></label></th>
+                 <td>   <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text" class="form-control" id="validationCustom03" required=""  value="<?php echo $MONTO_TOTAL_COTIZACION_ADEUDO; ?>" name="MONTO_TOTAL_COTIZACION_ADEUDO"placeholder="MONTO TOTAL DE LA COTIZACÓN" onkeyup="comasainput('MONTO_TOTAL_COTIZACION_ADEUDO')"></td>
                  </tr> </div>
              
              
@@ -769,7 +606,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
             
 
 
-                                <tr style="background:#fcf3cf">
+            <tr style="background:#fcf3cf">
                  <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">SUB TOTAL:</label></th>
               
                  
@@ -786,7 +623,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
 				 
 				 
 				 
-                                <tr style="background:#fcf3cf" id="row-iva">
+				 <tr style="background:#fcf3cf">
 				 <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">IVA:</label></th>               				 
 				 <td> 				 
 				<div id="2IVA">			 
@@ -798,7 +635,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
 
 			 
 				 
-                <tr style="background:#fcf3cf" id="row-impuestos-ret-iva">
+			<tr style="background:#fcf3cf">
             <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">IMPUESTOS RETENIDOS &nbsp;<a style="color:red;font:12px">(IVA)</a></label></th>               				 
 				 <td> 				 
 				<div id="2TImpuestosRetenidosIVA">			 
@@ -807,7 +644,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
 				</div></div>
 				 </td>
                  </tr>
-                                     <tr style="background:#fcf3cf" id="row-impuestos-ret-isr">
+				<tr style="background:#fcf3cf">
             <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">IMPUESTOS RETENIDOS &nbsp;<a style="color:red;font:12px">(ISR)</a></label></th>               				 
 				 <td> 				 
 				<div id="2TImpuestosRetenidosISR">			 
@@ -817,7 +654,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
 				 </td>
                  </tr>
 				 
-                 <tr style="background:#fcf3cf" id="row-monto-propina">
+                 <tr style="background:#fcf3cf">
 
                  <th scope="row"> <label   for="validationCustom03" class="form-label"><a style="color:red;font:12px">FAVOR DE PONER EL:&nbsp;</a>MONTO DE LA PROPINA O <br>SERVICIO ESTÉ INCLUIDO O NO EN LA FACTURA</label></th>
                
@@ -828,13 +665,13 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
                  </tr>
 				 
 				 
-                 <tr style="background: #d2faf1" id="row-impuesto-hospedaje">
+                 <tr style="background: #d2faf1">           
                  <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label"><a style="color:red;font:12px">FAVOR DE PONER EL:&nbsp;</a> IMPUESTO SOBRE <BR>HOSPEDAJE MÁS EL IMPUESTO DE SANEAMIENTO:</label></th>			
      				 <td> <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text"  style="width:300px;height:40px;" onkeyup="calcular()" id="IMPUESTO_HOSPEDAJE" required=""    value="<?php echo $IMPUESTO_HOSPEDAJE; ?>" name="IMPUESTO_HOSPEDAJE" class="total" placeholder="IMPUESTO SOBRE HOSPEDAJE"></td>
 				 </div></div>
 				 </td>
                  </tr>
-                        <tr style="background:#fcf3cf" id="row-descuentos">
+			<tr style="background:#fcf3cf">
             <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">DESCUENTO:</label></th>               				 
 				 <td> 				 
 				<div id="2descuentos">			 
@@ -884,22 +721,22 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
 
              </tr>
 				 
-				     <tr style="background:#fcf3cf" id="row-tipo-cambio">				 
+				     <tr style="background:#fcf3cf">				 
                  <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">TIPO DE CAMBIO:</label></th>
              			
 				 <td>
-            <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text" style="width:300px;height:40px;"  value="<?php echo $TIPO_CAMBIOP; ?>" name="TIPO_CAMBIOP" id="TIPO_CAMBIOP" onkeyup="comasainput2('TIPO_CAMBIOP')"  placeholder="TIPO DE CAMBIO" >
+             <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text" style="width:300px;height:40px;"  value="<?php echo $TIPO_CAMBIOP; ?>" name="TIPO_CAMBIOP" onkeyup="comasainput2('TIPO_CAMBIOP')"  placeholder="TIPO DE CAMBIO" >
 				 </div>
  </td>
 				 </tr>
-                                     <tr style="background:#fcf3cf" id="row-total-en-pesos">
+				     <tr style="background:#fcf3cf">				 
 				 <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">TOTAL DE LA CONVERSIÓN:</label></th>
              
                 
 				 
 			
 				 <td>
-            <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text" style="width:300px;height:40px;"  value="<?php echo $TOTAL_ENPESOS; ?>" name="TOTAL_ENPESOS" id="TOTAL_ENPESOS" onkeyup="comasainput2('TOTAL_ENPESOS')"  placeholder="TOTAL DE LA CONVERSIÓN" >
+             <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text" style="width:300px;height:40px;"  value="<?php echo $TOTAL_ENPESOS; ?>" name="TOTAL_ENPESOS" onkeyup="comasainput2('TOTAL_ENPESOS')"  placeholder="TOTAL DE LA CONVERSIÓN" >
 				 </div>
  </td>
 				 </tr>
@@ -959,15 +796,15 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
         </td>
 
         </tr>
-                 <tr style="background:#fcf3cf" id="row-fecha-programacion-pago">
+                 <tr style="background:#fcf3cf"> 
 
                  <th scope="row"> <label for="validationCustom03" class="form-label">FECHA DE PROGRAMACIÓN DEL PAGO:</label></th>
-                 <td>		 <div id="FECHA_DE_PAGO2"><input type="date" class="form-control" id="FECHA_DE_PAGO" required=""  value="<?php echo $FECHA_DE_PAGO; ?>" name="FECHA_DE_PAGO" placeholder="FECHA DE PAGO" ></div></td>
+                 <td>		 <div id="FECHA_DE_PAGO2"><input type="date" class="form-control" id="validationCustom03" required=""  value="<?php echo $FECHA_DE_PAGO; ?>" name="FECHA_DE_PAGO" placeholder="FECHA DE PAGO" ></div></td>
             </tr>
-                 <tr style="background:#fcf3cf" id="row-fecha-efectiva-pago"> 
+                 <tr style="background:#fcf3cf"> 
 
                  <th scope="row"> <label for="validationCustom03" class="form-label">FECHA EFECTIVA DE PAGO:</label></th>
-                 <td><input type="date" class="form-control" id="FECHA_A_DEPOSITAR" required=""  value="<?php echo $FECHA_A_DEPOSITAR; ?>" name="FECHA_A_DEPOSITAR" placeholder="FECHA A DEPOSITAR" readonly="readonly"></td>
+                 <td><input type="date" class="form-control" id="validationCustom03" required=""  value="<?php echo $FECHA_A_DEPOSITAR; ?>" name="FECHA_A_DEPOSITAR" placeholder="FECHA A DEPOSITAR" readonly="readonly"></td>
                  </tr>
 
                  <tr style="background: #d2faf1" > 
@@ -985,7 +822,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
                  <th scope="row"> <label for="validationCustom03" class="form-label">OBSERVACIONES:</label></th>
                  <td style="background: #ee5330" ><input type="text" class="form-control" id="validationCustom03" required=""  value="<?php echo $OBSERVACIONES_1; ?>" name="OBSERVACIONES_1"placeholder="OBSERVACIONES "></td>
                  </tr>
-                 <tr  style="background: #d2faf1" id="row-comprobante-transferencia">
+                 <tr  style="background: #d2faf1" >
 
 <th scope="row"> <label for="validationCustom03" class="form-label">ADJUNTAR COMPROBANTE DE TRANSFERENCIA: (FORMATO PDF)</label></th>
 <td>
@@ -1130,7 +967,7 @@ echo $encabezadoA.$option2.'</select>';
 <BR/>
 
 				       
-            <table  style="border-collapse:collapse;" border="1";  class="table mb-0 table-striped" id="resettabla">
+                           <table  style="border-collapse:collapse;" border="1";  class="table mb-0 table-striped" id="resettabla">
 	
 
                     <tr>
@@ -1337,6 +1174,7 @@ echo $encabezadoA.$option2.'</select>';
                  </tr></table><table>
              
   <tr>
+
    <td style="text-align:left;"><button  class="btn btn-primary" type="button" onclick="history.back();" >REGRESAR AL EVENTO</button></td>
 
    <?php if($conexion->variablespermisos('','VENTAS_Y_OPERACIONES','guardar')=='si'){ ?>	 
@@ -1366,8 +1204,7 @@ echo $encabezadoA.$option2.'</select>';
     1px 30px 60px rgba(16,16,16,0.4);"  id="mensajeventasoperaciones">  <?php } ?>  
 			        		 
  
-        </td>
-		
+     
 		
 		</tr>               
 			 
@@ -1382,4 +1219,6 @@ echo $encabezadoA.$option2.'</select>';
 </div>
 
 </div> 					  
-</div>	
+			  
+				  
+
