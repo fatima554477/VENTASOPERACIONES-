@@ -82,52 +82,127 @@ fecha fatis : 01/MAYO/2025
                                 'REEMBOLSO',
                                 'PAGO A PROVEEDOR CON DOS O MAS FACTURAS'
                         ].includes(select.value);
-                        const xmlRow = document.getElementById('row-adjuntar-factura-xml');
-                        const pdfRow = document.getElementById('row-adjuntar-factura-pdf');
-                        const xmlInput = document.getElementById('ADJUNTAR_FACTURA_XML');
-                        const pdfInput = document.getElementById('ADJUNTAR_FACTURA_PDF');
-                        const xmlFileInput = document.querySelector('input[type="file"][name="ADJUNTAR_FACTURA_XML"]');
-                        const pdfFileInput = document.querySelector('input[type="file"][name="ADJUNTAR_FACTURA_PDF"]');
-
-                        const inputs = [
-                                [xmlRow, xmlInput, xmlFileInput],
-                                [pdfRow, pdfInput, pdfFileInput]
+           const toggleableItems = [
+                                {
+                                        element: document.getElementById('row-adjuntar-factura-xml'),
+                                        inputs: [
+                                                document.getElementById('ADJUNTAR_FACTURA_XML'),
+                                                document.querySelector('input[type="file"][name="ADJUNTAR_FACTURA_XML"]')
+                                        ]
+                                },
+                                {
+                                        element: document.getElementById('row-adjuntar-factura-pdf'),
+                                        inputs: [
+                                                document.getElementById('ADJUNTAR_FACTURA_PDF'),
+                                                document.querySelector('input[type="file"][name="ADJUNTAR_FACTURA_PDF"]')
+                                        ]
+                                },
+                                {
+                                        element: document.getElementById('row-iva'),
+                                        inputs: [document.getElementById('IVA')]
+                                },
+                                {
+                                        element: document.getElementById('row-ret-iva'),
+                                        inputs: [document.getElementById('TImpuestosRetenidosIVA')]
+                                },
+                                {
+                                        element: document.getElementById('row-ret-isr'),
+                                        inputs: [document.getElementById('TImpuestosRetenidosISR')]
+                                },
+                                {
+                                        element: document.getElementById('row-monto-propina'),
+                                        inputs: [document.getElementById('MONTO_PROPINA')]
+                                },
+                                {
+                                        element: document.getElementById('row-imp-hospedaje'),
+                                        inputs: [document.getElementById('IMPUESTO_HOSPEDAJE')]
+                                },
+                                {
+                                        element: document.getElementById('row-descuentos'),
+                                        inputs: [document.getElementById('descuentos')]
+                                },
+                                {
+                                        element: document.getElementById('row-tipo-cambio'),
+                                        inputs: [document.getElementById('TIPO_CAMBIOP')]
+                                },
+                                {
+                                        element: document.getElementById('row-total-en-pesos'),
+                                        inputs: [document.getElementById('TOTAL_ENPESOS')]
+                                }
                         ];
 
-                        inputs.forEach(([row, textInput, fileInput]) => {
-                                if(textInput && !textInput.dataset.originalRequired) {
-                                        textInput.dataset.originalRequired = textInput.hasAttribute('required') ? 'true' : 'false';
+                        toggleableItems.forEach(({element, inputs = []}) => {
+                                if(!element) {
+                                        return;
                                 }
+                                inputs.forEach(input => {
+                                        if(input && !input.dataset.originalRequired) {
+                                                input.dataset.originalRequired = input.hasAttribute('required') ? 'true' : 'false';
+                                        }
+                                });
+
                                 if(shouldHide) {
-                                        if(row) row.style.display = 'none';
-                                        if(textInput) {
-                                                textInput.setAttribute('disabled', 'disabled');
-                                                textInput.removeAttribute('required');
-                                        }
-                                        if(fileInput) {
-                                                fileInput.setAttribute('disabled', 'disabled');
-                                        }
+                                        element.style.display = 'none';
                                 } else {
-                                        if(row) row.style.display = '';
-                                        if(textInput) {
-                                                textInput.removeAttribute('disabled');
-                                                if(textInput.dataset.originalRequired === 'true') {
-                                                        textInput.setAttribute('required', '');
+                                        element.style.display = '';
+                                }
+
+                                inputs.forEach(input => {
+                                        if(!input) {
+                                                return;
+                                        }
+                                        if(shouldHide) {
+                                                input.setAttribute('disabled', 'disabled');
+                                                input.removeAttribute('required');
+                                        } else {
+                                                input.removeAttribute('disabled');
+                                                if(input.dataset.originalRequired === 'true') {
+                                                        input.setAttribute('required', '');
                                                 }
                                         }
-                                        if(fileInput) {
-                                                fileInput.removeAttribute('disabled');
-                                        }
-                                }
+                                });
                         });
+
+                        const resetTable = document.getElementById('resettabla');
+                        if(resetTable) {
+                                const tableFields = resetTable.querySelectorAll('input, select, textarea');
+                                tableFields.forEach(field => {
+                                        if(!field.dataset.originalRequired) {
+                                                field.dataset.originalRequired = field.hasAttribute('required') ? 'true' : 'false';
+                                        }
+                                        if(shouldHide) {
+                                                field.setAttribute('disabled', 'disabled');
+                                                field.removeAttribute('required');
+                                        } else {
+                                                field.removeAttribute('disabled');
+                                                if(field.dataset.originalRequired === 'true') {
+                                                        field.setAttribute('required', '');
+                                                }
+                                        }
+                                });
+                                resetTable.style.display = shouldHide ? 'none' : '';
+                        }
                 }
                 document.addEventListener('DOMContentLoaded', () => {
+
                         toggleFacturaFields();
+
                         const select = document.querySelector('select[name="VIATICOSOPRO"]');
+
                         if(select) {
+
                                 select.addEventListener('change', toggleFacturaFields);
+
                         }
+
                 });
+
+				
+				
+				
+				
+				
+//////////////////////////////////////////////////////////////////////////////////////////////////////////				
                 $(document).on('change', 'input[type="checkbox"]', function(e) {
                         if(this.id == "MONTO_DEPOSITAR1") {
                                 if(this.checked) $('#FECHA_AUTORIZACION_RESPONSABLE').val(this.value);
@@ -135,6 +210,8 @@ fecha fatis : 01/MAYO/2025
                         }
 			
 		});
+		
+		
 		$(document).on('change', 'input[type="checkbox"]', function(e) {
 			if(this.id == "MONTO_DEPOSITAR2") {
 				if(this.checked) $('#FECHA_AUTORIZACION_AUDITORIA').val(this.value);
@@ -483,7 +560,7 @@ if($rfcE == true){
                  <th scope="row"> <label for="validationCustom03" class="form-label">MOTIVO DEL GASTO:</label></th>
                  <td><input type="text" class="form-control" id="validationCustom03" required=""  value="<?php echo $MOTIVO_GASTO; ?>" name="MOTIVO_GASTO"placeholder="MOTIVO DEL GASTO "></td>
                  </tr>
-                 <tr style="background: #d2faf1">
+    <tr style="background:#fcf3cf">
 
                                  <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">No. DE EVENTO<br><a style="color:red;font-size:11px">OBLIGATORIO</a></label></th>
                  <td>
@@ -623,7 +700,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
 				 
 				 
 				 
-				 <tr style="background:#fcf3cf">
+				       <tr id="row-iva" style="background:#fcf3cf">
 				 <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">IVA:</label></th>               				 
 				 <td> 				 
 				<div id="2IVA">			 
@@ -635,7 +712,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
 
 			 
 				 
-			<tr style="background:#fcf3cf">
+			  <tr id="row-ret-iva" style="background:#fcf3cf">
             <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">IMPUESTOS RETENIDOS &nbsp;<a style="color:red;font:12px">(IVA)</a></label></th>               				 
 				 <td> 				 
 				<div id="2TImpuestosRetenidosIVA">			 
@@ -644,7 +721,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
 				</div></div>
 				 </td>
                  </tr>
-				<tr style="background:#fcf3cf">
+				 <tr id="row-ret-isr" style="background:#fcf3cf">
             <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">IMPUESTOS RETENIDOS &nbsp;<a style="color:red;font:12px">(ISR)</a></label></th>               				 
 				 <td> 				 
 				<div id="2TImpuestosRetenidosISR">			 
@@ -654,7 +731,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
 				 </td>
                  </tr>
 				 
-                 <tr style="background:#fcf3cf">
+                 <tr id="row-monto-propina" style="background:#fcf3cf">
 
                  <th scope="row"> <label   for="validationCustom03" class="form-label"><a style="color:red;font:12px">FAVOR DE PONER EL:&nbsp;</a>MONTO DE LA PROPINA O <br>SERVICIO ESTÉ INCLUIDO O NO EN LA FACTURA</label></th>
                
@@ -665,13 +742,14 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
                  </tr>
 				 
 				 
-                 <tr style="background: #d2faf1">           
+               <tr id="row-imp-hospedaje" style="background: #d2faf1">
+         
                  <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label"><a style="color:red;font:12px">FAVOR DE PONER EL:&nbsp;</a> IMPUESTO SOBRE <BR>HOSPEDAJE MÁS EL IMPUESTO DE SANEAMIENTO:</label></th>			
      				 <td> <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text"  style="width:300px;height:40px;" onkeyup="calcular()" id="IMPUESTO_HOSPEDAJE" required=""    value="<?php echo $IMPUESTO_HOSPEDAJE; ?>" name="IMPUESTO_HOSPEDAJE" class="total" placeholder="IMPUESTO SOBRE HOSPEDAJE"></td>
 				 </div></div>
 				 </td>
                  </tr>
-			<tr style="background:#fcf3cf">
+			  <tr id="row-descuentos" style="background:#fcf3cf">
             <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">DESCUENTO:</label></th>               				 
 				 <td> 				 
 				<div id="2descuentos">			 
@@ -721,22 +799,22 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
 
              </tr>
 				 
-				     <tr style="background:#fcf3cf">				 
+				     <tr id="row-tipo-cambio" style="background:#fcf3cf">				 
                  <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">TIPO DE CAMBIO:</label></th>
              			
 				 <td>
-             <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text" style="width:300px;height:40px;"  value="<?php echo $TIPO_CAMBIOP; ?>" name="TIPO_CAMBIOP" onkeyup="comasainput2('TIPO_CAMBIOP')"  placeholder="TIPO DE CAMBIO" >
+             <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text" id="TIPO_CAMBIOP"style="width:300px;height:40px;"  value="<?php echo $TIPO_CAMBIOP; ?>" name="TIPO_CAMBIOP" onkeyup="comasainput2('TIPO_CAMBIOP')"  placeholder="TIPO DE CAMBIO" >
 				 </div>
  </td>
 				 </tr>
-				     <tr style="background:#fcf3cf">				 
+				     <tr id="row-total-en-pesos" style="background:#fcf3cf">			 
 				 <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">TOTAL DE LA CONVERSIÓN:</label></th>
              
                 
 				 
 			
 				 <td>
-             <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text" style="width:300px;height:40px;"  value="<?php echo $TOTAL_ENPESOS; ?>" name="TOTAL_ENPESOS" onkeyup="comasainput2('TOTAL_ENPESOS')"  placeholder="TOTAL DE LA CONVERSIÓN" >
+             <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text" style="width:300px;height:40px;" id="TOTAL_ENPESOS"  value="<?php echo $TOTAL_ENPESOS; ?>" name="TOTAL_ENPESOS" onkeyup="comasainput2('TOTAL_ENPESOS')"  placeholder="TOTAL DE LA CONVERSIÓN" >
 				 </div>
  </td>
 				 </tr>
@@ -970,7 +1048,7 @@ echo $encabezadoA.$option2.'</select>';
                            <table  style="border-collapse:collapse;" border="1";  class="table mb-0 table-striped" id="resettabla">
 	
 
-                    <tr>
+                    <tr  id="resettabla">
                     <th scope="col">FACTURA</th>
                     <th  scope="col">DATOS DE LA FACTURA</th>
                     </tr>
