@@ -150,7 +150,7 @@ $actualiza = isset($_POST["actualiza"])?$_POST["actualiza"]:"";
 	}
 	
 	
-if($NOMBRE_COMERCIAL == "" OR $NUMERO_EVENTO == "" OR $MONTO_TOTAL_COTIZACION_ADEUDO == ""){
+if($NOMBRE_COMERCIAL == "" OR $NUMERO_EVENTO == "" ){
 	echo "<P style='color:red; font-size:23px;'>FAVOR DE LLENAR CAMPOS OBLIGATORIOS</p>";
 }else{	
 	

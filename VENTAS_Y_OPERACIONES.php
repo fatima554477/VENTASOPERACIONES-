@@ -163,7 +163,7 @@ fecha fatis : 01/MAYO/2025
                                 });
                         });
 
-                        const resetTable = document.getElementById('resettabla');
+                       const resetTable = document.getElementById('resettabla');
                         if(resetTable) {
                                 const tableFields = resetTable.querySelectorAll('input, select, textarea');
                                 tableFields.forEach(field => {
@@ -178,11 +178,53 @@ fecha fatis : 01/MAYO/2025
                                                 if(field.dataset.originalRequired === 'true') {
                                                         field.setAttribute('required', '');
                                                 }
-                                        }
+												
+												
+                  }
                                 });
                                 resetTable.style.display = shouldHide ? 'none' : '';
                         }
+
+                        const nombreLabelSpan = document.getElementById('label-nombre-comercial-text');
+                        const rfcLabelSpan = document.getElementById('label-rfc-proveedor-text');
+                        const rfcInput = document.getElementById('RFC_PROVEEDOR');
+
+                        if(nombreLabelSpan && !nombreLabelSpan.dataset.defaultText) {
+                                nombreLabelSpan.dataset.defaultText = nombreLabelSpan.textContent.trim();
+                        }
+                        if(rfcLabelSpan && !rfcLabelSpan.dataset.defaultText) {
+                                rfcLabelSpan.dataset.defaultText = rfcLabelSpan.textContent.trim();
+                        }
+                        if(rfcInput && !rfcInput.dataset.defaultPlaceholder) {
+                                rfcInput.dataset.defaultPlaceholder = rfcInput.getAttribute('placeholder') || '';
+                        }
+
+                        let nombreLabelText = nombreLabelSpan ? nombreLabelSpan.dataset.defaultText : '';
+                        let rfcLabelText = rfcLabelSpan ? rfcLabelSpan.dataset.defaultText : '';
+                        let rfcPlaceholder = rfcInput ? rfcInput.dataset.defaultPlaceholder : '';
+
+                        if(select.value === 'REEMBOLSO') {
+                                nombreLabelText = 'NOMBRE DEL BENEFICIARIO DEL REEMBOLSO';
+                                rfcLabelText = 'RFC DEL BENEFICIARIO DEL REEMBOLSO';
+                                rfcPlaceholder = 'RFC DEL BENEFICIARIO DEL REEMBOLSO';
+                        } else if(select.value === 'VIATICOS') {
+                                nombreLabelText = 'NOMBRE DEL BENEFICIARIO DEL VIATICO';
+                                rfcLabelText = 'RFC DEL BENEFICIARIO DEL VIATICO';
+                                rfcPlaceholder = 'RFC DEL BENEFICIARIO DEL VIATICO';
+                        }
+
+                        if(nombreLabelSpan) {
+                                nombreLabelSpan.textContent = nombreLabelText;
+                        }
+                        if(rfcLabelSpan) {
+                                rfcLabelSpan.textContent = rfcLabelText;
+                        }
+                        if(rfcInput) {
+                                rfcInput.setAttribute('placeholder', rfcPlaceholder);
+                        }
                 }
+				
+				
                 document.addEventListener('DOMContentLoaded', () => {
 
                         toggleFacturaFields();
@@ -258,24 +300,32 @@ fecha fatis : 01/MAYO/2025
                  
                   
                  <table class="table table-striped table-bordered"  >
-				 				  <tr style="width:300px;background:#ebf8fa">
-    <th scope="row"> <label  style="width:300px;text-align:left"  for="validationCustom03" class="form-label"> PAGO A PROVEEDOR , VIÁTICO O REEMBOLSO<br><a style="color:red;font-size:11px">OBLIGATORIO</a></label></th>
-                
-      
-             
-                <td>
-				<select class="form-select mb-3" aria-label="Default select example" id="validationCustom02" required="" name="VIATICOSOPRO"> >
-               
- <option style="background:#fac3aa" value="PAGO A PROVEEDOR" <?php if($VIATICOSOPRO=='PAGO A PROVEEDOR'){echo "selected";} ?>>PAGO A PROVEEDOR </option>
-<option style="background:#f571f7" value="PAGO A PROVEEDOR CON DOS O MAS FACTURAS" <?php if($VIATICOSOPRO=='PAGO A PROVEEDOR CON DOS O MAS FACTURAS'){echo "selected";} ?>>SOLICITUD DE PAGO A PROVEEDOR CON DOS O MÁS FACTURAS</option>
-<option style="background:#b3f39b" value="PAGOS CON UNA SOLA FACTURA" <?php if($VIATICOSOPRO=='PAGOS CON UNA SOLA FACTURA' ){echo "selected";} ?>>SOLICITUD DE PAGOS CON UNA SOLA FACTURA</option>
-<option style="background:#faf7aa" value="VIATICOS" <?php if($VIATICOSOPRO=='VIATICOS'){echo "selected";} ?>>SOLICITUD DE VIATICOS</option>
-<option style="background:#c0c7f6" value="REEMBOLSO" <?php if($VIATICOSOPRO=='REEMBOLSO'){echo "selected";} ?>>SOLICITUD DE REEMBOLSO</option>
-
-				</select> 
-			</td>
-		</div> 
-	</tr>
+							<tr style="width:300px;background:#d2faf1">
+				
+								<th scope="row">
+									<label  for="validationCustom03" class="form-label"> PAGO A PROVEEDOR, VIÁTICO, REEMBOLSO,   etc.
+										</label>
+								</th>
+								<td>
+									<select class="form-select mb-3" aria-label="Default select example" id="validationCustom02" required="" name="VIATICOSOPRO"> 
+						<option style="background:#fac3aa" value="PAGO A PROVEEDOR" <?php if($VIATICOSOPRO=='PAGOAPROVE' ){echo "selected";} ?>>SOLICITUD DE UN SOLO PAGO CON UNA SOLA FACTURA </option>
+						<option style="background:#faf7aa" value="VIATICOS" <?php if($VIATICOSOPRO=='VIATICOS' ){echo "selected";} ?>>SOLICITUD DE VIATICOS</option>
+						<option style="background:#c0c7f6" value="REEMBOLSO" <?php if($VIATICOSOPRO=='REEMBOLSO' ){echo "selected";} ?>>SOLICITUD DE REEMBOLSO</option>
+					
+						
+						
+						<option style="background:#f571f7" value="PAGO A PROVEEDOR CON DOS O MAS FACTURAS" <?php if($VIATICOSOPRO=='PAGO A PROVEEDOR CON DOS O MAS FACTURAS' ){echo "selected";} ?>>SOLICITUD DE UN SOLO PAGO  CON DOS O MÁS FACTURAS</option>
+							<option style="background:#b3f39b" value="PAGOS CON UNA SOLA FACTURA" <?php if($VIATICOSOPRO=='PAGOS CON UNA SOLA FACTURA' ){echo "selected";} ?>>SOLICITUD DE VARIOS PAGOS CON UNA SOLA FACTURA</option>
+                       
+						
+						
+						
+										
+										
+									</select>
+								</td>
+				</div>
+				</tr>
 
                
                 <tr style="background: #d2faf1" id="row-adjuntar-factura-xml">
@@ -421,7 +471,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_FACTURA_PD
 
                  <tr  style="background:#fcf3cf"> 
 
-                 <th scope="row"> <label for="validationCustom03" class="form-label">NÚMERO CONSECUTIVO DE PAGO A PROVEEDORES</label></th>
+                 <th scope="row"> <label for="validationCustom03" class="form-label">NÚMERO DE SOLICITUD</label></th>
                  <td> <div id="NUMERO_CONSECUTIVO_PROVEE2"><input type="text" class="form-control" id="NUMERO_CONSECUTIVO_PROVEE" required=""  value="<?php echo $NUMERO_CONSECUTIVO_PROVEE; ?>" name="NUMERO_CONSECUTIVO_PROVEE" placeholder="NÚMERO CONSECUTIVO DE PAGO A PROVEEDORES" readonly="readonly"></div></td>
                  </tr>
 				 
@@ -430,8 +480,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_FACTURA_PD
 				  <input type="hidden" name="ID_RELACIONADO" value="NUMERO_CONSECUTIVO_PROVEE">
 
                  <tr style="background: #d2faf1"> 
-
-               <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">NOMBRE COMERCIAL<br><a style="color:red;font-size:11px">OBLIGATORIO</a></label></th>
+            <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label"><span id="label-nombre-comercial-text">NOMBRE COMERCIAL</span><br><a style="color:red;font-size:11px">OBLIGATORIO</a></label></th>
                  <td >
 
 
@@ -544,11 +593,11 @@ if($rfcE == true){
                  <tr  style="background:#fcf3cf"> 
               
 
-                 <th scope="row"> <label for="validationCustom03" class="form-label">RFC DEL PROVEEDOR:</label></th>
-                 <td>
-				 
-				 <div id="RFC_PROVEEDOR2">
-			 <input type="text" class="form-control" id="RFC_PROVEEDOR"   value="<?php echo $rfcE; ?>" name="RFC_PROVEEDOR" placeholder="RFC DEL PROVEEDOR">
+               <th scope="row"> <label for="validationCustom03" class="form-label"><span id="label-rfc-proveedor-text">RFC DEL PROVEEDOR</span>:</label></th>
+                 <td>␊
+
+                                 <div id="RFC_PROVEEDOR2">
+                        <input type="text" class="form-control" id="RFC_PROVEEDOR"   value="<?php echo $rfcE; ?>" name="RFC_PROVEEDOR" placeholder="RFC DEL PROVEEDOR">
 				 
 				 </div>
 				 </td>
@@ -980,7 +1029,7 @@ $select='selected';
 }
 
 $option2 .= '<option style="background: #'.$fondos[$num].'" '.$select.' 
-value="'.$row['NOMBRE_1'].' '.$row['APELLIDO_PATERNO'].' '.$row['APELLIDO_MATERNO'].'">'.$row['NOMBRE_1'].' '.$row['APELLIDO_PATERNO'].' '.$row['APELLIDO_MATERNO'].
+value="'.$row['NOMBRE_1'].' '.$row['NOMBRE_2'].' '.$row['APELLIDO_PATERNO'].' '.$row['APELLIDO_MATERNO'].'">'.$row['NOMBRE_1'].' '.$row['NOMBRE_2'].' '.$row['APELLIDO_PATERNO'].' '.$row['APELLIDO_MATERNO'].
 '</option>';
 }
 echo $encabezadoA.$option2.'</select>';		

@@ -682,7 +682,7 @@ $('#mensajeDATOSBANCARIOS1').html("<span id='ACTUALIZADO' >"+data+"</span>");
 			$('#target2').hide("linear");
 			$('#target3').hide("linear");
 			$('#target4').hide("linear");
-			$('#target5').hide("linear");
+			$('#target5').show("linear");
 			$('#target6').hide("linear");
 			$('#target7').hide("linear");
 			$('#target8').hide("linear");
