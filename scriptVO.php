@@ -233,9 +233,9 @@ $.ajax({
                			
 
 	        $("#ventasoperacionesform")[0].reset(); //resetea formulario
-			$("#RAZON_SOCIAL").val(''); //borra valores vienen de PHP
+			$("#RAZON_SOCIAL2").val(''); //borra valores vienen de PHP
 			$("#CONCEPTO_PROVEE").val(''); //borra valores vienen de PHP
-			$("#RFC_PROVEEDOR").val(''); //borra valores vienen de PHP
+			$("#RFC_PROVEEDOR2").val(''); //borra valores vienen de PHP
 			$("#TIPO_DE_MONEDA").val(''); //borra valores vienen de PHP
 			$("#FECHA_DE_PAGO").val(''); //borra valores vienen de PHP
 			$("#NUMERO_CONSECUTIVO_PROVEE").val(''); //borra valores vienen de PHP
@@ -276,6 +276,7 @@ $.ajax({
 			$('#TImpuestosRetenidosISR').load(location.href + ' #TImpuestosRetenidosISR');
 			$('#2descuentos').load(location.href + ' #2descuentos');
 			$('#descuentos').load(location.href + ' #descuentos');
+
 
 //NOMBRE_COMERCIAL
 			$('#NOMBRE_COMERCIAL').empty().trigger("change");

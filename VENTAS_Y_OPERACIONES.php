@@ -586,18 +586,18 @@ if($rfcE == true){
 				 
 				 <div id="RAZON_SOCIAL2">
 				 
-				 <input type="text" class="form-control" id="RAZON_SOCIAL" required=""  value="<?php echo $nombreE; ?>" name="RAZON_SOCIAL" placeholder="RAZÓN SOCIAL">
+				 <input type="text" class="form-control"  required=""  value="<?php echo $nombreE; ?>" name="RAZON_SOCIAL" placeholder="RAZÓN SOCIAL">
 				 </div>
 				 </td>
                  </tr>
                  <tr  style="background:#fcf3cf"> 
               
 
-               <th scope="row"> <label for="validationCustom03" class="form-label"><span id="label-rfc-proveedor-text">RFC DEL PROVEEDOR</span>:</label></th>
-                 <td>␊
+               <th scope="row"> <label for="validationCustom03" class="form-label">RFC DEL PROVEEDOR:</label></th>
+                 <td>
 
                                  <div id="RFC_PROVEEDOR2">
-                        <input type="text" class="form-control" id="RFC_PROVEEDOR"   value="<?php echo $rfcE; ?>" name="RFC_PROVEEDOR" placeholder="RFC DEL PROVEEDOR">
+                        <input type="text" class="form-control"   value="<?php echo $rfcE; ?>" name="RFC_PROVEEDOR" placeholder="RFC DEL PROVEEDOR">
 				 
 				 </div>
 				 </td>
@@ -1094,10 +1094,10 @@ echo $encabezadoA.$option2.'</select>';
 <BR/>
 
 				       
-                           <table  style="border-collapse:collapse;" border="1";  class="table mb-0 table-striped" id="resettabla">
+             <table  style="border-collapse:collapse;" border="1";  class="table mb-0 table-striped" id="resettabla">
 	
 
-                    <tr  id="resettabla">
+                    <tr  >
                     <th scope="col">FACTURA</th>
                     <th  scope="col">DATOS DE LA FACTURA</th>
                     </tr>
