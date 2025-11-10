@@ -480,7 +480,8 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_FACTURA_PD
 				  <input type="hidden" name="ID_RELACIONADO" value="NUMERO_CONSECUTIVO_PROVEE">
 
                  <tr style="background: #d2faf1"> 
-            <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label"><span id="label-nombre-comercial-text">NOMBRE COMERCIAL</span><br><a style="color:red;font-size:11px">OBLIGATORIO</a></label></th>
+  <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label"><span 
+  id="label-nombre-comercial-text">NOMBRE COMERCIAL</span><br><a style="color:red;font-size:11px">OBLIGATORIO</a></label></th>
                  <td >
 
 
@@ -579,25 +580,25 @@ if($rfcE == true){
                  </tr>
 				 
 				 
-<tr  style="background:#fcf3cf"> 
+                 <tr  style="background:#fcf3cf"> 
 
                  <th scope="row"> <label for="validationCustom03" class="form-label">RAZÓN SOCIAL</label></th>
                  <td>
 				 
 				 <div id="RAZON_SOCIAL2">
 				 
-				 <input type="text" class="form-control"  required=""  value="<?php echo $nombreE; ?>" name="RAZON_SOCIAL" placeholder="RAZÓN SOCIAL">
+				 <input type="text" class="form-control" id="RAZON_SOCIAL" required=""  value="<?php echo $nombreE; ?>" name="RAZON_SOCIAL" placeholder="RAZÓN SOCIAL">
 				 </div>
 				 </td>
                  </tr>
                  <tr  style="background:#fcf3cf"> 
               
 
-               <th scope="row"> <label for="validationCustom03" class="form-label">RFC DEL PROVEEDOR:</label></th>
+               <th scope="row"> <label for="validationCustom03" class="form-label"><span id="label-rfc-proveedor-text">RFC DEL PROVEEDOR</span>:</label></th>
                  <td>
 
-                                 <div id="RFC_PROVEEDOR2">
-                        <input type="text" class="form-control"   value="<?php echo $rfcE; ?>" name="RFC_PROVEEDOR" placeholder="RFC DEL PROVEEDOR">
+            <div id="RFC_PROVEEDOR2">
+            <input type="text" class="form-control" id="RFC_PROVEEDOR"   value="<?php echo $rfcE; ?>" name="RFC_PROVEEDOR" placeholder="RFC DEL PROVEEDOR">
 				 
 				 </div>
 				 </td>
@@ -947,7 +948,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
                  <tr  style="background: #d2faf1"> 
 
                  <th scope="row"> <label for="validationCustom03" class="form-label">OBSERVACIONES:</label></th>
-                 <td style="background: #ee5330" ><input type="text" class="form-control" id="validationCustom03" required=""  value="<?php echo $OBSERVACIONES_1; ?>" name="OBSERVACIONES_1"placeholder="OBSERVACIONES "></td>
+                 <td style="background: #ee5330" ><input type="text" class="form-control" id="OBSERVACIONES_1" required=""  value="<?php echo $OBSERVACIONES_1; ?>" name="OBSERVACIONES_1"placeholder="OBSERVACIONES "></td>
                  </tr>
                  <tr  style="background: #d2faf1" >
 
@@ -1094,10 +1095,10 @@ echo $encabezadoA.$option2.'</select>';
 <BR/>
 
 				       
-             <table  style="border-collapse:collapse;" border="1";  class="table mb-0 table-striped" id="resettabla">
+                           <table  style="border-collapse:collapse;" border="1";  class="table mb-0 table-striped" id="resettabla">
 	
 
-                    <tr  >
+                    <tr>
                     <th scope="col">FACTURA</th>
                     <th  scope="col">DATOS DE LA FACTURA</th>
                     </tr>
