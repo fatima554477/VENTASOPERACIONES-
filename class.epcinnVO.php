@@ -388,22 +388,65 @@ if($row['ultimo_id']==0 or $row['ultimo_id']==''){
 	}
 
 
-	public function borrar_pdfs($ruta,$id,$nombrearchivo,$tabla1,$tabla2){
-		$conn = $this->db();
+      public function borrar_pdfs($ruta,$id,$nombrearchivo,$tabla1,$tabla2){
+                $conn = $this->db();
 
-		$var2 = "SELECT * FROM ".$tabla2." WHERE 
-		`idTemporal` = '".$id."' and 
-		ADJUNTAR_FACTURA_PDF <> '".$nombrearchivo."' and ADJUNTAR_FACTURA_PDF <> '' ";
-		$QUERYVAR2 = mysqli_query($conn,$var2) or die('P44'.mysqli_error($conn));
-		while($row = mysqli_fetch_array($QUERYVAR2, MYSQLI_ASSOC)){
-			if( file_exists($ruta.''.$row['ADJUNTAR_FACTURA_PDF']) ){
-			UNLINK($ruta.''.$row['ADJUNTAR_FACTURA_PDF']);
-			}
-		}
-		$var3 = "DELETE FROM ".$tabla2." WHERE `idTemporal` = '".$id."'and 
-		ADJUNTAR_FACTURA_PDF <> '".$nombrearchivo."' and ADJUNTAR_FACTURA_PDF <>'' ";
-		mysqli_query($conn,$var3) or die('P44'.mysqli_error($conn));		
-	}
+                $var2 = "SELECT * FROM ".$tabla2." WHERE
+                `idTemporal` = '".$id."' and
+                ADJUNTAR_FACTURA_PDF <> '".$nombrearchivo."' and ADJUNTAR_FACTURA_PDF <> '' ";
+                $QUERYVAR2 = mysqli_query($conn,$var2) or die('P44'.mysqli_error($conn));
+                while($row = mysqli_fetch_array($QUERYVAR2, MYSQLI_ASSOC)){
+                        if( file_exists($ruta.''.$row['ADJUNTAR_FACTURA_PDF']) ){
+                        UNLINK($ruta.''.$row['ADJUNTAR_FACTURA_PDF']);
+                        }
+                }
+                $var3 = "DELETE FROM ".$tabla2." WHERE `idTemporal` = '".$id."'and
+                ADJUNTAR_FACTURA_PDF <> '".$nombrearchivo."' and ADJUNTAR_FACTURA_PDF <>'' ";
+                mysqli_query($conn,$var3) or die('P44'.mysqli_error($conn));
+        }
+
+        public function limpiarAdjuntoFacturaUnico($campo,$idTemporal,$idRelacion){
+                $permitidos = ['ADJUNTAR_FACTURA_XML','ADJUNTAR_FACTURA_PDF'];
+                if(!in_array($campo,$permitidos,true)){
+                        return;
+                }
+
+                $conn = $this->db();
+                if(!$conn){
+                        return;
+                }
+
+                if($idRelacion === '' || $idRelacion === null){
+                        return;
+                }
+
+                $idRelacionEsc = mysqli_real_escape_string($conn,$idRelacion);
+                $condTemporal = '';
+                if($idTemporal !== '' && $idTemporal !== null){
+                        $idTemporalEsc = mysqli_real_escape_string($conn,$idTemporal);
+                        $condTemporal = " and idTemporal = '".$idTemporalEsc."'";
+                }
+
+                $rutaBase = __ROOT3__.'/includes/archivos/';
+                $campoSql = $campo;
+                $varSelect = "SELECT id,".$campoSql." FROM 02SUBETUFACTURADOCTOS WHERE idRelacion = '".$idRelacionEsc."'".$condTemporal." and ".$campoSql." <> '' and ".$campoSql." IS NOT NULL";
+                $resultado = mysqli_query($conn,$varSelect);
+                if($resultado){
+                        while($row = mysqli_fetch_array($resultado, MYSQLI_ASSOC)){
+                                $archivo = isset($row[$campoSql])?$row[$campoSql]:'';
+                                if($archivo !== ''){
+                                        $rutaArchivo = $rutaBase.$archivo;
+                                        if(is_file($rutaArchivo)){
+                                                @unlink($rutaArchivo);
+                                        }
+                                }
+                        }
+                        mysqli_free_result($resultado);
+                }
+
+                $varUpdate = "UPDATE 02SUBETUFACTURADOCTOS SET ".$campoSql." = '' WHERE idRelacion = '".$idRelacionEsc."'".$condTemporal." and ".$campoSql." <> '' and ".$campoSql." IS NOT NULL";
+                mysqli_query($conn,$varUpdate);
+        }
 	
 	public function busca_07XML2($ultimo_id,$tabla){
 	$conn = $this->db();		

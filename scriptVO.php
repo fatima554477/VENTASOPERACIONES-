@@ -232,7 +232,10 @@ $.ajax({
 		if($.trim(data)=='Ingresado' || $.trim(data)=='Actualizado'){
                			
 
-	        $("#ventasoperacionesform")[0].reset(); //resetea formulario
+	               $("#ventasoperacionesform")[0].reset(); //resetea formulario
+                        $("#RAZON_SOCIAL2 input[name='RAZON_SOCIAL']").val(''); //borra valores vienen de PHP
+                        $("#CONCEPTO_PROVEE").val(''); //borra valores vienen de PHP
+                        $("#RFC_PROVEEDOR2 input[name='RFC_PROVEEDOR']").val(''); //bo
 			$("#RAZON_SOCIAL2").val(''); //borra valores vienen de PHP
 			$("#CONCEPTO_PROVEE").val(''); //borra valores vienen de PHP
 			$("#RFC_PROVEEDOR2").val(''); //borra valores vienen de PHP
@@ -287,6 +290,8 @@ $.ajax({
 			
 			
 			$.getScript(load2(1));
+			
+			location.reload();
 			}else{
 			$("#mensajeventasoperaciones").html(data).fadeIn().delay(3000).fadeOut();
 		}
@@ -679,7 +684,7 @@ $('#mensajeDATOSBANCARIOS1').html("<span id='ACTUALIZADO' >"+data+"</span>");
 
 
 
-			$('#target1').hide("linear");
+			$('#target1').show("linear");
 			$('#target2').hide("linear");
 			$('#target3').hide("linear");
 			$('#target4').hide("linear");

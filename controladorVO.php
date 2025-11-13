@@ -306,9 +306,16 @@ if($IPventasoperar != ''){
 foreach($_FILES AS $ETQIETA => $VALOR){
 
 
-	if($_FILES['ADJUNTAR_FACTURA_XML']==true){	
-	$ADJUNTAR_FACTURA_XML = $conexion->sologuardar6($ETQIETA,$ADJUNTAR_FACTURA_XML2,'02SUBETUFACTURADOCTOS',$idPROV,$IPventasoperar);	
-	}else{
+$errorArchivo = isset($VALOR['error'])?intval($VALOR['error']):1;
+$nombreArchivoOriginal = isset($VALOR['name'])?$VALOR['name']:'';
+if($errorArchivo === 0 && $nombreArchivoOriginal != '' && ($ETQIETA == 'ADJUNTAR_FACTURA_XML' || $ETQIETA == 'ADJUNTAR_FACTURA_PDF')){
+$ventasoperaciones->limpiarAdjuntoFacturaUnico($ETQIETA,$IPventasoperar,$idPROV);
+}
+
+
+if($_FILES['ADJUNTAR_FACTURA_XML']==true){
+$ADJUNTAR_FACTURA_XML = $conexion->sologuardar6($ETQIETA,$ADJUNTAR_FACTURA_XML2,'02SUBETUFACTURADOCTOS',$idPROV,$IPventasoperar);
+}else{
 	$ADJUNTAR_FACTURA_XML = $conexion->cargar($ETQIETA,'02SUBETUFACTURADOCTOS','6',$IPventasoperar,'si',$IPventasoperar);
 		if($_FILES['ADJUNTAR_FACTURA_PDF']==true){
 			$pagoproveedores->borrar_pdfs(__ROOT1__.'/includes/archivos/',$IPventasoperar,$ADJUNTAR_FACTURA_XML,'','02SUBETUFACTURADOCTOS');

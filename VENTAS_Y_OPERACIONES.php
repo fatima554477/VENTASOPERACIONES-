@@ -77,12 +77,17 @@ fecha fatis : 01/MAYO/2025
                         if(!select) {
                                 return;
                         }
-                        const shouldHide = [
+                        const shouldHideFacturaFields = [
                                 'VIATICOS',
                                 'REEMBOLSO',
                                 'PAGO A PROVEEDOR CON DOS O MAS FACTURAS'
                         ].includes(select.value);
+                        const shouldHideBeneficiaryFields = [
+                                'VIATICOS',
+                                'REEMBOLSO'
+                        ].includes(select.value);
            const toggleableItems = [
+        
                                 {
                                         element: document.getElementById('row-adjuntar-factura-xml'),
                                         inputs: [
@@ -139,9 +144,12 @@ fecha fatis : 01/MAYO/2025
                                         if(input && !input.dataset.originalRequired) {
                                                 input.dataset.originalRequired = input.hasAttribute('required') ? 'true' : 'false';
                                         }
-                                });
+										
+										
+										
+    });
 
-                                if(shouldHide) {
+                                if(shouldHideFacturaFields) {
                                         element.style.display = 'none';
                                 } else {
                                         element.style.display = '';
@@ -151,7 +159,7 @@ fecha fatis : 01/MAYO/2025
                                         if(!input) {
                                                 return;
                                         }
-                                        if(shouldHide) {
+                                        if(shouldHideFacturaFields) {
                                                 input.setAttribute('disabled', 'disabled');
                                                 input.removeAttribute('required');
                                         } else {
@@ -170,7 +178,7 @@ fecha fatis : 01/MAYO/2025
                                         if(!field.dataset.originalRequired) {
                                                 field.dataset.originalRequired = field.hasAttribute('required') ? 'true' : 'false';
                                         }
-                                        if(shouldHide) {
+                                            if(shouldHideFacturaFields) {
                                                 field.setAttribute('disabled', 'disabled');
                                                 field.removeAttribute('required');
                                         } else {
@@ -182,8 +190,59 @@ fecha fatis : 01/MAYO/2025
 												
                   }
                                 });
-                                resetTable.style.display = shouldHide ? 'none' : '';
+              resetTable.style.display = shouldHideFacturaFields ? 'none' : '';
                         }
+
+                        const beneficiaryToggleItems = [
+                                {
+                                        element: document.getElementById('row-rfc-proveedor'),
+                                        inputs: [document.getElementById('RFC_PROVEEDOR')]
+                                },
+                                {
+                                        element: document.getElementById('row-concepto-provee'),
+                                        inputs: [document.getElementById('CONCEPTO_PROVEE')]
+                                },
+                                {
+                                        element: document.getElementById('row-comprobante-transferencia'),
+                                        inputs: [
+                                                document.getElementById('CONPROBANTE_TRANSFERENCIA_DISPLAY'),
+                                                document.querySelector('input[type="file"][name="CONPROBANTE_TRANSFERENCIA"]')
+                                        ]
+                                }
+                        ];
+
+                        beneficiaryToggleItems.forEach(({ element, inputs }) => {
+                                if(!element) {
+                                        return;
+                                }
+
+                                inputs.forEach(input => {
+                                        if(input && !input.dataset.originalRequired) {
+                                                input.dataset.originalRequired = input.hasAttribute('required') ? 'true' : 'false';
+                                        }
+                                });
+
+                                if(shouldHideBeneficiaryFields) {
+                                        element.style.display = 'none';
+                                } else {
+                                        element.style.display = '';
+                                }
+
+                                inputs.forEach(input => {
+                                        if(!input) {
+                                                return;
+                                        }
+                                        if(shouldHideBeneficiaryFields) {
+                                                input.setAttribute('disabled', 'disabled');
+                                                input.removeAttribute('required');
+                                        } else {
+                                                input.removeAttribute('disabled');
+                                                if(input.dataset.originalRequired === 'true') {
+                                                        input.setAttribute('required', '');
+                                                }
+                                        }
+                                });
+                        });
 
                         const nombreLabelSpan = document.getElementById('label-nombre-comercial-text');
                         const rfcLabelSpan = document.getElementById('label-rfc-proveedor-text');
@@ -469,7 +528,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_FACTURA_PD
 </td>
 </tr>             
 
-                 <tr  style="background:#fcf3cf"> 
+                  <tr  style="background:#fcf3cf">
 
                  <th scope="row"> <label for="validationCustom03" class="form-label">NÚMERO DE SOLICITUD</label></th>
                  <td> <div id="NUMERO_CONSECUTIVO_PROVEE2"><input type="text" class="form-control" id="NUMERO_CONSECUTIVO_PROVEE" required=""  value="<?php echo $NUMERO_CONSECUTIVO_PROVEE; ?>" name="NUMERO_CONSECUTIVO_PROVEE" placeholder="NÚMERO CONSECUTIVO DE PAGO A PROVEEDORES" readonly="readonly"></div></td>
@@ -580,7 +639,7 @@ if($rfcE == true){
                  </tr>
 				 
 				 
-                 <tr  style="background:#fcf3cf"> 
+                   <tr  style="background:#fcf3cf">
 
                  <th scope="row"> <label for="validationCustom03" class="form-label">RAZÓN SOCIAL</label></th>
                  <td>
@@ -591,7 +650,8 @@ if($rfcE == true){
 				 </div>
 				 </td>
                  </tr>
-                 <tr  style="background:#fcf3cf"> 
+             <tr  style="background:#fcf3cf" id="row-rfc-proveedor">
+
               
 
                <th scope="row"> <label for="validationCustom03" class="form-label"><span id="label-rfc-proveedor-text">RFC DEL PROVEEDOR</span>:</label></th>
@@ -610,7 +670,7 @@ if($rfcE == true){
                  <th scope="row"> <label for="validationCustom03" class="form-label">MOTIVO DEL GASTO:</label></th>
                  <td><input type="text" class="form-control" id="validationCustom03" required=""  value="<?php echo $MOTIVO_GASTO; ?>" name="MOTIVO_GASTO"placeholder="MOTIVO DEL GASTO "></td>
                  </tr>
-    <tr style="background:#fcf3cf">
+     <tr style="background:#fcf3cf">
 
                                  <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">No. DE EVENTO<br><a style="color:red;font-size:11px">OBLIGATORIO</a></label></th>
                  <td>
@@ -688,12 +748,14 @@ var parametros = {
 				
 				 
 				 
-    <tr style="background:#fcf3cf"> 
+   <tr style="background:#fcf3cf" id="row-concepto-provee">
+
 
     <th scope="row"> <label for="validationCustom03" class="form-label">CONCEPTO DE LA FACTURA:</label></th>
     <td><div id="CONCEPTO_PROVEE2"><input type="text" class="form-control" id="CONCEPTO_PROVEE" required=""  value="<?php echo $Descripcion; ?>" name="CONCEPTO_PROVEE"placeholder="CONCEPTO DE LA FACTURA"></div></td>
                  </tr>
-                 <tr  style="background: #d2faf1" > 
+                              <tr  style="background: #d2faf1" id="row-comprobante-transferencia" >
+
              <th scope="row"> <label for="validationCustom03" class="form-label">ADJUNTAR COTIZACIÓN O REPORTE: (CUAQUIER FORMATO)</label></th>
              <td>
 
@@ -950,14 +1012,17 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
                  <th scope="row"> <label for="validationCustom03" class="form-label">OBSERVACIONES:</label></th>
                  <td style="background: #ee5330" ><input type="text" class="form-control" id="OBSERVACIONES_1" required=""  value="<?php echo $OBSERVACIONES_1; ?>" name="OBSERVACIONES_1"placeholder="OBSERVACIONES "></td>
                  </tr>
-                 <tr  style="background: #d2faf1" >
+				 
+				 
+                 <!-- <tr  style="background: #d2faf1" id="row-comprobante-transferencia">
+
 
 <th scope="row"> <label for="validationCustom03" class="form-label">ADJUNTAR COMPROBANTE DE TRANSFERENCIA: (FORMATO PDF)</label></th>
 <td>
 
 <div id="drop_file_zone" ondrop="upload_file(event,'CONPROBANTE_TRANSFERENCIA')" ondragover="return false" >
 <p>Suelta aquí o busca tu archivo</p>
-<p><input class="form-control form-control-sm" style="background:#f5eef9"  /></p>
+<p><input class="form-control form-control-sm" style="background:#f5eef9"  id="CONPROBANTE_TRANSFERENCIA_DISPLAY" /></p>
 <input type="file" name="CONPROBANTE_TRANSFERENCIA" id="nono"/>
 
 </div>
@@ -976,7 +1041,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['CONPROBANTE_TRANSFE
 
 
 
-</tr>
+</tr>-->
                  <!-- <tr style="background: #d2faf1"> 
 
                  <th scope="row"> <label for="validationCustom03" class="form-label"> ADJUNTAR COMPROBANTE DE DEVOLUCIÓN DE DINERO A EPC:(CUALQUIER FORMATO)</label></th>
