@@ -346,10 +346,27 @@ $sWhere2.="  $tables2.propina = '".$propina."' and ";}
 
 if ($sWhere2 != "") {
     $sWhere22 = substr($sWhere2, 0, -4);
-    $sWhere3 = ' ' . $sWhereCC . ' WHERE ( (' . $sWhere22 . ') 
-        AND (02SUBETUFACTURA.ID_RELACIONADO IS NULL OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "") ) '; 
+    $sWhere3 = ' ' . $sWhereCC . ' 
+        INNER JOIN 04altaeventos 
+            ON 04altaeventos.NUMERO_EVENTO = 02SUBETUFACTURA.NUMERO_EVENTO
+        INNER JOIN 04personal 
+            ON 04personal.idRelacion = 04altaeventos.id
+        WHERE ( (' . $sWhere22 . ') 
+            AND (02SUBETUFACTURA.ID_RELACIONADO IS NULL OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "")
+            AND 04personal.idPersonal = "' . $_SESSION['idem'] . '"
+            AND 04personal.autoriza = "si"
+        )';
 } else {
-    $sWhere3 = ' ' . $sWhereCC . ' WHERE (02SUBETUFACTURA.ID_RELACIONADO IS NULL OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "") '; 
+    $sWhere3 = ' ' . $sWhereCC . ' 
+        INNER JOIN 04altaeventos 
+            ON 04altaeventos.NUMERO_EVENTO = 02SUBETUFACTURA.NUMERO_EVENTO
+        INNER JOIN 04personal 
+            ON 04personal.idRelacion = 04altaeventos.id
+        WHERE 
+            (02SUBETUFACTURA.ID_RELACIONADO IS NULL OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "")
+            AND 04personal.idPersonal = "' . $_SESSION['idem'] . '"
+            AND 04personal.autoriza = "si"
+    ';
 }
 
 
@@ -415,121 +432,124 @@ $sWhere3 .= " order by ".$sWhere3campo;
 
 	public function getTotalAmaunt($rfc,$idrelacioN=false){
 		//PRINT_R($idrelacioN);
+		$query_OR = "";
 		foreach($idrelacioN as $etiqueta => $valor){
-			FOREACH( $valor AS $etiqueta2 => $valor2){
-			$query_OR .= ' id = '. $valor2.' OR ';
+			foreach( $valor AS $etiqueta2 => $valor2){
+				$query_OR .= ' id = '. $valor2.' OR ';
 			}
 		}
 		//ECHO $query_OR;
-
 		$query_OR2 = substr($query_OR,0,-3);
 		$ROWevento = $this->var_altaeventos();
 		$conn = $this->db();		
 		$NUMERO_EVENTO = isset($ROWevento["NUMERO_EVENTO"])?$ROWevento["NUMERO_EVENTO"]:"";
-
-		$sWhere3  = ' where ( 02SUBETUFACTURA.NUMERO_EVENTO = "'.$NUMERO_EVENTO.'") and RFC_PROVEEDOR = trim("'.trim($rfc).'")  ';
-		echo $sql1="SELECT sum(MONTO_TOTAL_COTIZACION_ADEUDO - MONTO_DEPOSITADO) as MONTO_TOTAL_COTIZACION_ADEUDO1 FROM  02SUBETUFACTURA ".$sWhere3." and (".$query_OR2.") ";
+                $identificadorProveedor = trim((string)$rfc);
+                $sWhere3  = ' where ( 02SUBETUFACTURA.NUMERO_EVENTO = "'.$NUMERO_EVENTO.'") and (NOMBRE_COMERCIAL = trim("'.$identificadorProveedor.'") or RFC_PROVEEDOR = trim("'.$identificadorProveedor.'"))  ';
+		$sql1="SELECT sum(MONTO_TOTAL_COTIZACION_ADEUDO - MONTO_DEPOSITADO) as MONTO_TOTAL_COTIZACION_ADEUDO1 FROM  02SUBETUFACTURA ".$sWhere3." and (".$query_OR2.") ";
 		$query = mysqli_query($conn,$sql1);
 		$fetch_arrary = mysqli_fetch_array($query);
 		return $fetch_arrary['MONTO_TOTAL_COTIZACION_ADEUDO1'];
 	}
 	
-	public function ingresarTemproal($RFC_PROVEEDOR,$MONTO_TOTAL_COTIZACION_ADEUDO,$MONTO_DEPOSITADO,$idRelacion){
-	$connn=$this->db();
-	$queryTemporal = 'insert into 02temporalEstadoCuenta (RFC_PROVEEDOR ,MONTO_TOTAL_COTIZACION_ADEUDO, MONTO_DEPOSITADO, idRelacion)values("'.$RFC_PROVEEDOR.'","'.$MONTO_TOTAL_COTIZACION_ADEUDO.'","'.$MONTO_DEPOSITADO.'","'.$idRelacion.'");';
-	mysqli_query($connn,$queryTemporal);	
+	public function ingresarTemproal($RFC_PROVEEDOR,$MONTO_TOTAL_COTIZACION_ADEUDO,$MONTO_DEPOSITADO,$idRelacion,$balance){
+		$connn=$this->db();
+		$queryTemporal = 'insert into 02temporalEstadoCuenta (RFC_PROVEEDOR ,MONTO_TOTAL_COTIZACION_ADEUDO, MONTO_DEPOSITADO, idRelacion, BALANCE)values("'.$RFC_PROVEEDOR.'","'.$MONTO_TOTAL_COTIZACION_ADEUDO.'","'.$MONTO_DEPOSITADO.'","'.$idRelacion.'", "'.$balance.'");';
+		mysqli_query($connn,$queryTemporal);	
 	}		
+
+	public function resultadoTemproal($idRelacion,$rfc){
+		$connn=$this->db();
+		$identificadorProveedor = trim((string)$rfc);
+		$queryTemporal = 'select * from 02temporalEstadoCuenta where idRelacion = "'.$idRelacion.'" and RFC_PROVEEDOR = "'.$identificadorProveedor.'" ';
+		$query = mysqli_query($connn,$queryTemporal);
+		$fetch_arrary = mysqli_fetch_array($query);
+		return $fetch_arrary['BALANCE'];
+	}
+
 	
 	public function TruncateingresarTemproal(){
-	$connn=$this->db();
-	$queryTemporal = 'truncate table 02temporalEstadoCuenta;';
-	mysqli_query($connn,$queryTemporal);	
+		$connn=$this->db();
+		$queryTemporal = 'truncate table 02temporalEstadoCuenta;';
+		mysqli_query($connn,$queryTemporal);	
 	}
+
+
+
+
+
+	
+	
+	public function ingresarTemproal2($RFC_PROVEEDOR,$MONTO_TOTAL_COTIZACION_ADEUDO,$MONTO_DEPOSITADO,$idRelacion,$balance){
+		$connn=$this->db();
+		$queryTemporal = 'insert into 02temporalEstadoCuenta2 (RFC_PROVEEDOR ,MONTO_TOTAL_COTIZACION_ADEUDO, MONTO_DEPOSITADO, idRelacion, BALANCE)values("'.$RFC_PROVEEDOR.'","'.$MONTO_TOTAL_COTIZACION_ADEUDO.'","'.$MONTO_DEPOSITADO.'","'.$idRelacion.'", "'.$balance.'");';
+		mysqli_query($connn,$queryTemporal);	
+	}		
+
+	public function resultadoTemproal2(){
+		$connn=$this->db();
+		$queryTemporal = 'select * from 02temporalEstadoCuenta2 order by RFC_PROVEEDOR, id desc; ';
+		return $query = mysqli_query($connn,$queryTemporal);
+
+	}
+
+	
+	public function TruncateingresarTemproal2(){
+		$connn=$this->db();
+		$queryTemporal = 'truncate table 02temporalEstadoCuenta2;';
+		mysqli_query($connn,$queryTemporal);	
+	}
+
+
+
+
+
+
+
+
 
 
 	public function getTotalAmaunt2($rfc){
-
-		$query_OR2 = substr($query_OR,0,-3);
 		$conn = $this->db();		
-
-		$sWhere3  = ' where RFC_PROVEEDOR = trim("'.trim($rfc).'")  ';
+		$identificadorProveedor = trim((string)$rfc);
+		$sWhere3  = ' where RFC_PROVEEDOR = trim("'.$identificadorProveedor.'")  ';
 		$sql1="SELECT sum(MONTO_TOTAL_COTIZACION_ADEUDO - MONTO_DEPOSITADO) as MONTO_TOTAL_COTIZACION_ADEUDO1 FROM  02temporalEstadoCuenta ".$sWhere3." ";
 		$query = mysqli_query($conn,$sql1);
 		$fetch_arrary = mysqli_fetch_array($query);
-		$fetch_arrary['MONTO_TOTAL_COTIZACION_ADEUDO1'];
-
 		return $fetch_arrary['MONTO_TOTAL_COTIZACION_ADEUDO1'];
-
 	}
 
-public function obtener_rfc_a_id($valor) {
-    $conn = $this->db();
-
-    // Escapar el valor por seguridad
-    $valor = mysqli_real_escape_string($conn, trim($valor));
-
-    // 1. Buscar por RFC exacto
-    $query = 'SELECT idRelacion FROM 02direccionproveedor1 WHERE P_RFC_MTDP = "'.$valor.'" LIMIT 1';
-    $respuesta = mysqli_query($conn, $query);
-    $fetch_array = mysqli_fetch_array($respuesta, MYSQLI_ASSOC);
-
-    if (!empty($fetch_array['idRelacion'])) {
-        return $fetch_array['idRelacion'];
-    }
-
-    // 2. Buscar por razón social (LIKE)
-    $query2 = 'SELECT idRelacion FROM 02direccionproveedor1 WHERE P_NOMBRE_FISCAL_RS_EMPRESA LIKE "%'.$valor.'%" LIMIT 1';
-    $respuesta2 = mysqli_query($conn, $query2);
-    $fetch_array2 = mysqli_fetch_array($respuesta2, MYSQLI_ASSOC);
-
-    if (!empty($fetch_array2['idRelacion'])) {
-        return $fetch_array2['idRelacion'];
-    }
-
-    // 3. Buscar por nombre comercial (LIKE)
-    $query3 = 'SELECT idRelacion FROM 02direccionproveedor1 WHERE P_NOMBRE_COMERCIAL_EMPRESA LIKE "%'.$valor.'%" LIMIT 1';
-    $respuesta3 = mysqli_query($conn, $query3);
-    $fetch_array3 = mysqli_fetch_array($respuesta3, MYSQLI_ASSOC);
-
-    if (!empty($fetch_array3['idRelacion'])) {
-        return $fetch_array3['idRelacion'];
-    }
-
-    // Si no encontró nada, regresar NULL o falso
-    return null;
-}
-
 	public function getTotalAmaunt2id($rfc,$idrelacioN,$idactual){
-		//PRINT_R($idrelacioN);
+		$query_OR = "";
+		//EP2
 		foreach($idrelacioN as $etiqueta => $valor){
-			FOREACH( $valor AS $etiqueta2 => $valor2){
+			foreach( $valor AS $etiqueta2 => $valor2){
 				if($idactual!=$valor2){
-			$query_OR .= ' idRelacion = '. $valor2.' OR ';
+					$query_OR .= ' idRelacion = '. $valor2.' OR ';
 				}
 			}
 		}
-
 		if($query_OR != ''){
-		$query_OR2 = substr($query_OR,0,-3);
-		$query_OR3 = " and (".$query_OR2.") ";
-		}ELSE{
-			RETURN 0;
+			$query_OR2 = substr($query_OR,0,-3);
+			$query_OR3 = " and (".$query_OR2.") ";
+		}else{
+			return 0;
 		}
-		
-		
-
-		//$query_OR2 = substr($query_OR,0,-3);
 		$conn = $this->db();		
-		$sWhere3  = ' where RFC_PROVEEDOR = trim("'.trim($rfc).'")  ';
+		$identificadorProveedor = trim((string)$rfc);
+		$sWhere3  = ' where RFC_PROVEEDOR = trim("'.$identificadorProveedor.'")  ';
 		$sql12="SELECT sum(MONTO_DEPOSITADO) as MONTO_DEPOSITADO1 FROM  02temporalEstadoCuenta ".$sWhere3.$query_OR3." ";
-		
 		$query2 = mysqli_query($conn,$sql12);
 		$fetch_arrary2 = mysqli_fetch_array($query2);
 		return $fetch_arrary2['MONTO_DEPOSITADO1'];
-
 	}
+	
 
-
+		function setCounter($counter) {
+		$this->counter = $counter;
+	}
+	function getCounter() {
+		return $this->counter;
+	}
 	
 	public function diferenciaPorConsecutivo($NUMERO_CONSECUTIVO_PROVEE) {
     $NUMERO_CONSECUTIVO_PROVEE = $this->mysqli->real_escape_string($NUMERO_CONSECUTIVO_PROVEE);
@@ -621,12 +641,7 @@ return (float) $PorfaltaDeFacturaSUBERES2 = (float) $PorfaltaDeFactura + (float)
 
 
 
-	function setCounter($counter) {
-		$this->counter = $counter;
-	}
-	function getCounter() {
-		return $this->counter;
-	}
+
 	
 	
 	      /**
