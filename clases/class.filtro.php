@@ -349,25 +349,39 @@ if ($sWhere2 != "") {
     $sWhere3 = ' ' . $sWhereCC . ' 
         INNER JOIN 04altaeventos 
             ON 04altaeventos.NUMERO_EVENTO = 02SUBETUFACTURA.NUMERO_EVENTO
-        INNER JOIN 04personal 
+        LEFT JOIN 04personal 
             ON 04personal.idRelacion = 04altaeventos.id
         WHERE ( (' . $sWhere22 . ') 
-            AND (02SUBETUFACTURA.ID_RELACIONADO IS NULL OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "")
-            AND 04personal.idPersonal = "' . $_SESSION['idem'] . '"
-            AND 04personal.autoriza = "si"
+            AND (02SUBETUFACTURA.ID_RELACIONADO IS NULL 
+                 OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "")
+            AND (
+                    (
+                        04personal.idPersonal = "' . $_SESSION['idem'] . '" 
+                        AND 04personal.autoriza = "si"
+                    )
+                 OR 02SUBETUFACTURA.ID_AYUDO = "' . $_SESSION['idem'] . '"
+                )
         )';
 } else {
     $sWhere3 = ' ' . $sWhereCC . ' 
         INNER JOIN 04altaeventos 
             ON 04altaeventos.NUMERO_EVENTO = 02SUBETUFACTURA.NUMERO_EVENTO
-        INNER JOIN 04personal 
+        LEFT JOIN 04personal 
             ON 04personal.idRelacion = 04altaeventos.id
         WHERE 
-            (02SUBETUFACTURA.ID_RELACIONADO IS NULL OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "")
-            AND 04personal.idPersonal = "' . $_SESSION['idem'] . '"
-            AND 04personal.autoriza = "si"
+            (02SUBETUFACTURA.ID_RELACIONADO IS NULL 
+             OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "")
+            AND (
+                    (
+                        04personal.idPersonal = "' . $_SESSION['idem'] . '" 
+                        AND 04personal.autoriza = "si"
+                    )
+                 OR 02SUBETUFACTURA.ID_AYUDO = "' . $_SESSION['idem'] . '"
+                )
     ';
 }
+
+
 
 
 
