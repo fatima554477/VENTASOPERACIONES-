@@ -3,10 +3,10 @@
 <div id="content">     
 			<hr/>
 		<strong>	  <p class="mb-0 text-uppercase" ><img src="includes/contraer31.png" id="mostrar5" onclick="load2(1);"style="cursor:pointer;"/>
-<img src="includes/contraer41.png" id="ocultar5" style="cursor:pointer;"/>&nbsp;&nbsp;&nbsp; FILTRO PAGO APROVEEDORES-VYO</p></strong></div>
+<img src="includes/contraer41.png" id="ocultar5" style="cursor:pointer;"/>&nbsp;&nbsp;&nbsp; FILTRO PAGO A PROVEEDORES-VYO</p></strong></div>
 
 
-<div  id="mensajefiltro"></div>
+<div  id="enviarVENTASOPERACIONES"></div>
 <div  id="pasarpagado2"></div>
  </div>
 							

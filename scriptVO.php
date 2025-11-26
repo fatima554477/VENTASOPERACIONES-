@@ -500,7 +500,7 @@ $('#mensajeventasoperaciones').html("<span id='ACTUALIZADO' >"+data+"</span>");
 $(document).on('click', '.view_dataVENTASOPERACIONES', function(){
 var personal_id = $(this).attr('id');
 $.ajax({
-url:'pagoproveedores/VistaPreviapagoproveedor2.php',
+url:'pagoproveedores/VistaPreviapagoproveedor.php',
 method:'POST',
 data:{personal_id:personal_id},
 beforeSend:function(){

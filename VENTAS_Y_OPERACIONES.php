@@ -198,6 +198,10 @@ fecha fatis : 01/MAYO/2025
                                         element: document.getElementById('row-rfc-proveedor'),
                                         inputs: [document.getElementById('RFC_PROVEEDOR')]
                                 },
+								{
+                                        element: document.getElementById('row-monto-total-cotizacion'),
+                                        inputs: [document.querySelector('input[name="MONTO_TOTAL_COTIZACION_ADEUDO"]')]
+                                },
                                 {
                                         element: document.getElementById('row-concepto-provee'),
                                         inputs: [document.getElementById('CONCEPTO_PROVEE')]
@@ -209,6 +213,7 @@ fecha fatis : 01/MAYO/2025
                                                 document.querySelector('input[type="file"][name="CONPROBANTE_TRANSFERENCIA"]')
                                         ]
                                 }
+
                         ];
 
                         beneficiaryToggleItems.forEach(({ element, inputs }) => {
@@ -390,7 +395,7 @@ fecha fatis : 01/MAYO/2025
                 <tr style="background: #d2faf1" id="row-adjuntar-factura-xml">
 
            
-                 <th scope="row"> <label  for="formFileSm"  class="form-label">ADJUNTAR FACTURA(FORMATO XML)</label></th>
+                 <th scope="row"> <label  for="formFileSm"  class="form-label">ADJUNTAR FACTURA FORMATO &nbsp;<a style="color:red;font:12px">(XML)</a></label></th>
                  <td style="width:400px;">
 				 
 	
@@ -497,7 +502,7 @@ if( file_exists($url) ){
               <tr style="background: #d2faf1" id="row-adjuntar-factura-pdf">  
 
              
-<th scope="row"> <label for="validationCustom03" class="form-label">ADJUNTAR FACTURA (FORMATO PDF)</label></th>
+<th scope="row"> <label for="validationCustom03" class="form-label">ADJUNTAR FACTURA FORMATO (PDF)</label></th>
 
 
 <td>
@@ -783,7 +788,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
              </tr>
              
 
-                 <tr style="background: #d2faf1">  
+                  <tr style="background: #d2faf1" id="row-monto-total-cotizacion"> 
 
                  <th scope="row"> <label for="validationCustom03" class="form-label">MONTO TOTAL DE LA COTIZACIÓN O DEL ADEUDO<br><a style="color:red;font-size:11px">OBLIGATORIO</a></label></th>
                  <td>   <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text" class="form-control" id="validationCustom03" required=""  value="<?php echo $MONTO_TOTAL_COTIZACION_ADEUDO; ?>" name="MONTO_TOTAL_COTIZACION_ADEUDO"placeholder="MONTO TOTAL DE LA COTIZACÓN" onkeyup="comasainput('MONTO_TOTAL_COTIZACION_ADEUDO')"></td>
@@ -843,7 +848,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
 				 </td>
                  </tr>
 				 
-                 <tr id="row-monto-propina" style="background:#fcf3cf">
+                 <tr id="row-monto-propina" style="background:#d2faf1">
 
                  <th scope="row"> <label   for="validationCustom03" class="form-label"><a style="color:red;font:12px">FAVOR DE PONER EL:&nbsp;</a>MONTO DE LA PROPINA O <br>SERVICIO ESTÉ INCLUIDO O NO EN LA FACTURA</label></th>
                
@@ -986,11 +991,11 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
         </td>
 
         </tr>
-                 <tr style="background:#fcf3cf"> 
+                 <!-- <tr style="background:#fcf3cf">  
 
                  <th scope="row"> <label for="validationCustom03" class="form-label">FECHA DE PROGRAMACIÓN DEL PAGO:</label></th>
                  <td>		 <div id="FECHA_DE_PAGO2"><input type="date" class="form-control" id="validationCustom03" required=""  value="<?php echo $FECHA_DE_PAGO; ?>" name="FECHA_DE_PAGO" placeholder="FECHA DE PAGO" ></div></td>
-            </tr>
+            </tr> -->
                  <tr style="background:#fcf3cf"> 
 
                  <th scope="row"> <label for="validationCustom03" class="form-label">FECHA EFECTIVA DE PAGO:</label></th>
@@ -1069,9 +1074,22 @@ while($rowsube=mysqli_fetch_array($listadosube)){
 				 
 <tr  style="background:#fcf3cf" >				 
 <th scope="row"> <label  for="validationCustom03" class="form-label">NOMBRE DEL EJECUTIVO QUE INGRESO ESTA FACTURA:</label></th>
-<td><input type="text" class="form-control" id="validationCustom03" required=""  value="<?php echo $_SESSION["NOMBREUSUARIO"]; ?>" name="NOMBRE_DEL_AYUDO"placeholder="NOMBRE DEL EJECUTIVO" readonly="readonly"></td>
-</tr>					 
+<td><input type="text" class="form-control" id="NOMBRE_DEL_AYUDO" required=""  value="<?php echo $_SESSION["NOMBREUSUARIO"]; ?>" name="NOMBRE_DEL_AYUDO" placeholder="NOMBRE DEL EJECUTIVO" readonly="readonly"></td>
+</tr>
+
+<input 
+    type="hidden" 
+    name="ID_AYUDO"
+    id="ID_AYUDO"
+    value="<?php echo $_SESSION['idem']; ?>"
+>
+
+
+
+					 
 <tr>
+
+
     <th style="background: #d2faf1; text-align:left" scope="col">NOMBRE DEL EJECUTIVO QUE REALIZÓ LA COMPRA:</th>
        <td  style="background: #d2faf1"  >
 <?php
@@ -1322,8 +1340,8 @@ echo $encabezadoA.$option2.'</select>';
                  <td><input type="text" class="form-control" id="validationCustom03" required=""  value="<?php echo $Moneda; ?>" name="MONEDA_FACTURA" placeholder="MONEDA"readonly="readonly"></td>
                  </tr>
                  <tr>
-                    <th scope="row"> <label for="validationCustom03" class="form-label">MONEDA EXTRANGERA:</label></th>
-                 <td><input type="text" class="form-control" id="validationCustom03" required=""  value="<?php echo $MONEDA_EXTRANGERA_FACTURA; ?>" name="MONEDA_EXTRNGERA_FACTURA" placeholder="MONEDA EXTRANGERA"readonly="readonly"></td>
+                    <th scope="row"> <label for="validationCustom03" class="form-label">MONEDA EXTRANJERA:</label></th>
+                 <td><input type="text" class="form-control" id="validationCustom03" required=""  value="<?php echo $MONEDA_EXTRANGERA_FACTURA; ?>" name="MONEDA_EXTRNGERA_FACTURA" placeholder="MONEDA EXTRANJERA"readonly="readonly"></td>
                  </tr>
                  
 				 <tr>
