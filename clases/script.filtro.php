@@ -1,41 +1,7 @@
-
-<style>
-/* Loader con animación */
-.loader {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #6a0dad; /* Morado elegante */
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  animation: spin 1s linear infinite;
-  display: inline-block;
-  vertical-align: middle;
-  margin-right: 8px;
-}
-
-@keyframes spin {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Texto estilizado */
-.msg-actualizando {
-  font-weight: bold;
-  font-size: 20px;
-  color: #6a0dad;
-  background: #f3e9fb;
-  border-radius: 6px;
-  padding: 6px 12px;
-  display: inline-flex;
-  align-items: center;
-  box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
-}
-</style>
-
 <script type="text/javascript">
-
 	function pasarpagado2(pasarpagado_id){
-
+	//$('#personal_detalles4').html();
+	//$('#dataModal4').modal('show');	
 
 	var checkBox = document.getElementById("pasarpagado1a"+pasarpagado_id);
 	var pasarpagado_text = "";
@@ -53,9 +19,7 @@
 	},
 		success:function(data){
 		var result = data.split('^');			
-		$('#pasarpagado2').html("<span 'ACTUALIZADO'</span>").fadeIn().delay(500).fadeOut();
-		load2(1);
-		
+		$('#pasarpagado2').html("<span id='ACTUALIZADO' >"+result[0]+"</span>");
 		if(pasarpagado_text=='si'){
 		$('#color_pagado1a'+pasarpagado_id).css('background-color', '#ceffcc');
 		}
@@ -69,7 +33,8 @@
 
 
 	function STATUS_RESPONSABLE_EVENTO(RESPONSABLE_EVENTO_id){
-
+	//$('#personal_detalles4').html();
+	//$('#dataModal4').modal('show');	
 
 	var checkBox = document.getElementById("STATUS_RESPONSABLE_EVENTO"+RESPONSABLE_EVENTO_id);
 	var RESPONSABLE_text = "";
@@ -102,11 +67,9 @@
 
 
 
-
-
-
 	function STATUS_AUDITORIA1(AUDITORIA1_id){
-
+	//$('#personal_detalles4').html();
+	//$('#dataModal4').modal('show');	
 
 	var checkBox = document.getElementById("STATUS_AUDITORIA1"+AUDITORIA1_id);
 	var AUDITORIA1_text = "";
@@ -115,26 +78,23 @@
 	}else{
 	AUDITORIA1_text = "no";
 	}
-
 	  $.ajax({
 		url:'pagoproveedores/controladorPP.php',
 		method:'POST',
 		data:{AUDITORIA1_id:AUDITORIA1_id,AUDITORIA1_text:AUDITORIA1_text},
 		beforeSend:function(){
-		$('#STATUS_AUDITORIA1').html('cargando');
+		$('#pasarpagado2').html('cargando');
 	},
 		success:function(data){
 		var result = data.split('^');				
-		$('#STATUS_AUDITORIA1').html("ACTUALIZADO").fadeIn().delay(1000).fadeOut();
-		 load2(1);
+		$('#pasarpagado2').html("<span id='ACTUALIZADO' >"+result[0]+result[1]+"</span>");
 
 		if(result[1]=='si'){
 		$('#color_AUDITORIA1'+AUDITORIA1_id).css('background-color', '#ceffcc');
 		}
 		if(result[1]=='no'){
 		$('#color_AUDITORIA1'+AUDITORIA1_id).css('background-color', '#e9d8ee');
-		}
-	   	
+		}			
 		
 	}
 	});
@@ -143,280 +103,9 @@
 
 
 
-function STATUS_CHECKBOX(CHECKBOX_id, permisoModificar) {
-    var checkBox = document.getElementById("STATUS_CHECKBOX" + CHECKBOX_id);
-    var CHECKBOX_text = checkBox.checked ? "si" : "no";
-
-    // Cambiar color visual inmediato (optimista)
-    var newColor = checkBox.checked ? '#ceffcc' : '#e9d8ee';
-    $('#color_CHECKBOX' + CHECKBOX_id).css('background-color', newColor);
-
-    let monto = $('#montoOriginal_' + CHECKBOX_id).text().replace(/,/g, '');
-    
-    // Bloqueo inmediato si se activa sin permiso
-    if (checkBox.checked && !permisoModificar) {
-        setTimeout(() => {
-            checkBox.disabled = true;
-        }, 100);
-    }
-
-    // Actualizar el valor calculado en la interfaz inmediatamente
-    if (checkBox.checked) {
-        $('#valorCalculado_' + CHECKBOX_id).text('');
-    } else {
-        if (!isNaN(monto)) {
-            let resultado = monto * 1.46;
-            let resultadoFormateado = resultado.toLocaleString('es-MX', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-            $('#valorCalculado_' + CHECKBOX_id).text('$' + resultadoFormateado);
-        } else {
-            $('#valorCalculado_' + CHECKBOX_id).text('NaN');
-        }
-    }
-
-    // Enviar actualización al servidor
-    $.ajax({
-        url: 'pagoproveedores/controladorPP.php',
-        method: 'POST',
-        data: { 
-            CHECKBOX_id: CHECKBOX_id,
-            CHECKBOX_text: CHECKBOX_text 
-        },
-        beforeSend: function() {
-            $('#ajax-notification')
-                .html('<div class="loader"></div> ⏳ ACTUALIZANDO...')
-                .fadeIn();
-        },
-        success: function(data) {
-            var result = data.split('^'); // ejemplo de retorno: "ok^si" o "ok^no"
-
-            // Mostrar notificación de éxito
-            $('#ajax-notification')
-                .html("✅ ACTUALIZADO")
-                .delay(1000)
-                .fadeOut();
-
-            // Validar respuesta del servidor
-            if (result[1] === 'si') {
-                $('#color_CHECKBOX' + CHECKBOX_id).css('background-color', '#ceffcc');
-                $('#valorCalculado_' + CHECKBOX_id).text('');
-                
-                // Bloquear después de confirmación si no hay permiso
-                if (!permisoModificar) {
-                    checkBox.disabled = true;
-                }
-            } else if (result[1] === 'no') {
-                $('#color_CHECKBOX' + CHECKBOX_id).css('background-color', '#e9d8ee');
-                
-                if (!isNaN(monto)) {
-                    let resultado = monto * 1.46;
-                    let resultadoFormateado = resultado.toLocaleString('es-MX', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-                    $('#valorCalculado_' + CHECKBOX_id).text('$' + resultadoFormateado);
-                } else {
-                    $('#valorCalculado_' + CHECKBOX_id).text('NaN');
-                }
-                
-                // Re-habilitar si falló el guardado
-                checkBox.disabled = false;
-            }
-        },
-        error: function() {
-            // Revertir el cambio si ocurre un error
-            checkBox.checked = !checkBox.checked;
-            let originalColor = checkBox.checked ? '#ceffcc' : '#e9d8ee';
-            $('#color_CHECKBOX' + CHECKBOX_id).css('background-color', originalColor);
-            
-            // Re-habilitar en caso de error
-            checkBox.disabled = false;
-
-            $('#ajax-notification')
-                .html("❌ Error al actualizar")
-                .delay(2000)
-                .fadeOut();
-        }
-    });
-    recalcularTotal();
-}
-
-
-function recalcularTotal() {
-    let total = 0;
-
-    $('[id^=valorCalculado_]').each(function() {
-        let texto = $(this).text().replace(/[$,]/g, ''); // quitar $ y ,
-        let valor = parseFloat(texto);
-        if (!isNaN(valor)) {
-            total += valor;
-        }
-    });
-
-    let totalFormateado = total.toLocaleString('es-MX', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-    $('#totalCalculado').text('$' + totalFormateado);
-}
-
-
-
-
-
-
-
-
-function STATUS_AUDITORIA3(id){
-  var $cb = $("#STATUS_AUDITORIA3" + id);
-  var permGuardar   = ($cb.data("perm-guardar")   == 1);
-  var permModificar = ($cb.data("perm-modificar") == 1);
-  var valorPrevio   = String($cb.data("prev")); // 'si' | 'no'
-  var valorNuevo    = $cb.is(":checked") ? "si" : "no";
-
-  // 1) Sin guardar ni modificar: nunca debería disparar, pero por seguridad:
-  if(!permGuardar && !permModificar){
-    $cb.prop('checked', (valorPrevio === 'si'));
-    showNotify("Sin permiso para modificar", false);
-    return;
-  }
-
-  // 2) Si NO tiene modificar:
-  // - Puede pasar de 'no' -> 'si'
-  // - NO puede pasar de 'si' -> 'no' (revertir y salir)
-  if(!permModificar){
-    if(valorPrevio === 'si' && valorNuevo === 'no'){
-      // No permitido apagar
-      $cb.prop('checked', true);
-      showNotify("Solo puedes prender, no apagar", false);
-      return;
-    }
-  }
-
-  // Pintado optimista
-  $("#color_AUDITORIA3" + id).css('background-color', (valorNuevo === 'si') ? '#ceffcc' : '#e9d8ee');
-
-  $.ajax({
-    url: 'pagoproveedores/controladorPP.php',
-    type: 'POST',
-    data: { AUDITORIA3_id: id, AUDITORIA3_text: valorNuevo },
-    beforeSend: function(){
-      $('#pasarpagado2').html('cargando...');
-    },
-    success: function(resp){
-      // Éxito → fijar nuevo previo
-      $cb.data("prev", valorNuevo);
-
-      // 3) Regla clave: si SOLO tiene guardar y acaba de prender -> BLOQUEAR
-      if(!permModificar && permGuardar && valorNuevo === 'si'){
-        $cb.prop('disabled', true)
-           .css('cursor','not-allowed')
-           .attr('title','Autorizado (bloqueado)');
-      }
-
-      $('#pasarpagado2').html("<span>ACTUALIZADO</span>").fadeIn().delay(500).fadeOut();
-      showNotify("Autorización actualizada ✅", true);
-	  	load2(1);
-    },
-
-    error: function(xhr){
-      // Rollback total
-      var volverSi = (valorPrevio === 'si');
-      $cb.prop('checked', volverSi);
-      $("#color_AUDITORIA3" + id).css('background-color', volverSi ? '#ceffcc' : '#e9d8ee');
-
-      showNotify("❌ Error de conexión (" + xhr.status + ")", false);
-    }
-  });
-}
-
-function showNotify(msg, ok){
-  $("#ajax-notification").stop(true,true)
-    .text(msg)
-    .css('background', ok ? '#4CAF50' : '#E53935')
-    .fadeIn(150).delay(1000).fadeOut(300);
-}
-
-
-
-
-function STATUS_SINXML(id){
-  var $cb = $("#STATUS_SINXML" + id);
-  var permGuardar2   = ($cb.data("perm-guardar2")   == 1);
-  var permModificar2 = ($cb.data("perm-modificar2") == 1);
-  var valorPrevio2   = String($cb.data("prev2")); // 'si' | 'no'
-  var valorNuevo2    = $cb.is(":checked") ? "si" : "no";
-
-  // 1) Sin guardar ni modificar: nunca debería disparar, pero por seguridad:
-  if(!permGuardar2 && !permModificar2){
-    $cb.prop('checked', (valorPrevio2 === 'si'));
-    showNotify2("Sin permiso para modificar", false);
-    return;
-  }
-
-  // 2) Si NO tiene modificar:
-  // - Puede pasar de 'no' -> 'si'
-  // - NO puede pasar de 'si' -> 'no' (revertir y salir)
-  if(!permModificar2){
-    if(valorPrevio2 === 'si' && valorNuevo2 === 'no'){
-      // No permitido apagar
-      $cb.prop('checked', true);
-      showNotify2("Solo puedes prender, no apagar", false);
-      return;
-    }
-  }
-
-  // Pintado optimista
-  $("#color_SINXML" + id).css('background-color', (valorNuevo2 === 'si') ? '#ceffcc' : '#e9d8ee');
-
-  $.ajax({
-    url: 'pagoproveedores/controladorPP.php',
-    type: 'POST',
-    data: { SINXML_id: id, SINXML_text: valorNuevo2 },
-    beforeSend: function(){
-      $('#pasarpagado2').html('cargando...');
-    },
-    success: function(resp){
-      // Éxito → fijar nuevo prev2io
-      $cb.data("prev2", valorNuevo2);
-
-      // 3) Regla clave: si SOLO tiene guardar y acaba de prender -> BLOQUEAR
-      if(!permModificar2 && permGuardar2 && valorNuevo2 === 'si'){
-        $cb.prop('disabled', true)
-           .css('cursor','not-allowed')
-           .attr('title','Autorizado (bloqueado)');
-      }
-
-      $('#pasarpagado2').html("<span>ACTUALIZADO</span>").fadeIn().delay(500).fadeOut();
-      showNotify2("Autorización actualizada ✅", true);
-	  	load2(1);
-    },
-
-    error: function(xhr){
-      // Rollback total
-      var volverSi = (valorPrevio2 === 'si');
-      $cb.prop('checked', volverSi);
-      $("#color_SINXML" + id).css('background-color', volverSi ? '#ceffcc' : '#e9d8ee');
-
-      showNotify2("❌ Error de conexión (" + xhr.status + ")", false);
-    }
-  });
-}
-
-function showNotify2(msg, ok){
-  $("#ajax-notification").stop(true,true)
-    .text(msg)
-    .css('background', ok ? '#4CAF50' : '#E53935')
-    .fadeIn(150).delay(1000).fadeOut(300);
-}
-
-
-
-
 	function STATUS_AUDITORIA2(AUDITORIA2_id){
-	
+	//$('#personal_detalles4').html();
+	//$('#dataModal4').modal('show');	
 
 	var checkBox = document.getElementById("STATUS_AUDITORIA2"+AUDITORIA2_id);
 	var AUDITORIA2_text = "";
@@ -434,8 +123,7 @@ function showNotify2(msg, ok){
 	},
 		success:function(data){
 		var result = data.split('^');				
-		$('#pasarpagado2').html("Cargando...").fadeIn().delay(500).fadeOut();
-		 load2(1);
+		$('#pasarpagado2').html("<span id='ACTUALIZADO' >"+result[0]+"</span>");
 
 		if(result[1]=='si'){
 		$('#color_AUDITORIA2'+AUDITORIA2_id).css('background-color', '#ceffcc');
@@ -451,7 +139,8 @@ function showNotify2(msg, ok){
 
 
 	function STATUS_FINANZAS(FINANZAS_id){
-
+	//$('#personal_detalles4').html();
+	//$('#dataModal4').modal('show');	
 
 	var checkBox = document.getElementById("STATUS_FINANZAS"+FINANZAS_id);
 	var FINANZAS_text = "";
@@ -469,8 +158,7 @@ function showNotify2(msg, ok){
 	},
 		success:function(data){
 		var result = data.split('^');				
-		$('#pasarpagado2').html("Cargando...").fadeIn().delay(500).fadeOut();
-		 load2(1);
+		$('#pasarpagado2').html("<span id='ACTUALIZADO' >"+result[0]+"</span>");
 		
 		if(result[1]=='si'){
 		$('#color_FINANZAS'+FINANZAS_id).css('background-color', '#ceffcc');
@@ -484,7 +172,8 @@ function showNotify2(msg, ok){
 }
 
 	function STATUS_VENTAS(VENTAS_id){
-	
+	//$('#personal_detalles4').html();
+	//$('#dataModal4').modal('show');	
 
 	var checkBox = document.getElementById("STATUS_VENTAS"+VENTAS_id);
 	var VENTAS_text = "";
@@ -502,9 +191,7 @@ function showNotify2(msg, ok){
 	},
 		success:function(data){
 		var result = data.split('^');				
-		$('#pasarpagado2').html("Cargando...").fadeIn().delay(500).fadeOut();
-				 load2(1);
-
+		$('#pasarpagado2').html("<span id='ACTUALIZADO' >"+result[0]+"</span>");
 		
 		if(result[1]=='si'){
 		$('#color_VENTAS'+VENTAS_id).css('background-color', '#ceffcc');
@@ -610,22 +297,19 @@ $("#FECHA_A_DEPOSITAR_2").val("");
   $("#TImpuestosRetenidos").val("");
 
  
+ 
+ 
+ 
+		$(function() {
+			load2(1);
+		});
 }
 
-        $(function() {
-                const triggerSearch = () => load2(1);
 
-                $('#target5').on('keydown', 'thead input, thead select', function(event) {
-                        if (event.key === 'Enter' || event.which === 13) {
-                                event.preventDefault();
-                                triggerSearch();
-                        }
-                });
-
-                load2(1);
-        });
+		$(function() {
+			load2(1);
+		});
 		function load2(page){
-			
 			var query=$("#NOMBRE_EVENTO").val();
 			var DEPARTAMENTO2=$("#DEPARTAMENTO2WE").val();
 			
@@ -842,40 +526,19 @@ var ULTIMA_CARGA_DATOBANCA=$("#ULTIMA_CARGA_DATOBANCA").val();
 			'DEPARTAMENTO2':DEPARTAMENTO2
 			};
 			$("#loader2").fadeIn('slow');
-    $.ajax({
-        url: 'ventasoperaciones/clases/controlador_filtro.php', 
-        type: 'POST',
-        data: parametros,
-beforeSend: function(objeto) {
-  $("#loader2").html(
-    '<div class="msg-actualizando">' +
-      '<span class="loader2"></span> ⏳ ACTUALIZADO...' +
-    '</div>'
-  ).fadeIn();
-
-  // Ocultar después de 2 segundos (2000 milisegundos)
-  setTimeout(function() {
-    $("#loader2").fadeOut('slow', function() {
-      $(this).html(''); // Limpia el contenido después de ocultar
-    });
-  }, 2000);
-},
-
-        success: function (data) {
-            $(".datos_ajax2").html(data).fadeIn('slow');
-			$('.checkbox').each(function() {
-    const id = $(this).data('id');
-    if (localStorage.getItem('checkbox_' + id) === 'checked') {
-        this.checked = true;
-        this.closest('tr').style.filter = 'brightness(65%) sepia(100%) saturate(200%) hue-rotate(0deg)';
-    }
-});
-          
-
-
-        }
-    });
-}
+			$.ajax({
+				url:'ventasoperaciones/clases/controlador_filtro.php',
+				type: 'POST',				
+				data: parametros,
+				 beforeSend: function(objeto){
+				$("#loader2").html("Cargando...");
+			  },
+				success:function(data){
+					$(".datos_ajax2").html(data).fadeIn('slow');
+					$("#loader2").html("");
+				}
+			})
+		}
 /* terminaB1*/		
 		
 	</script>

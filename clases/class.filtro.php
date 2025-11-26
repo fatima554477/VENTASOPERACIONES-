@@ -346,42 +346,11 @@ $sWhere2.="  $tables2.propina = '".$propina."' and ";}
 
 if ($sWhere2 != "") {
     $sWhere22 = substr($sWhere2, 0, -4);
-    $sWhere3 = ' ' . $sWhereCC . ' 
-        INNER JOIN 04altaeventos 
-            ON 04altaeventos.NUMERO_EVENTO = 02SUBETUFACTURA.NUMERO_EVENTO
-        LEFT JOIN 04personal 
-            ON 04personal.idRelacion = 04altaeventos.id
-        WHERE ( (' . $sWhere22 . ') 
-            AND (02SUBETUFACTURA.ID_RELACIONADO IS NULL 
-                 OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "")
-            AND (
-                    (
-                        04personal.idPersonal = "' . $_SESSION['idem'] . '" 
-                        AND 04personal.autoriza = "si"
-                    )
-                 OR 02SUBETUFACTURA.ID_AYUDO = "' . $_SESSION['idem'] . '"
-                )
-        )';
+    $sWhere3 = ' ' . $sWhereCC . ' WHERE ( (' . $sWhere22 . ') 
+        AND (02SUBETUFACTURA.ID_RELACIONADO IS NULL OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "") ) '; 
 } else {
-    $sWhere3 = ' ' . $sWhereCC . ' 
-        INNER JOIN 04altaeventos 
-            ON 04altaeventos.NUMERO_EVENTO = 02SUBETUFACTURA.NUMERO_EVENTO
-        LEFT JOIN 04personal 
-            ON 04personal.idRelacion = 04altaeventos.id
-        WHERE 
-            (02SUBETUFACTURA.ID_RELACIONADO IS NULL 
-             OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "")
-            AND (
-                    (
-                        04personal.idPersonal = "' . $_SESSION['idem'] . '" 
-                        AND 04personal.autoriza = "si"
-                    )
-                 OR 02SUBETUFACTURA.ID_AYUDO = "' . $_SESSION['idem'] . '"
-                )
-    ';
+    $sWhere3 = ' ' . $sWhereCC . ' WHERE (02SUBETUFACTURA.ID_RELACIONADO IS NULL OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "") '; 
 }
-
-
 
 
 
@@ -446,332 +415,95 @@ $sWhere3 .= " order by ".$sWhere3campo;
 
 	public function getTotalAmaunt($rfc,$idrelacioN=false){
 		//PRINT_R($idrelacioN);
-		$query_OR = "";
 		foreach($idrelacioN as $etiqueta => $valor){
-			foreach( $valor AS $etiqueta2 => $valor2){
-				$query_OR .= ' id = '. $valor2.' OR ';
+			FOREACH( $valor AS $etiqueta2 => $valor2){
+			$query_OR .= ' id = '. $valor2.' OR ';
 			}
 		}
 		//ECHO $query_OR;
+
 		$query_OR2 = substr($query_OR,0,-3);
 		$ROWevento = $this->var_altaeventos();
 		$conn = $this->db();		
 		$NUMERO_EVENTO = isset($ROWevento["NUMERO_EVENTO"])?$ROWevento["NUMERO_EVENTO"]:"";
-                $identificadorProveedor = trim((string)$rfc);
-                $sWhere3  = ' where ( 02SUBETUFACTURA.NUMERO_EVENTO = "'.$NUMERO_EVENTO.'") and (NOMBRE_COMERCIAL = trim("'.$identificadorProveedor.'") or RFC_PROVEEDOR = trim("'.$identificadorProveedor.'"))  ';
-		$sql1="SELECT sum(MONTO_TOTAL_COTIZACION_ADEUDO - MONTO_DEPOSITADO) as MONTO_TOTAL_COTIZACION_ADEUDO1 FROM  02SUBETUFACTURA ".$sWhere3." and (".$query_OR2.") ";
+
+		$sWhere3  = ' where ( 02SUBETUFACTURA.NUMERO_EVENTO = "'.$NUMERO_EVENTO.'") and RFC_PROVEEDOR = trim("'.trim($rfc).'")  ';
+		echo $sql1="SELECT sum(MONTO_TOTAL_COTIZACION_ADEUDO - MONTO_DEPOSITADO) as MONTO_TOTAL_COTIZACION_ADEUDO1 FROM  02SUBETUFACTURA ".$sWhere3." and (".$query_OR2.") ";
 		$query = mysqli_query($conn,$sql1);
 		$fetch_arrary = mysqli_fetch_array($query);
 		return $fetch_arrary['MONTO_TOTAL_COTIZACION_ADEUDO1'];
 	}
 	
-	public function ingresarTemproal($RFC_PROVEEDOR,$MONTO_TOTAL_COTIZACION_ADEUDO,$MONTO_DEPOSITADO,$idRelacion,$balance){
-		$connn=$this->db();
-		$queryTemporal = 'insert into 02temporalEstadoCuenta (RFC_PROVEEDOR ,MONTO_TOTAL_COTIZACION_ADEUDO, MONTO_DEPOSITADO, idRelacion, BALANCE)values("'.$RFC_PROVEEDOR.'","'.$MONTO_TOTAL_COTIZACION_ADEUDO.'","'.$MONTO_DEPOSITADO.'","'.$idRelacion.'", "'.$balance.'");';
-		mysqli_query($connn,$queryTemporal);	
+	public function ingresarTemproal($RFC_PROVEEDOR,$MONTO_TOTAL_COTIZACION_ADEUDO,$MONTO_DEPOSITADO,$idRelacion){
+	$connn=$this->db();
+	$queryTemporal = 'insert into 02temporalEstadoCuenta (RFC_PROVEEDOR ,MONTO_TOTAL_COTIZACION_ADEUDO, MONTO_DEPOSITADO, idRelacion)values("'.$RFC_PROVEEDOR.'","'.$MONTO_TOTAL_COTIZACION_ADEUDO.'","'.$MONTO_DEPOSITADO.'","'.$idRelacion.'");';
+	mysqli_query($connn,$queryTemporal);	
 	}		
-
-	public function resultadoTemproal($idRelacion,$rfc){
-		$connn=$this->db();
-		$identificadorProveedor = trim((string)$rfc);
-		$queryTemporal = 'select * from 02temporalEstadoCuenta where idRelacion = "'.$idRelacion.'" and RFC_PROVEEDOR = "'.$identificadorProveedor.'" ';
-		$query = mysqli_query($connn,$queryTemporal);
-		$fetch_arrary = mysqli_fetch_array($query);
-		return $fetch_arrary['BALANCE'];
-	}
-
 	
 	public function TruncateingresarTemproal(){
-		$connn=$this->db();
-		$queryTemporal = 'truncate table 02temporalEstadoCuenta;';
-		mysqli_query($connn,$queryTemporal);	
+	$connn=$this->db();
+	$queryTemporal = 'truncate table 02temporalEstadoCuenta;';
+	mysqli_query($connn,$queryTemporal);	
 	}
-
-
-
-
-
-	
-	
-	public function ingresarTemproal2($RFC_PROVEEDOR,$MONTO_TOTAL_COTIZACION_ADEUDO,$MONTO_DEPOSITADO,$idRelacion,$balance){
-		$connn=$this->db();
-		$queryTemporal = 'insert into 02temporalEstadoCuenta2 (RFC_PROVEEDOR ,MONTO_TOTAL_COTIZACION_ADEUDO, MONTO_DEPOSITADO, idRelacion, BALANCE)values("'.$RFC_PROVEEDOR.'","'.$MONTO_TOTAL_COTIZACION_ADEUDO.'","'.$MONTO_DEPOSITADO.'","'.$idRelacion.'", "'.$balance.'");';
-		mysqli_query($connn,$queryTemporal);	
-	}		
-
-	public function resultadoTemproal2(){
-		$connn=$this->db();
-		$queryTemporal = 'select * from 02temporalEstadoCuenta2 order by RFC_PROVEEDOR, id desc; ';
-		return $query = mysqli_query($connn,$queryTemporal);
-
-	}
-
-	
-	public function TruncateingresarTemproal2(){
-		$connn=$this->db();
-		$queryTemporal = 'truncate table 02temporalEstadoCuenta2;';
-		mysqli_query($connn,$queryTemporal);	
-	}
-
-
-
-
-
-
-
-
 
 
 	public function getTotalAmaunt2($rfc){
+
+		$query_OR2 = substr($query_OR,0,-3);
 		$conn = $this->db();		
-		$identificadorProveedor = trim((string)$rfc);
-		$sWhere3  = ' where RFC_PROVEEDOR = trim("'.$identificadorProveedor.'")  ';
+
+		$sWhere3  = ' where RFC_PROVEEDOR = trim("'.trim($rfc).'")  ';
 		$sql1="SELECT sum(MONTO_TOTAL_COTIZACION_ADEUDO - MONTO_DEPOSITADO) as MONTO_TOTAL_COTIZACION_ADEUDO1 FROM  02temporalEstadoCuenta ".$sWhere3." ";
 		$query = mysqli_query($conn,$sql1);
 		$fetch_arrary = mysqli_fetch_array($query);
+		$fetch_arrary['MONTO_TOTAL_COTIZACION_ADEUDO1'];
+
 		return $fetch_arrary['MONTO_TOTAL_COTIZACION_ADEUDO1'];
+
 	}
 
+
+
 	public function getTotalAmaunt2id($rfc,$idrelacioN,$idactual){
-		$query_OR = "";
-		//EP2
+		//PRINT_R($idrelacioN);
 		foreach($idrelacioN as $etiqueta => $valor){
-			foreach( $valor AS $etiqueta2 => $valor2){
+			FOREACH( $valor AS $etiqueta2 => $valor2){
 				if($idactual!=$valor2){
-					$query_OR .= ' idRelacion = '. $valor2.' OR ';
+			$query_OR .= ' idRelacion = '. $valor2.' OR ';
 				}
 			}
 		}
+
 		if($query_OR != ''){
-			$query_OR2 = substr($query_OR,0,-3);
-			$query_OR3 = " and (".$query_OR2.") ";
-		}else{
-			return 0;
+		$query_OR2 = substr($query_OR,0,-3);
+		$query_OR3 = " and (".$query_OR2.") ";
+		}ELSE{
+			RETURN 0;
 		}
+		
+		
+
+		//$query_OR2 = substr($query_OR,0,-3);
 		$conn = $this->db();		
-		$identificadorProveedor = trim((string)$rfc);
-		$sWhere3  = ' where RFC_PROVEEDOR = trim("'.$identificadorProveedor.'")  ';
+		$sWhere3  = ' where RFC_PROVEEDOR = trim("'.trim($rfc).'")  ';
 		$sql12="SELECT sum(MONTO_DEPOSITADO) as MONTO_DEPOSITADO1 FROM  02temporalEstadoCuenta ".$sWhere3.$query_OR3." ";
+		
 		$query2 = mysqli_query($conn,$sql12);
 		$fetch_arrary2 = mysqli_fetch_array($query2);
 		return $fetch_arrary2['MONTO_DEPOSITADO1'];
-	}
-	
 
-		function setCounter($counter) {
+	}
+
+
+
+
+
+
+	function setCounter($counter) {
 		$this->counter = $counter;
 	}
 	function getCounter() {
 		return $this->counter;
 	}
-	
-	public function diferenciaPorConsecutivo($NUMERO_CONSECUTIVO_PROVEE) {
-    $NUMERO_CONSECUTIVO_PROVEE = $this->mysqli->real_escape_string($NUMERO_CONSECUTIVO_PROVEE);
-    $NUMERO_CONSECUTIVO_PROVEE = (int)$NUMERO_CONSECUTIVO_PROVEE;
-    $con = $this->db();
-
-    // Inicializar variables
-    $PorfaltaDeFactura = 0.0;
-    $PorfaltaDeFacturaSUBERES = 0.0;
-
-    $subTotalSUBETUFACTURA = 0.0;
-
-
-
-    // 1) Con ID_RELACIONADO != '' (relacionadas)
-    $VarSUBE = "SELECT subTotal, UUID, MONTO_DEPOSITAR, ID_RELACIONADO, STATUS_CHECKBOX,
-                       MONTO_FACTURA, NUMERO_CONSECUTIVO_PROVEE
-                FROM 02SUBETUFACTURA
-                LEFT JOIN 02XML ON 02SUBETUFACTURA.id = 02XML.`ultimo_id`
-                WHERE 02SUBETUFACTURA.NUMERO_CONSECUTIVO_PROVEE = '$NUMERO_CONSECUTIVO_PROVEE'
-                  AND 02SUBETUFACTURA.VIATICOSOPRO IN ('REEMBOLSO','VIATICOS',
-                      'PAGO A PROVEEDOR CON DOS O MAS FACTURAS','PAGOS CON UNA SOLA FACTURA')
-                  AND (02SUBETUFACTURA.ID_RELACIONADO IS NOT NULL
-                       AND TRIM(02SUBETUFACTURA.ID_RELACIONADO) <> '')";
-
-    $QUERYSUBE = mysqli_query($con, $VarSUBE);
-    while ($ROWe = mysqli_fetch_array($QUERYSUBE)) {
-
-        if ($ROWe['STATUS_CHECKBOX'] == 'no' && strlen(trim($ROWe['UUID'])) < 1) {
-            $PorfaltaDeFactura += (float)$ROWe['MONTO_DEPOSITAR'] * 1.46;
-        } else {
-            if (isset($ROWe['subTotal']) && is_numeric($ROWe['subTotal']) && $ROWe['subTotal'] > 0) {
-                $subTotalSUBETUFACTURA += (float)$ROWe['subTotal'];
-            } else {
-                $subTotalSUBETUFACTURA += (float)$ROWe['MONTO_FACTURA'];
-            }
-        }
-    }
-	
-	
-$NUMERO_CONSECUTIVO_PROVEE = $this->mysqli->real_escape_string($NUMERO_CONSECUTIVO_PROVEE);
-$NUMERO_CONSECUTIVO_PROVEE = (int)$NUMERO_CONSECUTIVO_PROVEE;
-$con = $this->db();
-
-$VarSUBERES = "
-    SELECT  STATUS_CHECKBOX ,UUID,
-        SUM(CASE WHEN ID_RELACIONADO IS NULL OR TRIM(ID_RELACIONADO) = ''
-                 THEN MONTO_DEPOSITAR ELSE 0 END) AS sin_relacion,
-        SUM(CASE WHEN ID_RELACIONADO IS NOT NULL AND TRIM(ID_RELACIONADO) <> ''
-                 THEN MONTO_DEPOSITAR ELSE 0 END) AS con_relacion
-    FROM 02SUBETUFACTURA LEFT JOIN 02XML ON 02SUBETUFACTURA.id = 02XML.`ultimo_id`
-    WHERE NUMERO_CONSECUTIVO_PROVEE = '$NUMERO_CONSECUTIVO_PROVEE'
-      AND VIATICOSOPRO IN ('VIATICOS','REEMBOLSO',
-                           'PAGO A PROVEEDOR CON DOS O MAS FACTURAS',
-                           'PAGOS CON UNA SOLA FACTURA')";
-
-$QUERYSUBERES = mysqli_query($con, $VarSUBERES);
-
-// Obtenemos el único registro de la consulta (suma de montos)
-$ROWeR = $QUERYSUBERES ? mysqli_fetch_assoc($QUERYSUBERES)
-                       : ['sin_relacion' => 0, 'con_relacion' => 0];
-
-// Evitar undefined index para claves no incluidas en el SELECT
-$ROWeR += ['UUID' => '', 'STATUS_CHECKBOX' => null];
-
-// Inicializar acumuladores para evitar avisos
-$con_relacion = 0.0;
-$sin_relacion = 0.0;
-
-
-    $sin_relacion = (float)$ROWeR['sin_relacion'];
-
-    $con_relacion = (float)$ROWeR['con_relacion'];
-
-
-
-if (
-    strlen(trim($ROWeR['UUID'])) < 1 &&
-    isset($ROWeR['STATUS_CHECKBOX']) && $ROWeR['STATUS_CHECKBOX'] === 'no'
-) {
-    $PorfaltaDeFacturaSUBERES = ($sin_relacion - $con_relacion) * 1.46;
-} else {
-    $PorfaltaDeFacturaSUBERES = $sin_relacion - $con_relacion;// o el valor que corresponda
-}
-
-return (float) $PorfaltaDeFacturaSUBERES2 = (float) $PorfaltaDeFactura + (float) $PorfaltaDeFacturaSUBERES;
-
-}
-
-
-
-
-	
-	
-	      /**
-         * Obtiene los números de evento para los que un colaborador puede
-         * autorizar operaciones de ventas.
-         *
-         * La autorización se determina cuando el colaborador tiene
-         * `autorizaAUT = 'si'` en la tabla 04personal y el evento asociado
-         * pertenece a 04altaeventos.
-         *
-         * @param string|int $idPersonal Identificador del colaborador (idem en sesión).
-         * @return string[] Lista de números de evento (normalizados en mayúsculas).
-         */
-        public function puedeAutorizarVentas($idPersonal) {
-                if (empty($idPersonal)) {
-                        return [];
-                }
-
-                $conn = $this->db();
-                if (!$conn) {
-                        return [];
-                }
-
-                $idPersonal = mysqli_real_escape_string($conn, trim((string) $idPersonal));
-
-                $columnasIdentificador = $this->columnasIdentificadorPersonal($conn);
-                if (empty($columnasIdentificador)) {
-                        return [];
-                }
-
-                $condicionesIdentificador = [];
-                foreach ($columnasIdentificador as $columna) {
-                        $condicionesIdentificador[] = "`p`.`".$columna."` = '".$idPersonal."'";
-                }
-
-                $sql = "
-                        SELECT DISTINCT ae.NUMERO_EVENTO
-                        FROM 04personal AS p
-                        INNER JOIN 04altaeventos AS ae ON ae.id = p.idRelacion
-                        WHERE (".implode(' OR ', $condicionesIdentificador).")
-                          AND LOWER(p.autorizaAUT) = 'si'
-                          AND ae.NUMERO_EVENTO IS NOT NULL
-                          AND ae.NUMERO_EVENTO <> ''";
-
-                $resultado = mysqli_query($conn, $sql);
-                if (!$resultado) {
-                        return [];
-                }
-
-                $eventosAutorizados = [];
-                while ($row = mysqli_fetch_assoc($resultado)) {
-                        $eventoNormalizado = strtoupper(trim((string) $row['NUMERO_EVENTO']));
-                        if ($eventoNormalizado !== '') {
-                                $eventosAutorizados[$eventoNormalizado] = true;
-                        }
-                }
-                mysqli_free_result($resultado);
-
-                return array_keys($eventosAutorizados);
-        }
-
-        /**
-         * Obtiene las columnas disponibles para identificar a un colaborador en 04personal.
-         *
-         * @param mysqli $conn Conexión activa a la base de datos.
-         * @return string[]
-         */
-        private function columnasIdentificadorPersonal($conn) {
-                static $columnasCache = null;
-
-                if ($columnasCache !== null) {
-                        return $columnasCache;
-                }
-
-                $columnasPosibles = ['idem', 'idPersonal', 'IDEM', 'ID_PERSONAL'];
-                $columnasDisponibles = [];
-
-                foreach ($columnasPosibles as $columna) {
-                        if ($this->columnaExisteEnTabla($conn, '04personal', $columna)) {
-                                $columnasDisponibles[] = $columna;
-                        }
-                }
-
-                $columnasCache = $columnasDisponibles;
-                return $columnasCache;
-        }
-
-        /**
-         * Verifica si una columna existe en una tabla de la base de datos activa.
-         *
-         * @param mysqli $conn Conexión activa a la base de datos.
-         * @param string $tabla Nombre de la tabla.
-         * @param string $columna Nombre de la columna.
-         * @return bool
-         */
-        private function columnaExisteEnTabla($conn, $tabla, $columna) {
-                if (!$conn || $tabla === '' || $columna === '') {
-                        return false;
-                }
-
-                $tablaLimpia = str_replace('`', '``', $tabla);
-                $columnaLimpia = mysqli_real_escape_string($conn, $columna);
-                $sql = "SHOW COLUMNS FROM `".$tablaLimpia."` LIKE '".$columnaLimpia."'";
-                $resultado = mysqli_query($conn, $sql);
-                if ($resultado) {
-                        $existe = mysqli_num_rows($resultado) > 0;
-                        mysqli_free_result($resultado);
-                        return $existe;
-                }
-
-                return false;
-        }
-	
-	
-	
-	
-	
 }
 ?>
