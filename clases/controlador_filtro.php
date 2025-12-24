@@ -389,7 +389,7 @@ if($database->plantilla_filtro($nombreTabla,"IMPUESTO_HOSPEDAJE",$altaeventos,$D
 if($database->plantilla_filtro($nombreTabla,"descuentos",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#c9e8e8"> DESCUENTO</th>
 <?php } ?>
 <?php 
-if($database->plantilla_filtro($nombreTabla,"MONTO_DEPOSITAR",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#c9e8e8;text-align:center">TOTAL</th>
+if($database->plantilla_filtro($nombreTabla,"MONTO_DEPOSITAR",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#c9e8e8;text-align:center">TOTAL A PAGAR</th>
 <?php } ?><?php 
 if($database->plantilla_filtro($nombreTabla,"MONTO_DEPOSITADO",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#f48a81;text-align:center">MONTO DEPOSITADO</th>
 <?php } ?><?php 
@@ -435,7 +435,7 @@ if($database->plantilla_filtro($nombreTabla,"NOMBRE_DEL_AYUDO",$altaeventos,$DEP
 
 
 <?php 
-if($database->plantilla_filtro($nombreTabla,"OBSERVACIONES_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#c9e8e8;text-align:center">OBSERVACIONES 1</th>
+if($database->plantilla_filtro($nombreTabla,"OBSERVACIONES_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#c9e8e8;text-align:center;width:700px;min-width:700px;max-width:700px;">OBSERVACIONES 1</th>
 <?php } ?>
 
 <?php 
@@ -454,7 +454,7 @@ if($database->plantilla_filtro($nombreTabla,"COMPLEMENTOS_PAGO_PDF",$altaeventos
 
 
 <?php 
-if($database->plantilla_filtro($nombreTabla,"FECHA_DE_LLENADO",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#c9e8e8;text-align:center">FECHA DE CREACIÓN</th>
+if($database->plantilla_filtro($nombreTabla,"FECHA_DE_LLENADO",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#c9e8e8;text-align:center">FECHA Y HORA <br> DE CREACIÓN</th>
 <?php } ?>
 
 
@@ -979,7 +979,7 @@ echo $NOMBRE_DEL_AYUDO; ?>"></td>
 
 
 <?php  
-if($database->plantilla_filtro($nombreTabla,"OBSERVACIONES_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="background:#c9e8e8"><input type="text" class="form-control" id="OBSERVACIONES_1_2" value="<?php 
+if($database->plantilla_filtro($nombreTabla,"OBSERVACIONES_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="background:#c9e8e8;width:700px;min-width:700px;max-width:700px;"><input type="text" class="form-control" id="OBSERVACIONES_1_2" value="<?php 
 echo $OBSERVACIONES_1; ?>"></td>
 <?php } ?>
 
@@ -1285,46 +1285,75 @@ foreach ($datos as $key=>$row){
     $nombreComercialMostrar = $nombreComercialActual !== '' ? $nombreComercialActual : $identificadorProveedor;
 
 // 0. Si está AUTORIZADO (AUDITORIA3) → blanco SIEMPRE
-if (isset($row['STATUS_AUDITORIA3']) && trim($row['STATUS_AUDITORIA3'])=='si') {
-    $fondo_existe_xml = "style='background-color: #ffffff'";
-    $fondo_existe_xml2 = "style='background-color: #ffffff'";
-}
-else if (isset($row['STATUS_DE_PAGO']) && $row['STATUS_DE_PAGO'] == 'RECHAZADO') {
-    // 1. Rechazado → Rojo
-    $fondo_existe_xml = "style='background-color: #ff0000'"; 
-    $fondo_existe_xml2 = "style='background-color: #ff0000'";
-}
-else if (
-    isset($row['metodoDePago']) && 
-    trim($row['metodoDePago']) !== '' && 
-    strtoupper(trim($row['metodoDePago'])) != 'PUE'
+
+
+$rowDoc = $database->getDoctos_subefactura($row['02SUBETUFACTURAid']); // 1 fila
+
+$complementoPdf = isset($rowDoc['COMPLEMENTOS_PAGO_PDF']) ? trim((string)$rowDoc['COMPLEMENTOS_PAGO_PDF']) : '';
+$complementoXml = isset($rowDoc['COMPLEMENTOS_PAGO_XML']) ? trim((string)$rowDoc['COMPLEMENTOS_PAGO_XML']) : '';
+
+$tieneComplemento = ($complementoPdf !== '' || $complementoXml !== '');
+
+if (
+    isset($row['STATUS_AUDITORIA3']) &&
+    trim($row['STATUS_AUDITORIA3']) === 'si'
 ) {
-    // 2. Método de pago diferente de 'PUE' → Rosado
-    $fondo_existe_xml = "style='background-color: #ffb6c1'"; 
-    $fondo_existe_xml2 = "style='background-color: #ffb6c1'"; 
+    $fondo_existe_xml  = "style='background-color:#ffffff'";
+    $fondo_existe_xml2 = "style='background-color:#ffffff'";
 }
-else if ($row['PFORMADE_PAGO'] != '03') {
-    // 3. Forma de pago diferente de '03' → Rosado
-    $fondo_existe_xml = "style='background-color: #ffb6c1'"; 
-    $fondo_existe_xml2 = "style='background-color: #ffb6c1'"; 
+
+// 0.1 TIENE COMPLEMENTO DE PAGO → BLANCO SIEMPRE
+else if ($tieneComplemento) {
+    $fondo_existe_xml  = "style='background-color:#ffffff'";
+    $fondo_existe_xml2 = "style='background-color:#ffffff'";
 }
+
+// 1. RECHAZADO → ROJO
+else if (
+    isset($row['STATUS_DE_PAGO']) &&
+    $row['STATUS_DE_PAGO'] === 'RECHAZADO'
+) {
+    $fondo_existe_xml  = "style='background-color:#ff0000'";
+    $fondo_existe_xml2 = "style='background-color:#ff0000'";
+}
+
+// 2. ROSADO → SOLO SI NO TIENE COMPLEMENTO
+else if (
+    !$tieneComplemento &&
+    (
+        (
+            isset($row['metodoDePago']) &&
+            trim($row['metodoDePago']) !== '' &&
+            strtoupper(trim($row['metodoDePago'])) !== 'PUE'
+        )
+        ||
+        (
+            isset($row['PFORMADE_PAGO']) &&
+            $row['PFORMADE_PAGO'] !== '03'
+        )
+    )
+) {
+    $fondo_existe_xml  = "style='background-color:#ffb6c1'";
+    $fondo_existe_xml2 = "style='background-color:#ffb6c1'";
+}
+
+// 3. Tiene ClaveUnidadConcepto → BLANCO
 else if (!empty($row['ClaveUnidadConcepto'])) {
-    // 4. Tiene ClaveUnidadConcepto → Blanco
-    $fondo_existe_xml = "style='background-color: #ffffff'"; 
-    $fondo_existe_xml2 = "style='background-color: #ffffff'"; 
+    $fondo_existe_xml  = "style='background-color:#ffffff'";
+    $fondo_existe_xml2 = "style='background-color:#ffffff'";
 }
+
+// 4. ClaveUnidadConcepto vacío → AMARILLO
 else if (empty($row['ClaveUnidadConcepto'])) {
-    // 5. Vacío → Amarillo
-    $fondo_existe_xml2 = "style='background-color: #fdfe87'"; 
-    $fondo_existe_xml = "style='background-color: #fdfe87'"; 
+    $fondo_existe_xml  = "style='background-color:#fdfe87'";
+    $fondo_existe_xml2 = "style='background-color:#fdfe87'";
 }
+
+// 5. DEFAULT
 else {
-    $fondo_existe_xml = "";
+    $fondo_existe_xml  = "";
     $fondo_existe_xml2 = "";
 }
-
-
-
 ?>
 <tr <?php echo $fondo_existe_xml2; ?>>
 <td>
@@ -1817,10 +1846,28 @@ echo  number_format($row['TOTAL_ENPESOS'],2,'.',',');
 <?php } ?>
 
 
+<?php  if($database->plantilla_filtro($nombreTabla,"OBSERVACIONES_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?>
 
-<?php  if($database->plantilla_filtro($nombreTabla,"OBSERVACIONES_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php echo $row['OBSERVACIONES_1'];
- $colspan2 += 1;
- ?></td>
+<td style="
+    text-align:left;
+
+    width:700px;
+
+    min-width:700px;
+
+    max-width:700px;
+
+">
+
+
+
+    <div style="width:700px; min-width:700px; max-width:700px; white-space:normal; word-break:break-word;">
+
+        <?php echo htmlspecialchars($row['OBSERVACIONES_1']); ?>
+
+    </div>
+
+</td>
 <?php } ?>
 
 <?php  if($database->plantilla_filtro($nombreTabla,"ADJUNTAR_ARCHIVO_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php echo $ADJUNTAR_ARCHIVO_1;
@@ -1840,10 +1887,23 @@ echo  number_format($row['TOTAL_ENPESOS'],2,'.',',');
 <?php } ?>
 
 
-<?php  if($database->plantilla_filtro($nombreTabla,"FECHA_DE_LLENADO",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php echo $row['FECHA_DE_LLENADO'];
- $colspan2 += 1;
- ?></td>
-<?php } ?>
+<?php  
+if ($database->plantilla_filtro($nombreTabla,"FECHA_DE_LLENADO",$altaeventos,$DEPARTAMENTO)=="si") {
+
+    $fechaHora = $row['FECHA_DE_LLENADO'];
+    $fecha = date('d-m-Y', strtotime($fechaHora));
+    $hora  = date('H:i:s', strtotime($fechaHora));
+?>
+<td style="text-align:center">
+    <?php echo $fecha; ?>
+    <span style="color:#2542C4; font-weight:bold;">
+        <?php echo $hora; ?>
+    </span>
+</td>
+<?php 
+    $colspan2 += 1;
+} 
+?>
 
 
 
@@ -2301,7 +2361,7 @@ if ($row["VIATICOSOPRO"] != "PAGOS CON UNA SOLA FACTURA"
 
 echo $P_TIPO_DE_MONEDA_1;
 
-$explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario);
+$explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario, $row['NOMBRE_COMERCIAL']);
 
 echo $explodeDatosBancarios['P_TIPO_DE_MONEDA_1'];
 ?></td>
@@ -2309,7 +2369,7 @@ echo $explodeDatosBancarios['P_TIPO_DE_MONEDA_1'];
 <?php  if($database->plantilla_filtro($nombreTabla,"P_INSTITUCION_FINANCIERA_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php 
 
 echo $P_INSTITUCION_FINANCIERA_1;
-$explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario);
+$explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario, $row['NOMBRE_COMERCIAL']);
 echo $explodeDatosBancarios['P_INSTITUCION_FINANCIERA_1'];
  ?></td>
 <?php } ?>
@@ -2317,21 +2377,21 @@ echo $explodeDatosBancarios['P_INSTITUCION_FINANCIERA_1'];
 <?php  if($database->plantilla_filtro($nombreTabla,"P_NUMERO_DE_CUENTA_DB_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php 
 
 echo $P_NUMERO_DE_CUENTA_DB_1; 
-$explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario);
+$explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario, $row['NOMBRE_COMERCIAL']);
 echo $explodeDatosBancarios['P_NUMERO_DE_CUENTA_DB_1'];
 ?></td>
 <?php } ?>
 
 <?php  if($database->plantilla_filtro($nombreTabla,"P_NUMERO_CLABE_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php 
 echo $P_NUMERO_CLABE_1; 
-$explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario);
+$explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario, $row['NOMBRE_COMERCIAL']);
 echo $explodeDatosBancarios['P_NUMERO_CLABE_1'];
 ?></td>
 <?php } ?>
 
 <?php  if($database->plantilla_filtro($nombreTabla,"P_NUMERO_IBAN_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php  
 echo $P_NUMERO_IBAN_1;
-$explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario);
+$explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario, $row['NOMBRE_COMERCIAL']);
 echo $explodeDatosBancarios['P_NUMERO_IBAN_1'];
 ?></td>
 <?php } ?>
@@ -2339,12 +2399,12 @@ echo $explodeDatosBancarios['P_NUMERO_IBAN_1'];
 <?php  if($database->plantilla_filtro($nombreTabla,"P_NUMERO_CUENTA_SWIFT_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php 
 
 echo $P_NUMERO_CUENTA_SWIFT_1; 
-$explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario);
+$explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario, $row['NOMBRE_COMERCIAL']);
 echo $explodeDatosBancarios['P_NUMERO_CUENTA_SWIFT_1'];
 ?></td>
 <?php } ?>
 
-<?php  if($database->plantilla_filtro($nombreTabla,"FOTO_ESTADO_PROVEE",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php $explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario);
+<?php  if($database->plantilla_filtro($nombreTabla,"FOTO_ESTADO_PROVEE",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php $explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario, $row['NOMBRE_COMERCIAL']);
 $regreso ="";
 	if($explodeDatosBancarios['FOTO_ESTADO_PROVEE']==2 or $explodeDatosBancarios['FOTO_ESTADO_PROVEE']=='' or $explodeDatosBancarios['FOTO_ESTADO_PROVEE']==1)
 	{
@@ -2399,26 +2459,40 @@ $VIATICOSOPRO = isset($row['VIATICOSOPRO'])?$row['VIATICOSOPRO']:'' ;
 	
 
 
-
 <?php /*termina copiar y terminaA5*/ ?> 
+
 <td>
 <?php if($database->variablespermisos('','PAGOS_EGRESOSPP','modificar')=='si'){ ?>
-
-<input type="button" name="view" value="MODIFICAR" id="<?php echo $row["02SUBETUFACTURAid"]; ?>" class="btn btn-info btn-xs view_dataVENTASOPERACIONES" /><?php } ?>
+    <input 
+        type="button" 
+        name="view" 
+        value="MODIFICAR" 
+        id="<?php echo $row["02SUBETUFACTURAid"]; ?>" 
+        class="btn btn-info btn-xs view_dataVENTASOPERACIONES" 
+    />
+<?php } ?>
+</td>
 
 <td>
 <?php
-$VIATICOSOPRO   = isset($row['VIATICOSOPRO']) ? $row['VIATICOSOPRO'] : '';
 $UUID           = isset($row['UUID']) ? trim($row['UUID']) : '';
 $STATUS_DE_PAGO = isset($row['STATUS_DE_PAGO']) ? strtoupper(trim($row['STATUS_DE_PAGO'])) : '';
 $PFORMADE_PAGO  = isset($row['PFORMADE_PAGO']) ? trim($row['PFORMADE_PAGO']) : '';
+$VIATICOSOPRO   = isset($row['VIATICOSOPRO']) ? strtoupper(trim($row['VIATICOSOPRO'])) : '';
+
+// Tipos especiales donde NUNCA queremos "SUBIR FACTURA"
+$esViaticoEspecial = in_array($VIATICOSOPRO, [
+    'VIATICOS',
+    'REEMBOLSO',
+    'PAGO A PROVEEDOR CON DOS O MAS FACTURAS'
+]);
 ?>
 
 <!-- BOTÓN COMPLEMENTO -->
 <?php if (
-    $VIATICOSOPRO === "PAGO A PROVEEDOR" &&
     $UUID !== '' &&
     $PFORMADE_PAGO !== '03' &&
+    !$tieneComplemento && // 👈 NUEVA CONDICIÓN
     $database->variablespermisos('', 'CALE_SUBE_PAGOVYO', 'ver') === 'si'
 ): ?>
     <button 
@@ -2429,30 +2503,49 @@ $PFORMADE_PAGO  = isset($row['PFORMADE_PAGO']) ? trim($row['PFORMADE_PAGO']) : '
     </button>
 <?php endif; ?>
 
+
 <!-- BOTÓN FACTURA o MODIFICAR -->
-<?php if (
-    $VIATICOSOPRO === "PAGO A PROVEEDOR" &&
-    $database->variablespermisos('', 'CALE_SUBE_PAGOVYO', 'ver') === 'si'
-): ?>
+<?php if ($database->variablespermisos('', 'CALE_SUBE_PAGOVYO', 'ver') === 'si'): ?>
+
     <?php if ($UUID !== '' && ($STATUS_DE_PAGO === 'APROBADO' || $STATUS_DE_PAGO === 'PAGADO')): ?>
-        <!-- Sin botón -->
+        <!-- SIN BOTÓN -->
+
     <?php elseif ($STATUS_DE_PAGO === 'SOLICITADO'): ?>
+        <!-- Siempre MODIFICAR cuando está SOLICITADO -->
         <button 
             type="button" 
             id="<?php echo $row['02SUBETUFACTURAid']; ?>" 
             class="btn btn-info btn-xs view_dataSUBIRF boton-centro">
             MODIFICAR
         </button>
+
     <?php elseif ($UUID === '' && ($STATUS_DE_PAGO === 'APROBADO' || $STATUS_DE_PAGO === 'PAGADO')): ?>
-        <button 
-            type="button" 
-            id="<?php echo $row['02SUBETUFACTURAid']; ?>" 
-            class="btn btn-info btn-xs view_dataSUBIRF boton-centro">
-            SUBIR FACTURA
-        </button>
+
+        <?php if ($esViaticoEspecial): ?>
+            <!-- CASOS ESPECIALES: NUNCA SUBIR FACTURA, SOLO MODIFICAR -->
+            <button 
+                type="button" 
+                id="<?php echo $row['02SUBETUFACTURAid']; ?>" 
+                class="btn btn-info btn-xs view_dataSUBIRF boton-centro">
+                MODIFICAR
+            </button>
+        <?php else: ?>
+            <!-- CASOS NORMALES: AQUÍ SÍ PUEDE SALIR SUBIR FACTURA -->
+            <button 
+                type="button" 
+                id="<?php echo $row['02SUBETUFACTURAid']; ?>" 
+                class="btn btn-info btn-xs view_dataSUBIRF boton-centro">
+                SUBIR FACTURA
+            </button>
+        <?php endif; ?>
+
     <?php endif; ?>
+
 <?php endif; ?>
 </td>
+
+
+
 
 
 

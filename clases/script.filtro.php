@@ -517,7 +517,35 @@ function showNotify2(msg, ok){
 	});
 }
 
+function pad(n){ return n < 10 ? '0'+n : n; }
 
+function actualizarFechaHora(){
+    const now = new Date();
+
+    const fecha =
+        pad(now.getDate()) + '-' +
+        pad(now.getMonth() + 1) + '-' +
+        now.getFullYear();
+
+    const hora =
+        pad(now.getHours()) + ':' +
+        pad(now.getMinutes()) + ':' +
+        pad(now.getSeconds());
+
+    document.getElementById('fecha').textContent = fecha;
+    document.getElementById('hora').textContent  = hora;
+
+    // Formato MySQL exacto
+    document.getElementById('FECHA_DE_LLENADO').value =
+        now.getFullYear() + '-' +
+        pad(now.getMonth() + 1) + '-' +
+        pad(now.getDate()) + ' ' +
+        hora;
+}
+
+// Hora exacta del cliente
+actualizarFechaHora();
+setInterval(actualizarFechaHora, 1000);
 
 function LIMPIAR(){
 
@@ -776,6 +804,7 @@ var ULTIMA_CARGA_DATOBANCA=$("#ULTIMA_CARGA_DATOBANCA").val();
 'MONTO_DE_COMISION':MONTO_DE_COMISION,
 'POLIZA_NUMERO':POLIZA_NUMERO,
 'NOMBRE_DEL_EJECUTIVO':NOMBRE_DEL_EJECUTIVO,
+'NOMBRE_DEL_AYUDO':NOMBRE_DEL_AYUDO,
 'OBSERVACIONES_2':OBSERVACIONES_2,
 'FECHA_DE_LLENADO':FECHA_DE_LLENADO,
 'hiddenpagoproveedores':hiddenpagoproveedores,

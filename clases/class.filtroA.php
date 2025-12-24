@@ -19,73 +19,25 @@ define("__ROOT1__", dirname(dirname(__FILE__)));
 	public $mysqli;
 	public $counter;//Propiedad para almacenar el numero de registro devueltos por la consulta
 
-        function __construct(){
-                $this->mysqli = $this->db();
+	function __construct(){
+		$this->mysqli = $this->db();
     }
 
-        private function isValidRfc($rfc){
-                $cleanRfc = trim((string)$rfc);
-                return $cleanRfc !== '' && preg_match('/^[A-Z&Ñ]{3,4}[0-9]{6}[A-Z0-9]{3}$/i', $cleanRfc);
-        }
-    public function datos_bancarios_xml($rfc, $idRelacion = null, $nombreComercial = null){
-                $conn = $this->db();
-                $filtros = [];
+	public function datos_bancarios_xml($rfc){
+	$conn = $this->db();
+	$variable = "select *,02usuarios.id as iddd from 02usuarios left join 02direccionproveedor1 ON 02usuarios.id = 02direccionproveedor1.idRelacion where P_RFC_MTDP = '".$rfc."' ";
+	$query = mysqli_query($conn,$variable);
+	$row = mysqli_fetch_array($query, MYSQLI_ASSOC);
+	return $idRelacion = $row['iddd'];
+	}
 
-                if($this->isValidRfc($rfc)){
-                        $valueRfc = mysqli_real_escape_string($conn, strtoupper($rfc));
-                        $filtros[] = "P_RFC_MTDP = '".$valueRfc."'";
-                }
-
-                $nombreComercial = trim((string)$nombreComercial);
-                if($nombreComercial !== ''){
-                        $valueNombre = mysqli_real_escape_string($conn, $nombreComercial);
-                        $filtros[] = "02direccionproveedor1.P_NOMBRE_COMERCIAL_EMPRESA = '".$valueNombre."'";
-                }
-
-                if(is_numeric($idRelacion)){
-                        $filtros[] = "02usuarios.id = '".intval($idRelacion)."'";
-                }
-
-                if(empty($filtros)){
-                        return null;
-                }
-
-                $variable = "SELECT 02DATOSBANCARIOS1.idRelacion AS idRelacion FROM 02usuarios "
-                        ."LEFT JOIN 02direccionproveedor1 ON 02usuarios.id = 02direccionproveedor1.idRelacion "
-                        ."LEFT JOIN 02DATOSBANCARIOS1 ON 02DATOSBANCARIOS1.idRelacion = 02usuarios.id "
-                        ."WHERE ".implode(' AND ', $filtros)." "
-                        ."ORDER BY 02DATOSBANCARIOS1.checkbox = 'si' DESC, 02DATOSBANCARIOS1.id DESC LIMIT 1";
-                $query = mysqli_query($conn,$variable);
-                $row = mysqli_fetch_array($query, MYSQLI_ASSOC);
-                return $row ? $row['idRelacion'] : null;
-        }
-
-        public function datos_bancarios_todo($idRelacion, $nombreComercial = null){
-                $conn = $this->db();
-                $filtros = [];
-
-                if(is_numeric($idRelacion)){
-                        $filtros[] = "02DATOSBANCARIOS1.idRelacion = '".intval($idRelacion)."'";
-                }
-
-                $nombreComercial = trim((string)$nombreComercial);
-                if($nombreComercial !== ''){
-                        $valueNombre = mysqli_real_escape_string($conn, $nombreComercial);
-                        $filtros[] = "02direccionproveedor1.P_NOMBRE_COMERCIAL_EMPRESA = '".$valueNombre."'";
-                }
-
-                if(empty($filtros)){
-                        return [];
-                }
-              $variable2 = "SELECT 02DATOSBANCARIOS1.* FROM 02DATOSBANCARIOS1 "
-                        ."LEFT JOIN 02usuarios ON 02usuarios.id = 02DATOSBANCARIOS1.idRelacion "
-                        ."LEFT JOIN 02direccionproveedor1 ON 02usuarios.id = 02direccionproveedor1.idRelacion "
-                        ."WHERE (".implode(' AND ', $filtros).") "
-                        ."AND 02DATOSBANCARIOS1.checkbox = 'si' ORDER BY 02DATOSBANCARIOS1.id DESC LIMIT 1";
-                $query2 = mysqli_query($conn,$variable2);
-                $row2 = mysqli_fetch_array($query2, MYSQLI_ASSOC);
-                return $row2 ? $row2 : [];
-        }
+	public function datos_bancarios_todo($idRelacion){
+	$conn = $this->db();
+	$variable2 = "select * from 02DATOSBANCARIOS1 where idRelacion = '".$idRelacion."' and checkbox = 'si'  ";
+	$query2 = mysqli_query($conn,$variable2);
+	$row2 = mysqli_fetch_array($query2, MYSQLI_ASSOC);
+	return $row2;
+	}
 
 	public function DOCUMENTOSFISCALES_PAGOA($idRelacion, $documento , $documento2=FALSE){
 		$conn = $this->db();
@@ -391,13 +343,54 @@ if($search['propina']!=""){
 	$propina = str_replace(',','',str_replace('$','',$search['propina']));
 $sWhere2.="  $tables2.propina = '".$propina."' and ";}
 
+
 if ($sWhere2 != "") {
     $sWhere22 = substr($sWhere2, 0, -4);
-    $sWhere3 = ' ' . $sWhereCC . ' WHERE ( (' . $sWhere22 . ') 
-        AND (02SUBETUFACTURA.ID_RELACIONADO IS NULL OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "") ) '; 
+    $sWhere3 = ' ' . $sWhereCC . ' 
+        INNER JOIN 04altaeventos
+            ON 04altaeventos.NUMERO_EVENTO = 02SUBETUFACTURA.NUMERO_EVENTO
+        INNER JOIN 04personal
+            ON 04personal.idRelacion = 04altaeventos.id
+        INNER JOIN 01informacionpersonal
+            ON 01informacionpersonal.idRelacion = 04personal.idPersonal
+        WHERE ( (' . $sWhere22 . ')
+            AND (02SUBETUFACTURA.ID_RELACIONADO IS NULL OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "")
+            AND (
+                    -- 1) Responsable del evento
+                    04personal.idPersonal = "' . $_SESSION['idem'] . '"
+
+                 -- 2) NOMBRE_DEL_AYUDO guarda el nombre completo
+                 OR TRIM(02SUBETUFACTURA.NOMBRE_DEL_AYUDO) = TRIM("' . $_SESSION['NOMBREUSUARIO'] . '")
+
+                 -- 3) NOMBRE_DEL_AYUDO guarda el ID de la persona
+                 OR TRIM(02SUBETUFACTURA.NOMBRE_DEL_AYUDO) = TRIM("' . $_SESSION['idem'] . '")
+                )
+            AND 04personal.autoriza = "si"
+        )';
 } else {
-    $sWhere3 = ' ' . $sWhereCC . ' WHERE (02SUBETUFACTURA.ID_RELACIONADO IS NULL OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "") '; 
+    $sWhere3 = ' ' . $sWhereCC . '
+        INNER JOIN 04altaeventos
+            ON 04altaeventos.NUMERO_EVENTO = 02SUBETUFACTURA.NUMERO_EVENTO
+        INNER JOIN 04personal
+            ON 04personal.idRelacion = 04altaeventos.id
+        INNER JOIN 01informacionpersonal
+            ON 01informacionpersonal.idRelacion = 04personal.idPersonal
+        WHERE
+            (02SUBETUFACTURA.ID_RELACIONADO IS NULL OR TRIM(02SUBETUFACTURA.ID_RELACIONADO) = "")
+            AND (
+                    -- 1) Responsable del evento
+                    04personal.idPersonal = "' . $_SESSION['idem'] . '"
+
+                 -- 2) NOMBRE_DEL_AYUDO guarda el nombre completo
+                 OR TRIM(02SUBETUFACTURA.NOMBRE_DEL_AYUDO) = TRIM("' . $_SESSION['NOMBREUSUARIO'] . '")
+
+                 -- 3) NOMBRE_DEL_AYUDO guarda el ID de la persona
+                 OR TRIM(02SUBETUFACTURA.NOMBRE_DEL_AYUDO) = TRIM("' . $_SESSION['idem'] . '")
+                )
+            AND 04personal.autoriza = "si"
+    ';
 }
+
 
 
 
