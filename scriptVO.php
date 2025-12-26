@@ -500,7 +500,7 @@ $('#mensajeventasoperaciones').html("<span id='ACTUALIZADO' >"+data+"</span>");
 $(document).on('click', '.view_dataVENTASOPERACIONES', function(){
 var personal_id = $(this).attr('id');
 $.ajax({
-url:'pagoproveedores/VistaPreviapagoproveedor.php',
+url:'pagoproveedores/VistaPreviapagoproveedorVENTAS.php',
 method:'POST',
 data:{personal_id:personal_id},
 beforeSend:function(){
@@ -688,7 +688,7 @@ $('#mensajeDATOSBANCARIOS1').html("<span id='ACTUALIZADO' >"+data+"</span>");
 			$('#target2').hide("linear");
 			$('#target3').hide("linear");
 			$('#target4').hide("linear");
-			$('#target5').show("linear");
+			$('#target5').hide("linear");
 			$('#target6').hide("linear");
 			$('#target7').hide("linear");
 			$('#target8').hide("linear");

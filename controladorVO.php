@@ -102,7 +102,7 @@ $MONTO_DE_COMISION = isset($_POST["MONTO_DE_COMISION"])?$_POST["MONTO_DE_COMISIO
 $POLIZA_NUMERO = isset($_POST["POLIZA_NUMERO"])?$_POST["POLIZA_NUMERO"]:"";
 $NOMBRE_DEL_EJECUTIVO = isset($_POST["NOMBRE_DEL_EJECUTIVO"])?$_POST["NOMBRE_DEL_EJECUTIVO"]:"";
 $NOMBRE_DEL_AYUDO = isset($_POST["NOMBRE_DEL_AYUDO"])?$_POST["NOMBRE_DEL_AYUDO"]:"";
-$ID_AYUDO = isset($_POST["ID_AYUDO"])?$_POST["ID_AYUDO"]:"";
+
 $OBSERVACIONES_1 = isset($_POST["OBSERVACIONES_1"])?$_POST["OBSERVACIONES_1"]:"";
 $hiddenVENTASOPERACIONES = isset($_POST["hiddenVENTASOPERACIONES"])?$_POST["hiddenVENTASOPERACIONES"]:""; 
 $IPventasoperar = isset($_POST["IPventasoperar"])?$_POST["IPventasoperar"]:""; 
@@ -144,7 +144,7 @@ $Descuento = isset($_POST["Descuento"])?$_POST["Descuento"]:"";
 $Propina = isset($_POST["Propina"])?$_POST["Propina"]:"";
 	
 	
-$actualiza = isset($_POST["actualiza"])?$_POST["actualiza"]:"";
+$actualiza = isset($_POST["actualiza"])?trim($_POST["actualiza"]):"";
 	
 	if($NOMBRE_COMERCIAL == '' and $NOMBRE_COMERCIAL23 != ''){
 		$NOMBRE_COMERCIAL = $NOMBRE_COMERCIAL23;
@@ -158,7 +158,7 @@ if($NOMBRE_COMERCIAL == "" OR $NUMERO_EVENTO == "" ){
 	
 	
 	
-	echo $ventasoperaciones->ventasyoperacionesP ($NUMERO_CONSECUTIVO_PROVEE , $NOMBRE_COMERCIAL , $RAZON_SOCIAL ,$VIATICOSOPRO, $RFC_PROVEEDOR , $NUMERO_EVENTO ,$NOMBRE_EVENTO, $MOTIVO_GASTO , $CONCEPTO_PROVEE , $MONTO_TOTAL_COTIZACION_ADEUDO , $MONTO_DEPOSITAR , $MONTO_PROPINA , $FECHA_AUTORIZACION_RESPONSABLE , $FECHA_AUTORIZACION_AUDITORIA , $FECHA_DE_LLENADO , $MONTO_FACTURA , $TIPO_DE_MONEDA ,$PFORMADE_PAGO, $FECHA_DE_PAGO , $FECHA_A_DEPOSITAR , $STATUS_DE_PAGO , $BANCO_ORIGEN , $MONTO_DEPOSITADO , $CLASIFICACION_GENERAL , $CLASIFICACION_ESPECIFICA , $PLACAS_VEHICULO , $MONTO_DE_COMISION , $POLIZA_NUMERO , $NOMBRE_DEL_EJECUTIVO ,$NOMBRE_DEL_AYUDO,$ID_AYUDO, $OBSERVACIONES_1, $TIPO_CAMBIOP,  $TOTAL_ENPESOS,$IMPUESTO_HOSPEDAJE,$TImpuestosRetenidosIVA,$TImpuestosRetenidosISR,$descuentos,$IVA,  $ENVIARventasoper,$hiddenVENTASOPERACIONES,$IPventasoperar,
+	echo $ventasoperaciones->ventasyoperacionesP ($NUMERO_CONSECUTIVO_PROVEE , $NOMBRE_COMERCIAL , $RAZON_SOCIAL ,$VIATICOSOPRO, $RFC_PROVEEDOR , $NUMERO_EVENTO ,$NOMBRE_EVENTO, $MOTIVO_GASTO , $CONCEPTO_PROVEE , $MONTO_TOTAL_COTIZACION_ADEUDO , $MONTO_DEPOSITAR , $MONTO_PROPINA , $FECHA_AUTORIZACION_RESPONSABLE , $FECHA_AUTORIZACION_AUDITORIA , $FECHA_DE_LLENADO , $MONTO_FACTURA , $TIPO_DE_MONEDA ,$PFORMADE_PAGO, $FECHA_DE_PAGO , $FECHA_A_DEPOSITAR , $STATUS_DE_PAGO , $BANCO_ORIGEN , $MONTO_DEPOSITADO , $CLASIFICACION_GENERAL , $CLASIFICACION_ESPECIFICA , $PLACAS_VEHICULO , $MONTO_DE_COMISION , $POLIZA_NUMERO , $NOMBRE_DEL_EJECUTIVO ,$NOMBRE_DEL_AYUDO, $OBSERVACIONES_1, $TIPO_CAMBIOP,  $TOTAL_ENPESOS,$IMPUESTO_HOSPEDAJE,$TImpuestosRetenidosIVA,$TImpuestosRetenidosISR,$descuentos,$IVA,  $ENVIARventasoper,$hiddenVENTASOPERACIONES,$IPventasoperar,
 	$FechaTimbrado, $tipoDeComprobante, 
 		$metodoDePago, $formaDePago, $condicionesDePago, $subTotal, 
 		$TipoCambio, $Moneda, $total, $serie, 
@@ -284,15 +284,18 @@ if( $_FILES["ADJUNTAR_FACTURA_XML"] == true){
 	$regreso = $conexion2->lectorxml($url);
 	$rfcE = $regreso['rfcE'];					
 	$nombreE = $regreso['nombreE'];	
-	$conn = $conexion->db();//verificar_usuario
-		if( $ventasoperaciones->verificar_rfc($conn,$rfcE) ==''){
-			$idwebc = $ventasoperaciones->ingresar_usuario($conn,TRIM($nombreE));
-			$ventasoperaciones->ingresar_rfc($conn,TRIM($rfcE),$idwebc);
-		}elseif($ventasoperaciones->verificar_rfc($conn,$rfcE) !=''){
-			$idwebc = $ventasoperaciones->verificar_rfc($conn,$rfcE);
-		}else{
-			$idwebc = $ventasoperaciones->verificar_usuario($conn,$nombreE);
-		}
+		
+		                if ($ventasoperaciones->verificar_rfc($conn, $rfcE) != '') {
+                        $idwebc = $ventasoperaciones->verificar_rfc($conn, $rfcE);
+                } elseif ($ventasoperaciones->verificar_usuario($conn, $nombreE) != '') {
+                        $idwebc = $ventasoperaciones->verificar_usuario($conn, $nombreE);
+                } elseif (isset($_SESSION["idPROV"]) && $_SESSION["idPROV"] != '') {
+                        $idwebc = $_SESSION["idPROV"];
+                } else {
+                        $idwebc = 1;
+                }
+				
+				
 		//echo $explotado[1];
 //}
 $_SESSION["idPROV"] = $idwebc;
