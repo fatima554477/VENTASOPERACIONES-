@@ -27,6 +27,7 @@ define("__ROOT1__", dirname(dirname(__FILE__)));
                 $cleanRfc = trim((string)$rfc);
                 return $cleanRfc !== '' && preg_match('/^[A-Z&Ñ]{3,4}[0-9]{6}[A-Z0-9]{3}$/i', $cleanRfc);
         }
+
     public function datos_bancarios_xml($rfc, $idRelacion = null, $nombreComercial = null){
                 $conn = $this->db();
                 $filtros = [];
@@ -35,6 +36,8 @@ define("__ROOT1__", dirname(dirname(__FILE__)));
                         $valueRfc = mysqli_real_escape_string($conn, strtoupper($rfc));
                         $filtros[] = "P_RFC_MTDP = '".$valueRfc."'";
                 }
+
+     
 
                 $nombreComercial = trim((string)$nombreComercial);
                 if($nombreComercial !== ''){
@@ -173,15 +176,22 @@ $sWhere2.="  $tables.TIPO_DE_MONEDA LIKE '%".$search['TIPO_DE_MONEDA']."%' and "
 if($search['PFORMADE_PAGO']!=""){
 $sWhere2.="  $tables.PFORMADE_PAGO LIKE '%".$search['PFORMADE_PAGO']."%' and ";}
 
-if($search['FECHA_DE_PAGO']!="" and $search['FECHA_DE_PAGO2a']!=""){
+if(isset($search['FECHA_DE_PAGO_VACIO']) && $search['FECHA_DE_PAGO_VACIO']!==""){
+$sWhere2.=" ($tables.FECHA_DE_PAGO IS NULL OR $tables.FECHA_DE_PAGO = '' OR $tables.FECHA_DE_PAGO = '0000-00-00') and ";
+}elseif($search['FECHA_DE_PAGO']!="" and $search['FECHA_DE_PAGO2a']!=""){
 //BETWEEN '2022-01-12' AND '2022-01-22' DATE(`ribono_tabla`.fechaamazon) 	
 $sWhere2.=" $tables.FECHA_DE_PAGO BETWEEN 
 '".$search['FECHA_DE_PAGO']."' and '".$search['FECHA_DE_PAGO2a']."'  and ";
 }elseif($search['FECHA_DE_PAGO']!=""){
+
 $sWhere2.=" $tables.FECHA_DE_PAGO LIKE '%".$search['FECHA_DE_PAGO']."%' and ";
+
 }elseif($search['FECHA_DE_PAGO2a']!=""){
+
 $sWhere2.=" $tables.FECHA_DE_PAGO LIKE '%".$search['FECHA_DE_PAGO2a']."%' and ";
+
 }
+
 
 
 if($search['FECHA_A_DEPOSITAR']!=""){

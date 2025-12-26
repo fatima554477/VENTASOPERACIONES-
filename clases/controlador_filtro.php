@@ -55,6 +55,7 @@ $PFORMADE_PAGO = isset($_POST["PFORMADE_PAGO"])?trim($_POST["PFORMADE_PAGO"]):""
  
 $FECHA_DE_PAGO = isset($_POST["FECHA_DE_PAGO"])?trim($_POST["FECHA_DE_PAGO"]):"";
 $FECHA_DE_PAGO2a = isset($_POST["FECHA_DE_PAGO2a"])?trim($_POST["FECHA_DE_PAGO2a"]):"";
+$FECHA_DE_PAGO_VACIO = isset($_POST["FECHA_DE_PAGO_VACIO"])?trim($_POST["FECHA_DE_PAGO_VACIO"]):"";
   
 $FECHA_A_DEPOSITAR = isset($_POST["FECHA_A_DEPOSITAR"])?trim($_POST["FECHA_A_DEPOSITAR"]):"";  
 $STATUS_DE_PAGO = isset($_POST["STATUS_DE_PAGO"])?trim($_POST["STATUS_DE_PAGO"]):"";  
@@ -177,6 +178,7 @@ if ($per_page <= 0) {
 
 "FECHA_DE_PAGO"=>$FECHA_DE_PAGO,
 "FECHA_DE_PAGO2a"=>$FECHA_DE_PAGO2a,
+"FECHA_DE_PAGO_VACIO"=>$FECHA_DE_PAGO_VACIO,
 
 "FECHA_A_DEPOSITAR"=>$FECHA_A_DEPOSITAR,
 "STATUS_DE_PAGO"=>$STATUS_DE_PAGO,
@@ -920,6 +922,14 @@ echo $FECHA_DE_PAGO; ?>"></td>
 <td><strong>TERMINA&nbsp;</strong></td>
 <td><input type="date" class="form-control" id="FECHA_DE_PAGO2a" value="<?php 
 echo $FECHA_DE_PAGO2a; ?>"></td>
+<td style="padding-left:10px;">
+	<div class="form-check">
+		<input class="form-check-input" type="checkbox" value="1" id="FECHA_DE_PAGO_VACIO" <?php if($FECHA_DE_PAGO_VACIO==='1'){echo 'checked';} ?>>
+		<label class="form-check-label" for="FECHA_DE_PAGO_VACIO">
+			VACÍOS
+		</label>
+	</div>
+</td>
 </tr>
 </table>
 </div>
@@ -1910,7 +1920,7 @@ if ($database->plantilla_filtro($nombreTabla,"FECHA_DE_LLENADO",$altaeventos,$DE
 
 <?php 
 
-$id_relacion_bancario = $database->datos_bancarios_xml($row['RFC_PROVEEDOR']);
+$id_relacion_bancario = $database->datos_bancarios_xml($row['RFC_PROVEEDOR'], null, $row['NOMBRE_COMERCIAL']);
 $mostrarXML = ($row['STATUS_SINXML'] !== 'si');
 
 if($database->plantilla_filtro($nombreTabla,"CSF",$altaeventos,$DEPARTAMENTO)=="si"){ ?>
@@ -1924,6 +1934,7 @@ echo $database->DOCUMENTOSFISCALES_PAGOA($id_relacion_bancario,'CONSTANCIA DE SI
 
 
 <?php 
+$id_relacion_bancario = $database->datos_bancarios_xml($row['RFC_PROVEEDOR'], null, $row['NOMBRE_COMERCIAL']);
 if($database->plantilla_filtro($nombreTabla,"OPINION_CUMPLIMIENTO",$altaeventos,$DEPARTAMENTO)=="si"){ ?>
 <td style="text-align:center">
 <?php
@@ -2389,7 +2400,7 @@ echo $explodeDatosBancarios['P_NUMERO_CLABE_1'];
 ?></td>
 <?php } ?>
 
-<?php  if($database->plantilla_filtro($nombreTabla,"P_NUMERO_IBAN_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php  
+<?php  if($database->plantilla_filtro($nombreTabla,"P_NUMERO_IBAN_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php 
 echo $P_NUMERO_IBAN_1;
 $explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario, $row['NOMBRE_COMERCIAL']);
 echo $explodeDatosBancarios['P_NUMERO_IBAN_1'];
@@ -2399,6 +2410,7 @@ echo $explodeDatosBancarios['P_NUMERO_IBAN_1'];
 <?php  if($database->plantilla_filtro($nombreTabla,"P_NUMERO_CUENTA_SWIFT_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php 
 
 echo $P_NUMERO_CUENTA_SWIFT_1; 
+
 $explodeDatosBancarios = $database->datos_bancarios_todo($id_relacion_bancario, $row['NOMBRE_COMERCIAL']);
 echo $explodeDatosBancarios['P_NUMERO_CUENTA_SWIFT_1'];
 ?></td>
