@@ -571,7 +571,7 @@ if($row['ultimo_id']==0 or $row['ultimo_id']==''){
 		return $row['id'];
 	}
 
-	public function ventasyoperacionesP ($NUMERO_CONSECUTIVO_PROVEE , $NOMBRE_COMERCIAL , $RAZON_SOCIAL ,$VIATICOSOPRO, $RFC_PROVEEDOR , $NUMERO_EVENTO ,$NOMBRE_EVENTO, $MOTIVO_GASTO , $CONCEPTO_PROVEE , $MONTO_TOTAL_COTIZACION_ADEUDO , $MONTO_DEPOSITAR , $MONTO_PROPINA , $FECHA_AUTORIZACION_RESPONSABLE , $FECHA_AUTORIZACION_AUDITORIA , $FECHA_DE_LLENADO , $MONTO_FACTURA , $TIPO_DE_MONEDA ,$PFORMADE_PAGO, $FECHA_DE_PAGO , $FECHA_A_DEPOSITAR , $STATUS_DE_PAGO , $BANCO_ORIGEN , $MONTO_DEPOSITADO , $CLASIFICACION_GENERAL , $CLASIFICACION_ESPECIFICA , $PLACAS_VEHICULO , $MONTO_DE_COMISION , $POLIZA_NUMERO , $NOMBRE_DEL_EJECUTIVO ,$NOMBRE_DEL_AYUDO,$ID_AYUDO, $OBSERVACIONES_1, $TIPO_CAMBIOP,  $TOTAL_ENPESOS,$IMPUESTO_HOSPEDAJE,$TImpuestosRetenidosIVA,$TImpuestosRetenidosISR,$descuentos,$IVA,  $ENVIARventasoper,$hiddenVENTASOPERACIONES,$IPventasoperar,
+	public function ventasyoperacionesP ($NUMERO_CONSECUTIVO_PROVEE , $NOMBRE_COMERCIAL , $RAZON_SOCIAL ,$VIATICOSOPRO, $RFC_PROVEEDOR , $NUMERO_EVENTO ,$NOMBRE_EVENTO, $MOTIVO_GASTO , $CONCEPTO_PROVEE , $MONTO_TOTAL_COTIZACION_ADEUDO , $MONTO_DEPOSITAR , $MONTO_PROPINA , $FECHA_AUTORIZACION_RESPONSABLE , $FECHA_AUTORIZACION_AUDITORIA , $FECHA_DE_LLENADO , $MONTO_FACTURA , $TIPO_DE_MONEDA ,$PFORMADE_PAGO, $FECHA_DE_PAGO , $FECHA_A_DEPOSITAR , $STATUS_DE_PAGO , $BANCO_ORIGEN , $MONTO_DEPOSITADO , $CLASIFICACION_GENERAL , $CLASIFICACION_ESPECIFICA , $PLACAS_VEHICULO , $MONTO_DE_COMISION , $POLIZA_NUMERO , $NOMBRE_DEL_EJECUTIVO ,$NOMBRE_DEL_AYUDO, $OBSERVACIONES_1, $TIPO_CAMBIOP,  $TOTAL_ENPESOS,$IMPUESTO_HOSPEDAJE,$TImpuestosRetenidosIVA,$TImpuestosRetenidosISR,$descuentos,$IVA,  $ENVIARventasoper,$hiddenVENTASOPERACIONES,$IPventasoperar,
 	$FechaTimbrado, $tipoDeComprobante, 
 		$metodoDePago, $formaDePago, $condicionesDePago, $subTotal, 
 		$TipoCambio, $Moneda, $total, $serie, 
@@ -626,7 +626,12 @@ if( $ventasoperaciones->verificar_rfc($conn,$rfcE) ==''){
 			$idwebc = $ventasoperaciones->verificar_usuario($conn,$nombreE);
 		}*/
 		
-		$existe = $this->revisar_pagoproveedor2($IPventasoperar);	
+                $existe = $this->revisar_pagoproveedor2($IPventasoperar);
+                $registroId = $IPventasoperar;
+
+                if($registroId == '' && $existe != ''){
+                        $registroId = $existe;
+                }
 		
 		$idRelacionU = isset($_SESSION['idempermiso'])?$_SESSION['idempermiso']:'';
 
@@ -635,7 +640,7 @@ if( $ventasoperaciones->verificar_rfc($conn,$rfcE) ==''){
 		if($idem != ''){                           
 			//ADJUNTAR_FACTURA_XML idPROV
 		$var1 = "update 02SUBETUFACTURA set
-		NUMERO_CONSECUTIVO_PROVEE = '".$NUMERO_CONSECUTIVO_PROVEE."' , NOMBRE_COMERCIAL = '".$NOMBRE_COMERCIAL."' , RAZON_SOCIAL = '".$RAZON_SOCIAL."' , VIATICOSOPRO = '".$VIATICOSOPRO."' , RFC_PROVEEDOR = '".$RFC_PROVEEDOR."' , NUMERO_EVENTO = '".$NUMERO_EVENTO."' , NOMBRE_EVENTO = '".$NOMBRE_EVENTO."' , MOTIVO_GASTO = '".$MOTIVO_GASTO."' , CONCEPTO_PROVEE = '".$CONCEPTO_PROVEE."' , MONTO_TOTAL_COTIZACION_ADEUDO = '".$MONTO_TOTAL_COTIZACION_ADEUDO."' , MONTO_DEPOSITAR = '".$MONTO_DEPOSITAR."' , MONTO_PROPINA = '".$MONTO_PROPINA."' , FECHA_AUTORIZACION_RESPONSABLE = '".$FECHA_AUTORIZACION_RESPONSABLE."' , FECHA_AUTORIZACION_AUDITORIA = '".$FECHA_AUTORIZACION_AUDITORIA."' ,FECHA_DE_LLENADO = '".$FECHA_DE_LLENADO."' , MONTO_FACTURA = '".$MONTO_FACTURA."' , TIPO_DE_MONEDA = '".$TIPO_DE_MONEDA."' , PFORMADE_PAGO = '".$PFORMADE_PAGO."' , FECHA_DE_PAGO = '".$FECHA_DE_PAGO."' , FECHA_A_DEPOSITAR = '".$FECHA_A_DEPOSITAR."' , STATUS_DE_PAGO = '".$STATUS_DE_PAGO."' , BANCO_ORIGEN = '".$BANCO_ORIGEN."' , MONTO_DEPOSITADO = '".$MONTO_DEPOSITADO."' , CLASIFICACION_GENERAL = '".$CLASIFICACION_GENERAL."' , CLASIFICACION_ESPECIFICA = '".$CLASIFICACION_ESPECIFICA."' , PLACAS_VEHICULO = '".$PLACAS_VEHICULO."' , MONTO_DE_COMISION = '".$MONTO_DE_COMISION."' , POLIZA_NUMERO = '".$POLIZA_NUMERO."' , NOMBRE_DEL_EJECUTIVO = '".$NOMBRE_DEL_EJECUTIVO."' , NOMBRE_DEL_AYUDO = '".$NOMBRE_DEL_AYUDO."' , ID_AYUDO = '".$ID_AYUDO."' , OBSERVACIONES_1 = '".$OBSERVACIONES_1."' , TIPO_CAMBIOP = '".$TIPO_CAMBIOP."' , TOTAL_ENPESOS = '".$TOTAL_ENPESOS."' , IMPUESTO_HOSPEDAJE = '".$IMPUESTO_HOSPEDAJE."' , TImpuestosRetenidosIVA = '".$TImpuestosRetenidosIVA."' , TImpuestosRetenidosISR = '".$TImpuestosRetenidosISR."' , descuentos = '".$descuentos."' , IVA = '".$IVA."' where id = '".$IPventasoperar."' ; ";
+		NUMERO_CONSECUTIVO_PROVEE = '".$NUMERO_CONSECUTIVO_PROVEE."' , NOMBRE_COMERCIAL = '".$NOMBRE_COMERCIAL."' , RAZON_SOCIAL = '".$RAZON_SOCIAL."' , VIATICOSOPRO = '".$VIATICOSOPRO."' , RFC_PROVEEDOR = '".$RFC_PROVEEDOR."' , NUMERO_EVENTO = '".$NUMERO_EVENTO."' , NOMBRE_EVENTO = '".$NOMBRE_EVENTO."' , MOTIVO_GASTO = '".$MOTIVO_GASTO."' , CONCEPTO_PROVEE = '".$CONCEPTO_PROVEE."' , MONTO_TOTAL_COTIZACION_ADEUDO = '".$MONTO_TOTAL_COTIZACION_ADEUDO."' , MONTO_DEPOSITAR = '".$MONTO_DEPOSITAR."' , MONTO_PROPINA = '".$MONTO_PROPINA."' , FECHA_AUTORIZACION_RESPONSABLE = '".$FECHA_AUTORIZACION_RESPONSABLE."' , FECHA_AUTORIZACION_AUDITORIA = '".$FECHA_AUTORIZACION_AUDITORIA."' ,FECHA_DE_LLENADO = '".$FECHA_DE_LLENADO."' , MONTO_FACTURA = '".$MONTO_FACTURA."' , TIPO_DE_MONEDA = '".$TIPO_DE_MONEDA."' , PFORMADE_PAGO = '".$PFORMADE_PAGO."' , FECHA_DE_PAGO = '".$FECHA_DE_PAGO."' , FECHA_A_DEPOSITAR = '".$FECHA_A_DEPOSITAR."' , STATUS_DE_PAGO = '".$STATUS_DE_PAGO."' , BANCO_ORIGEN = '".$BANCO_ORIGEN."' , MONTO_DEPOSITADO = '".$MONTO_DEPOSITADO."' , CLASIFICACION_GENERAL = '".$CLASIFICACION_GENERAL."' , CLASIFICACION_ESPECIFICA = '".$CLASIFICACION_ESPECIFICA."' , PLACAS_VEHICULO = '".$PLACAS_VEHICULO."' , MONTO_DE_COMISION = '".$MONTO_DE_COMISION."' , POLIZA_NUMERO = '".$POLIZA_NUMERO."' , NOMBRE_DEL_EJECUTIVO = '".$NOMBRE_DEL_EJECUTIVO."' , NOMBRE_DEL_AYUDO = '".$NOMBRE_DEL_AYUDO."' , OBSERVACIONES_1 = '".$OBSERVACIONES_1."' , TIPO_CAMBIOP = '".$TIPO_CAMBIOP."' , TOTAL_ENPESOS = '".$TOTAL_ENPESOS."' , IMPUESTO_HOSPEDAJE = '".$IMPUESTO_HOSPEDAJE."' , TImpuestosRetenidosIVA = '".$TImpuestosRetenidosIVA."' , TImpuestosRetenidosISR = '".$TImpuestosRetenidosISR."' , descuentos = '".$descuentos."' , IVA = '".$IVA."' where id = '".$registroId."' ; ";
 		
 		//hiddenVENTASOPERACIONES
 		$var2 = "insert into 02SUBETUFACTURA ( 
@@ -669,7 +674,7 @@ if( $ventasoperaciones->verificar_rfc($conn,$rfcE) ==''){
 		POLIZA_NUMERO, 
 		NOMBRE_DEL_EJECUTIVO, 
 		NOMBRE_DEL_AYUDO, 
-		ID_AYUDO,
+		
 		OBSERVACIONES_1,
 		TIPO_CAMBIOP,
 		TOTAL_ENPESOS,
@@ -710,7 +715,7 @@ if( $ventasoperaciones->verificar_rfc($conn,$rfcE) ==''){
 		'".$POLIZA_NUMERO."' , 
 		'".$NOMBRE_DEL_EJECUTIVO."' , 
 		'".$NOMBRE_DEL_AYUDO."' , 
-		'".$ID_AYUDO."' ,
+		
 		'".$OBSERVACIONES_1."',
 		'".$TIPO_CAMBIOP."',
 		'".$TOTAL_ENPESOS."',
@@ -722,8 +727,9 @@ if( $ventasoperaciones->verificar_rfc($conn,$rfcE) ==''){
 
 		'".$session."' );  ";			
 
-
-		if($ENVIARventasoper=='ENVIARventasoper'){
+     // Se actualiza cuando existe un identificador de registro
+                // en lugar de depender del texto del botón de envío.
+                if($IPventasoperar != ''){
 
 		$this->ActualizaxmlDB($FechaTimbrado, $tipoDeComprobante, 
 		$metodoDePago, $formaDePago, $condicionesDePago, $subTotal, 
@@ -731,7 +737,7 @@ if( $ventasoperaciones->verificar_rfc($conn,$rfcE) ==''){
 		$folio, $LugarExpedicion, $rfcE, $nombreE, 
 		$regimenE, $rfcR, $nombreR, $UsoCFDI, 
 		$DomicilioFiscalReceptor, $RegimenFiscalReceptor, $UUID, $TImpuestosRetenidos, 
-		$TImpuestosTrasladados, $session, $existe, $TuaTotalCargos, $TUA, $Descuento, $Propina, $conn,$actualiza );
+                $TImpuestosTrasladados, $session, $registroId, $TuaTotalCargos, $TUA, $Descuento, $Propina, $conn,$actualiza );
 
 
 		mysqli_query($conn,$var1) or die('P1561'.mysqli_error($conn));
@@ -774,7 +780,25 @@ if( $ventasoperaciones->verificar_rfc($conn,$rfcE) ==''){
 	ECHO "ELEMENTO BORRADO";	
 
 	}
+    
+	//Listado_subefacturadocto
+public function getDoctos_subefactura($ID)
+{
+    $conn = $this->db();
 
+    $sql = "
+        SELECT 
+            COMPLEMENTOS_PAGO_PDF,
+            COMPLEMENTOS_PAGO_XML
+        FROM 02SUBETUFACTURADOCTOS
+        WHERE idTemporal = '".mysqli_real_escape_string($conn,$ID)."'
+        ORDER BY id DESC
+        LIMIT 1
+    ";
+
+    $query = mysqli_query($conn, $sql);
+    return $query ? mysqli_fetch_array($query, MYSQLI_ASSOC) : null;
+}
     public function select_02XML(){
     $conn = $this->db(); 
     $variablequery = "select id from 02XML order by id desc "; 
@@ -825,11 +849,26 @@ public function Listado_ventasoperaciones(){ $conn = $this->db(); $variablequery
 	return $arrayquery = mysqli_query($conn,$variablequery); 
 	} 
 	
-    public function delete_subefacturadocto2($id){ $conn = $this->db(); 
+  public function delete_subefacturadocto2($id){ $conn = $this->db();
+
+    $query = "SELECT idTemporal, ADJUNTAR_FACTURA_XML FROM 02SUBETUFACTURADOCTOS WHERE id = '".$id."' ";
+    $resultado = mysqli_query($conn,$query);
+    $row = mysqli_fetch_array($resultado, MYSQLI_ASSOC);
+
+    if ($row && $row['ADJUNTAR_FACTURA_XML'] != '') {
+        $variablequery = "DELETE FROM 02XML WHERE ultimo_id = '".$row['idTemporal']."' ";
+        mysqli_query($conn,$variablequery);
+
+
+    }
+
     $variablequery = "delete from 02SUBETUFACTURADOCTOS where id = '".$id."' ";
-    return $arrayquery = mysqli_query($conn,$variablequery); 
+    return $arrayquery = mysqli_query($conn,$variablequery);
 
 }
+
+
+
 
    public function delete_subefactura2nombre($nombre){ $conn = $this->db(); 
    $variablequery = "delete from 02SUBETUFACTURADOCTOS where ADJUNTAR_FACTURA_XML = '".$nombre."' ";
@@ -842,7 +881,7 @@ public function Listado_ventasoperaciones(){ $conn = $this->db(); $variablequery
 
 
 
-/* DATOS BANCARIOS 1 */ 
+/* DATOS BANCARIOS 1 */ 
 
 
 	public function variable_DATOSBANCARIOS1(){

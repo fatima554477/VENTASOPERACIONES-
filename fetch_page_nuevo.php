@@ -2,7 +2,7 @@
 
 <div id="content">     
 			<hr/>
-		<strong>	  <p class="mb-0 text-uppercase" ><img src="includes/contraer31.png" id="mostrar5" onclick="load2(1);"style="cursor:pointer;"/>
+		<strong>	  <p class="mb-0 text-uppercase" ><img src="includes/contraer31.png" id="mostrar5" onclick="load(1);"style="cursor:pointer;"/>
 <img src="includes/contraer41.png" id="ocultar5" style="cursor:pointer;"/>&nbsp;&nbsp;&nbsp; FILTRO PAGO A PROVEEDORES-VYO</p></strong></div>
 
 
@@ -21,7 +21,7 @@
 <tr>
 <td width="30%" align="center">
 	<span>Mostrar</span>
-	<select  class="form-select mb-3" id="per_page" onchange="load2(1);">
+	<select  class="form-select mb-3" id="per_page" onchange="load(1);">
 		<option value="20" <?php if(!empty($_REQUEST['per_page'])){echo 'selected';} ?>>20</option>
 
 
@@ -33,7 +33,7 @@
 
 
 <td width="30%" align="center">					
-	<button  class="btn btn-sm btn-outline-success px-5" type="button" onclick="load2(1);" >BUSCAR/RESET</button>
+	<button  class="btn btn-sm btn-outline-success px-5" type="button" onclick="load(1);" >BUSCAR/RESET</button>
 </td>
 
 <td width="30%" align="center">
@@ -43,7 +43,7 @@
 
 
 <?php
-$encabezado = '<select class="form-select mb-3" id="DEPARTAMENTO2WE" required onchange="load2(1);">
+$encabezado = '<select class="form-select mb-3" id="DEPARTAMENTO2WE" required onchange="load(1);">
                 <option value="">SELECCIONA UNA OPCIÓN</option>';
 $options = '';
 
