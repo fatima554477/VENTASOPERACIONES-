@@ -54,7 +54,7 @@
 		success:function(data){
 		var result = data.split('^');			
 		$('#pasarpagado2').html("<span 'ACTUALIZADO'</span>").fadeIn().delay(500).fadeOut();
-		load2(1);
+		load(1);
 		
 		if(pasarpagado_text=='si'){
 		$('#color_pagado1a'+pasarpagado_id).css('background-color', '#ceffcc');
@@ -126,7 +126,7 @@
 		success:function(data){
 		var result = data.split('^');				
 		$('#STATUS_AUDITORIA1').html("ACTUALIZADO").fadeIn().delay(1000).fadeOut();
-		 load2(1);
+		 load(1);
 
 		if(result[1]=='si'){
 		$('#color_AUDITORIA1'+AUDITORIA1_id).css('background-color', '#ceffcc');
@@ -318,7 +318,7 @@ function STATUS_AUDITORIA3(id){
 
       $('#pasarpagado2').html("<span>ACTUALIZADO</span>").fadeIn().delay(500).fadeOut();
       showNotify("Autorización actualizada ✅", true);
-	  	load2(1);
+	  	load(1);
     },
 
     error: function(xhr){
@@ -391,7 +391,7 @@ function STATUS_SINXML(id){
 
       $('#pasarpagado2').html("<span>ACTUALIZADO</span>").fadeIn().delay(500).fadeOut();
       showNotify2("Autorización actualizada ✅", true);
-	  	load2(1);
+	  	load(1);
     },
 
     error: function(xhr){
@@ -435,7 +435,7 @@ function showNotify2(msg, ok){
 		success:function(data){
 		var result = data.split('^');				
 		$('#pasarpagado2').html("Cargando...").fadeIn().delay(500).fadeOut();
-		 load2(1);
+		 load(1);
 
 		if(result[1]=='si'){
 		$('#color_AUDITORIA2'+AUDITORIA2_id).css('background-color', '#ceffcc');
@@ -470,7 +470,7 @@ function showNotify2(msg, ok){
 		success:function(data){
 		var result = data.split('^');				
 		$('#pasarpagado2').html("Cargando...").fadeIn().delay(500).fadeOut();
-		 load2(1);
+		 load(1);
 		
 		if(result[1]=='si'){
 		$('#color_FINANZAS'+FINANZAS_id).css('background-color', '#ceffcc');
@@ -503,7 +503,7 @@ function showNotify2(msg, ok){
 		success:function(data){
 		var result = data.split('^');				
 		$('#pasarpagado2').html("Cargando...").fadeIn().delay(500).fadeOut();
-				 load2(1);
+				 load(1);
 
 		
 		if(result[1]=='si'){
@@ -644,18 +644,19 @@ $("#FECHA_A_DEPOSITAR_2").val("");
 }
 
         $(function() {
-                const triggerSearch = () => load2(1);
+                const triggerSearch = () => load(1);
 
-                $('#target5').on('keydown', 'thead input, thead select', function(event) {
+    // Permitir ejecutar la búsqueda con la tecla Enter desde cualquier campo del filtro
+                $('#target5').on('keydown', 'input, select', function(event) {
                         if (event.key === 'Enter' || event.which === 13) {
                                 event.preventDefault();
                                 triggerSearch();
                         }
                 });
 
-                load2(1);
+                load(1);
         });
-		function load2(page){
+		function load(page){
 			
 			var query=$("#NOMBRE_EVENTO").val();
 			var DEPARTAMENTO2=$("#DEPARTAMENTO2WE").val();
