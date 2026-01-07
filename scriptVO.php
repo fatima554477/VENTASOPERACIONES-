@@ -289,7 +289,7 @@ $.ajax({
             $('#reset_totales').load(location.href + ' #reset_totales');
 			
 			
-			$.getScript(load2(1));
+			$.getScript(load(1));
 			
 			location.reload();
 			}else{
@@ -454,7 +454,7 @@ $('#'+borra_id_sb).load(location.href + ' #'+borra_id_sb);
 $('#A'+borra_id_sb).load(location.href + ' #A'+borra_id_sb);
 			
 		$.getScript(load(1));
-		$.getScript(load2(1));
+	
 		
 }
 });
@@ -482,7 +482,7 @@ $('#dataModal3').modal('hide');
 $('#mensajeventasoperaciones').html("<span id='ACTUALIZADO' >"+data+"</span>");
 //$('#resetSB').load(location.href + ' #resetSB');
 	//$("#results").load("ventasoperaciones/fetch_pagesVO.php");
-		$.getScript(load2(1));
+		$.getScript(load(1));
 		$("#reset_totales").load(location.href + " #reset_totales");
 	
 }

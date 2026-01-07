@@ -5,6 +5,20 @@ fecha fatis : 01/MAYO/2025
 */
 ?>
 
+	<?php
+$connecDB = $conexion->db();
+
+
+if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || $_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest') {
+$idem_usuario = $_SESSION['idem'];
+$ventasoperaciones->borrar_historico_xml('02SUBETUFACTURADOCTOS',$idem_usuario);
+$_SESSION['P_NOMBRE_COMERCIAL_EMPRESA12'] = '';
+$_SESSION['idusuario12']= '';
+
+}
+
+?>
+
 		<script type="text/javascript">
 
 		function calcular() {
@@ -71,6 +85,16 @@ fecha fatis : 01/MAYO/2025
 				});
 			});
 		}
+		             function setCurrentFillingDate() {
+                       const fechaInput = document.querySelector('input[name="FECHA_DE_LLENADO"]');
+                       if(!fechaInput) {
+                               return;
+                       }
+                       const now = new Date();
+                       const pad = (value) => value.toString().padStart(2, '0');
+                       const formatted = `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+                       fechaInput.value = formatted;
+               }
                document.addEventListener("DOMContentLoaded", calcular);
                 function toggleFacturaFields() {
                         const select = document.querySelector('select[name="VIATICOSOPRO"]');
@@ -672,7 +696,7 @@ if($rfcE == true){
 				 
 				                  <tr  style="background: #d2faf1">
 
-                 <th scope="row"> <label for="validationCustom03" class="form-label">MOTIVO DEL GASTO:</label></th>
+                 <th scope="row"> <label for="validationCustom03" class="form-label">MOTIVO DEL GASTO:<br><a style="color:red;font-size:11px">OBLIGATORIO</a></label></th>
                  <td><input type="text" class="form-control" id="validationCustom03" required=""  value="<?php echo $MOTIVO_GASTO; ?>" name="MOTIVO_GASTO"placeholder="MOTIVO DEL GASTO "></td>
                  </tr>
      <tr style="background:#fcf3cf">
@@ -879,10 +903,10 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
 
                     <tr style="background:#fcf3cf; border:red 3px solid; margin:20px;">
 
-                 <th scope="row"> <label for="tres" class="form-label">TOTAL:</label></th>
+                 <th scope="row"> <label for="tres" class="form-label">TOTAL A PAGAR:</label></th>
                  <td>   
 				 <div id="2MONTO_DEPOSITAR" >
-				 <div class="input-group mb-3"> <span class="input-group-text">$</span><input type="text" class="form-control" id="MONTO_DEPOSITAR" required=""   value="<?php echo $total; ?>" name="MONTO_DEPOSITAR" placeholder="TOTAL">
+				 <div class="input-group mb-3"> <span class="input-group-text">$</span><input type="text" class="form-control" id="MONTO_DEPOSITAR" required=""   value="<?php echo $total; ?>" name="MONTO_DEPOSITAR" placeholder="TOTAL" readonly="readonly">
 				 </div></div>
 				 </td>
                  </tr>
@@ -991,16 +1015,16 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
         </td>
 
         </tr>
-                 <!-- <tr style="background:#fcf3cf">  
+                  <tr style="background:#fcf3cf">  
 
                  <th scope="row"> <label for="validationCustom03" class="form-label">FECHA DE PROGRAMACIÓN DEL PAGO:</label></th>
                  <td>		 <div id="FECHA_DE_PAGO2"><input type="date" class="form-control" id="validationCustom03" required=""  value="<?php echo $FECHA_DE_PAGO; ?>" name="FECHA_DE_PAGO" placeholder="FECHA DE PAGO" ></div></td>
-            </tr> -->
-                 <tr style="background:#fcf3cf"> 
+            </tr> 
+                 <!--<tr style="background:#fcf3cf"> 
 
                  <th scope="row"> <label for="validationCustom03" class="form-label">FECHA EFECTIVA DE PAGO:</label></th>
                  <td><input type="date" class="form-control" id="validationCustom03" required=""  value="<?php echo $FECHA_A_DEPOSITAR; ?>" name="FECHA_A_DEPOSITAR" placeholder="FECHA A DEPOSITAR" readonly="readonly"></td>
-                 </tr>
+                 </tr>-->
 
                  <tr style="background: #d2faf1" > 
                              
@@ -1077,12 +1101,7 @@ while($rowsube=mysqli_fetch_array($listadosube)){
 <td><input type="text" class="form-control" id="NOMBRE_DEL_AYUDO" required=""  value="<?php echo $_SESSION["NOMBREUSUARIO"]; ?>" name="NOMBRE_DEL_AYUDO" placeholder="NOMBRE DEL EJECUTIVO" readonly="readonly"></td>
 </tr>
 
-<input 
-    type="hidden" 
-    name="ID_AYUDO"
-    id="ID_AYUDO"
-    value="<?php echo $_SESSION['idem']; ?>"
->
+
 
 
 
@@ -1150,7 +1169,9 @@ echo $encabezadoA.$option2.'</select>';
 					 
 
          
-         <input type="hidden" style="width:200px;"  class="form-control" id="validationCustom03"   value="<?php echo date('d-m-Y'); ?>" name="FECHA_DE_LLENADO">
+ <input type="hidden" style="width:200px;" class="form-control" id="validationCustom03" value="<?php echo date('d-m-Y H:i:s'); ?>" name="FECHA_DE_LLENADO">
+
+
       
             
  
