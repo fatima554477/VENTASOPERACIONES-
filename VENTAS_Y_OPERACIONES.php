@@ -449,11 +449,14 @@ while($rowsube=mysqli_fetch_array($listadosube)){
 	$NUMERO_CONSECUTIVO_PROVEE = '';	
 	$FECHA_DE_PAGO = '';
 	
-	$regreso = $ventasoperaciones->variable_SUBETUFACTURA();
-	$url = __ROOT1__.'/includes/archivos/'.$regreso['ADJUNTAR_FACTURA_XML'];
-	
-if( file_exists($url) ){
+$regreso = $ventasoperaciones->variable_SUBETUFACTURA();
+$url = __ROOT1__.'/includes/archivos/'.$regreso['ADJUNTAR_FACTURA_XML'];
+$xmlFacturaCargada = !empty($regreso['ADJUNTAR_FACTURA_XML']) && file_exists($url);
+		
+if($xmlFacturaCargada){
 	$regreso = $conexion2->lectorxml($url);
+	
+
 	
 	$Version = $regreso['Version'];
 	$sello = $regreso['selo'];
@@ -675,7 +678,7 @@ if($rfcE == true){
 				 
 				 <div id="RAZON_SOCIAL2">
 				 
-				 <input type="text" class="form-control" id="RAZON_SOCIAL" required=""  value="<?php echo $nombreE; ?>" name="RAZON_SOCIAL" placeholder="RAZÓN SOCIAL">
+			 <input type="text" class="form-control" id="RAZON_SOCIAL" required=""  value="<?php echo $nombreE; ?>" name="RAZON_SOCIAL" placeholder="RAZÓN SOCIAL" <?php echo $xmlFacturaCargada ? 'readonly="readonly"' : ''; ?>>
 				 </div>
 				 </td>
                  </tr>
@@ -687,7 +690,7 @@ if($rfcE == true){
                  <td>
 
             <div id="RFC_PROVEEDOR2">
-            <input type="text" class="form-control" id="RFC_PROVEEDOR"   value="<?php echo $rfcE; ?>" name="RFC_PROVEEDOR" placeholder="RFC DEL PROVEEDOR">
+            <input type="text" class="form-control" id="RFC_PROVEEDOR"   value="<?php echo $rfcE; ?>" name="RFC_PROVEEDOR" placeholder="RFC DEL PROVEEDOR"  <?php echo $xmlFacturaCargada ? 'readonly="readonly"' : ''; ?>>
 				 
 				 </div>
 				 </td>
@@ -781,7 +784,7 @@ var parametros = {
 
 
     <th scope="row"> <label for="validationCustom03" class="form-label">CONCEPTO DE LA FACTURA:</label></th>
-    <td><div id="CONCEPTO_PROVEE2"><input type="text" class="form-control" id="CONCEPTO_PROVEE" required=""  value="<?php echo $Descripcion; ?>" name="CONCEPTO_PROVEE"placeholder="CONCEPTO DE LA FACTURA"></div></td>
+    <td><div id="CONCEPTO_PROVEE2"><input type="text" class="form-control" id="CONCEPTO_PROVEE" required=""  value="<?php echo $Descripcion; ?>" name="CONCEPTO_PROVEE"placeholder="CONCEPTO DE LA FACTURA"  <?php echo $xmlFacturaCargada ? 'readonly="readonly"' : ''; ?>></div></td>
                  </tr>
                               <tr  style="background: #d2faf1" id="row-comprobante-transferencia" >
 
@@ -832,7 +835,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
 				 <td> 
 				 
 				<div id="2MONTO_FACTURA">			 
-				 <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text"  style="width:300px;height:40px;"  id="MONTO_FACTURA" required="" onkeyup="calcular()"   value="<?php echo $subTotal; ?>" name="MONTO_FACTURA" class="total"  placeholder="SUB TOTAL">
+				 <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text"  style="width:300px;height:40px;"  id="MONTO_FACTURA" required="" onkeyup="calcular()"   value="<?php echo $subTotal; ?>" name="MONTO_FACTURA" class="total"  placeholder="SUB TOTAL" <?php echo $xmlFacturaCargada ? 'readonly="readonly"' : ''; ?>>
 				
 				</div></div>
 				 </td>
@@ -845,7 +848,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
 				 <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">IVA:</label></th>               				 
 				 <td> 				 
 				<div id="2IVA">			 
-     <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text"  style="width:300px;height:40px;"  id="IVA" required="" onkeyup="calcular()" value="<?php echo $TImpuestosTrasladados; ?>"   name="IVA" class="total" placeholder="IVA">
+     <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text"  style="width:300px;height:40px;"  id="IVA" required="" onkeyup="calcular()" value="<?php echo $TImpuestosTrasladados; ?>"   name="IVA" class="total" placeholder="IVA" <?php echo $xmlFacturaCargada ? 'readonly="readonly"' : ''; ?>>
 				
 				</div></div>
 				 </td>
@@ -857,7 +860,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
             <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">IMPUESTOS RETENIDOS &nbsp;<a style="color:red;font:12px">(IVA)</a></label></th>               				 
 				 <td> 				 
 				<div id="2TImpuestosRetenidosIVA">			 
-     <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text"  style="width:300px;height:40px;"  id="TImpuestosRetenidosIVA" required=""  onkeyup="comasainput('TImpuestosRetenidosIVA')"   name="TImpuestosRetenidosIVA"  value="<?php echo $impueRdesglosado002; ?>" placeholder="IMPUESTOS RETENIDOS IVA" class="total">
+     <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text"  style="width:300px;height:40px;"  id="TImpuestosRetenidosIVA" required=""  onkeyup="comasainput('TImpuestosRetenidosIVA')"   name="TImpuestosRetenidosIVA"  value="<?php echo $impueRdesglosado002; ?>" placeholder="IMPUESTOS RETENIDOS IVA" class="total"  <?php echo $xmlFacturaCargada ? 'readonly="readonly"' : ''; ?>>
 				
 				</div></div>
 				 </td>
@@ -866,7 +869,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
             <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">IMPUESTOS RETENIDOS &nbsp;<a style="color:red;font:12px">(ISR)</a></label></th>               				 
 				 <td> 				 
 				<div id="2TImpuestosRetenidosISR">			 
-     <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text"  style="width:300px;height:40px;"  onkeyup="comasainput('TImpuestosRetenidosISR')" id="TImpuestosRetenidosISR" required=""  class="total"  name="TImpuestosRetenidosISR"  value="<?php echo $impueRdesglosado001; ?>" placeholder="IMPUESTOS RETENIDOS ISR" class="total">
+     <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text"  style="width:300px;height:40px;"  onkeyup="comasainput('TImpuestosRetenidosISR')" id="TImpuestosRetenidosISR" required=""  class="total"  name="TImpuestosRetenidosISR"  value="<?php echo $impueRdesglosado001; ?>" placeholder="IMPUESTOS RETENIDOS ISR" class="total"   <?php echo $xmlFacturaCargada ? 'readonly="readonly"' : ''; ?>>
 				
 				</div></div>
 				 </td>
@@ -894,7 +897,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
             <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label">DESCUENTO:</label></th>               				 
 				 <td> 				 
 				<div id="2descuentos">			 
-     <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text"  style="width:300px;height:40px;"  id="descuentos" required=""  onkeyup="comasainput('descuentos')" class="total" name="descuentos"  value="<?php echo $Descuento; ?>" placeholder="DESCUENTO">
+     <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text"  style="width:300px;height:40px;"  id="descuentos" required=""  onkeyup="comasainput('descuentos')" class="total" name="descuentos"  value="<?php echo $Descuento; ?>" placeholder="DESCUENTO"  <?php echo $xmlFacturaCargada ? 'readonly="readonly"' : ''; ?>>
 				
 				</div></div>
 				 </td>
@@ -906,7 +909,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
                  <th scope="row"> <label for="tres" class="form-label">TOTAL A PAGAR:</label></th>
                  <td>   
 				 <div id="2MONTO_DEPOSITAR" >
-				 <div class="input-group mb-3"> <span class="input-group-text">$</span><input type="text" class="form-control" id="MONTO_DEPOSITAR" required=""   value="<?php echo $total; ?>" name="MONTO_DEPOSITAR" placeholder="TOTAL" readonly="readonly">
+				 <div class="input-group mb-3"> <span class="input-group-text">$</span><input type="text" class="form-control" id="MONTO_DEPOSITAR" required=""   value="<?php echo $total; ?>" name="MONTO_DEPOSITAR" placeholder="TOTAL" readonly="readonly"  >
 				 </div></div>
 				 </td>
                  </tr>
@@ -919,7 +922,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
               
 				
 				            
-             <td> <div id="TIPO_DE_MONEDA2"><select class="form-select mb-3" aria-label="Default select example" id="validationCustom02" required="" name="TIPO_DE_MONEDA"  > 
+             <td> <div id="TIPO_DE_MONEDA2"><select class="form-select mb-3" aria-label="Default select example" id="validationCustom02" required="" name="TIPO_DE_MONEDA"  <?php echo $xmlFacturaCargada ? 'readonly="readonly"' : ''; ?>> 
                   <option style="background: #c9e8e8" name="TIPO_DE_MONEDA" value="MXN" <?php if($Moneda=='MXN'){echo "selected";} ?>>MXN (Peso mexicano)</option>
                      <option style="background: #a3e4d7" name="TIPO_DE_MONEDA" value="USD" <?php if($Moneda=='USD'){echo "selected";} ?>>USD (Dolar)</option>
                      <option style="background: #e8f6f3" name="TIPO_DE_MONEDA" value="EUR" <?php if($Moneda=='EUR'){echo "selected";} ?>>EUR (Euro)</option>
@@ -982,7 +985,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
                   
 					<script type="text/javascript">  function EFECTIVO (texto) {    alert(texto);} </script>
                    
-				 <option style="background:#f2b4f5"  name="PFORMADE_PAGO" value="03">03 TRANSFERENCIA ELECTRONICA DE FONDOS</option>	
+				 <option style="background:#f2b4f5"  name="PFORMADE_PAGO" <?php echo $xmlFacturaCargada ? 'readonly="readonly"' : ''; ?> value="03">03 TRANSFERENCIA ELECTRONICA DE FONDOS</option>	
 		     <option style="background:#f2b4f5"  <?php if($formaDePago=='03'){echo "selected";} ?> value="03" name="PFORMADE_PAGO">03 TRANSFERENCIA ELECTRONICA DE FONDOS</option>	
 					
 					
