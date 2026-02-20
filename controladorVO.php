@@ -53,6 +53,13 @@ if($action=='ajax'){
 	echo $resultado = $ventasoperaciones->buscarnombre($NUMERO_EVENTO);
 }
 
+if($action=='bitacora'){
+	$idSubetufactura = isset($_POST["idSubetufactura"])?$_POST["idSubetufactura"]:"";
+	$bitacora = $ventasoperaciones->Listado_bitacora_pagoproveedor_array($idSubetufactura);
+	echo json_encode($bitacora);
+	exit;
+}
+
 
 
 
@@ -273,6 +280,29 @@ elseif($borrasbdoc =='borrasbdoc'){
 
 
 
+$xmlFacturaInvalido = isset($_FILES['ADJUNTAR_FACTURA_XML'])
+	&& is_array($_FILES['ADJUNTAR_FACTURA_XML'])
+	&& isset($_FILES['ADJUNTAR_FACTURA_XML']['error'])
+	&& intval($_FILES['ADJUNTAR_FACTURA_XML']['error']) === 0
+	&& strtolower(pathinfo(isset($_FILES['ADJUNTAR_FACTURA_XML']['name']) ? $_FILES['ADJUNTAR_FACTURA_XML']['name'] : '', PATHINFO_EXTENSION)) !== 'xml';
+
+if($xmlFacturaInvalido){
+	echo '4';
+	exit;
+}
+
+$pdfFacturaInvalido = isset($_FILES['ADJUNTAR_FACTURA_PDF'])
+	&& is_array($_FILES['ADJUNTAR_FACTURA_PDF'])
+	&& isset($_FILES['ADJUNTAR_FACTURA_PDF']['error'])
+	&& intval($_FILES['ADJUNTAR_FACTURA_PDF']['error']) === 0
+	&& strtolower(pathinfo(isset($_FILES['ADJUNTAR_FACTURA_PDF']['name']) ? $_FILES['ADJUNTAR_FACTURA_PDF']['name'] : '', PATHINFO_EXTENSION)) !== 'pdf';
+
+if($pdfFacturaInvalido){
+	echo '4';
+	exit;
+}
+
+//ob_start();
 
 
 if( $_FILES["ADJUNTAR_FACTURA_XML"] == true){
