@@ -132,5 +132,5 @@ $_SESSION['num_evento']=$_GET['num_evento'];
 }else{
 $_SESSION['num_evento']='';
 }
-require "clases/script.filtro.php";
+require __DIR__ . "/clases/script.filtro.php";
 ?>
