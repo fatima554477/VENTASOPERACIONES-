@@ -19,6 +19,7 @@ include_once (__ROOT1__."/ventasoperaciones/class.epcinnVO.php");
 $ventasoperaciones= NEW accesoclase();
 $conexion = NEW colaboradores();                            
 $conexion2 = new herramientas();
+
                                                
 
 $hiddenVENTASOPERACIONES = isset($_POST["hiddenVENTASOPERACIONES"])?$_POST["hiddenVENTASOPERACIONES"]:"";
@@ -290,7 +291,11 @@ foreach($_FILES AS $ETQIETA => $VALOR){
 
 	$errorArchivo = isset($VALOR['error']) ? intval($VALOR['error']) : 1;
 	$nombreArchivoOriginal = isset($VALOR['name']) ? $VALOR['name'] : '';
-	if($errorArchivo === 0 && $nombreArchivoOriginal != '' && ($ETQIETA == 'ADJUNTAR_FACTURA_XML' || $ETQIETA == 'ADJUNTAR_FACTURA_PDF')){
+
+	// ⚠️ Para PDF: la limpieza previa es segura (no depende de validación posterior).
+	// Para XML: NO se limpia aquí — se limpia más abajo SOLO si el UUID es válido,
+	// para evitar borrar el XML ya registrado en caso de UUID duplicado.
+	if($errorArchivo === 0 && $nombreArchivoOriginal != '' && $ETQIETA == 'ADJUNTAR_FACTURA_PDF'){
 		$ventasoperaciones->limpiarAdjuntoFacturaUnico($ETQIETA,$IPventasoperar,$idPROV);
 	}
 
@@ -319,14 +324,14 @@ foreach($_FILES AS $ETQIETA => $VALOR){
 				ob_end_clean();
 
 			} elseif(strpos($resultado, 'UUID_DUPLICADO:') === 0) {
-				// ❌ UUID duplicado — informar número de solicitud
+				// ❌ UUID duplicado — NO tocar el XML anterior, solo eliminar el intento fallido
 				$numeroSolicitud = str_replace('UUID_DUPLICADO:', '', $resultado);
 				echo '3^^'.$numeroSolicitud;
 				UNLINK($url);
 				$ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
 
 			} else {
-				// ❌ UUID duplicado sin número de solicitud
+				// ❌ UUID duplicado sin número de solicitud — preservar el anterior
 				echo '3^^';
 				UNLINK($url);
 				$ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
