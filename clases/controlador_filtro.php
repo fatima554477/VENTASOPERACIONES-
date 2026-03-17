@@ -7,13 +7,30 @@
 	Propietario: EPC
     fecha sandor: 
     fecha fatis : 05/06/2025
-	OPTIMIZADO: permisos calculados una sola vez fuera del foreach
+
 	----------------------------
 */
 
 if(!isset($_SESSION)) { session_start(); }
 define("__ROOT6__", dirname(__FILE__));
 $action = (isset($_POST["action"]) && $_POST["action"] != NULL) ? $_POST["action"] : "";
+
+if($action == "bitacora_pago"){
+	require(__ROOT6__."/class.filtro.php");
+	$database = new orders();
+	$idSubetufactura = isset($_POST['idSubetufactura']) ? intval($_POST['idSubetufactura']) : 0;
+
+	header('Content-Type: application/json; charset=utf-8');
+
+	if($idSubetufactura <= 0){
+		echo json_encode(array());
+		exit;
+	}
+
+	echo json_encode($database->Listado_bitacora_pagoproveedor_array($idSubetufactura));
+	exit;
+}
+
 if($action == "ajax"){
 
 	require(__ROOT6__."/class.filtro.php");
@@ -287,6 +304,7 @@ if($action == "ajax"){
 	$p_pagoprov_borrar      = $database->variablespermisos('', 'VENTAS_Y_OPERACIONES', 'borrar') == 'si';
 	$p_totales_ver          = $database->variablespermisos('', 'totales_VYO', 'ver')         == 'si';
 	$p_cale_sube_ver        = $database->variablespermisos('', 'CALE_SUBE_PAGOVYO', 'ver')   == 'si';
+		$p_bitacora_ver         = $database->variablespermisos('', 'bitacora', 'ver')            == 'si';
 	// ─────────────────────────────────────────────────────────────────────────
 	?>
 
@@ -497,6 +515,7 @@ if($action == "ajax"){
 <th style="background:#c9e8e8"></th>
 <th style="background:#c9e8e8"></th>
 <th style="background:#c9e8e8"></th>
+<th style="background:#c9e8e8"></th>
 			</tr>
 
 			<tr>
@@ -520,7 +539,7 @@ if($action == "ajax"){
 <?php } ?>
 <?php if($database->plantilla_filtro($nombreTabla,"VIATICOSOPRO",$altaeventos,$DEPARTAMENTO)=="si"){ ?>
 <td style="background:#c9e8e8">
-	<select class="form-select mb-3" aria-label="Default select example" id="VIATICOSOPRO_2" onchange="load2(1);">
+	<select class="form-select mb-3" aria-label="Default select example" id="VIATICOSOPRO_2" onchange="load(1);">
 	<option value="">TODOS</option>
 	<option value="PAGO A PROVEEDOR" <?php if($_POST['VIATICOSOPRO']=='PAGO A PROVEEDOR'){echo 'selected';} ?>>PAGO A PROVEEDOR</option>
 	<option value="VIATICOS" <?php if($_POST['VIATICOSOPRO']=='VIATICOS'){echo 'selected';} ?>>VIATICOS</option>
@@ -537,7 +556,7 @@ if($action == "ajax"){
 <td style="background:#c9e8e8;text-align:center">
 	<div style="display: flex; align-items: center; gap: 0;">
 		<input style="width:300px; margin-right: 0; border-right: none; border-top-right-radius: 0; border-bottom-right-radius: 0;" type="text" class="form-control" id="RAZON_SOCIAL_2" value="<?php echo $RAZON_SOCIAL; ?>"/>
-		<select style="width:80px; border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: 0;" id="RAZON_SOCIAL_orden" onchange="load2('<?php echo $_POST['page']; ?>')">
+		<select style="width:80px; border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: 0;" id="RAZON_SOCIAL_orden" onchange="load('<?php echo $_POST['page']; ?>')">
 			<option value="">NORMAL</option>
 			<option value="asc" <?= $_POST['RAZON_SOCIAL_orden']=='asc' ? 'selected' : '' ?>>ASC</option>
 			<option value="desc" <?= $_POST['RAZON_SOCIAL_orden']=='desc' ? 'selected' : '' ?>>DESC</option>
@@ -549,7 +568,7 @@ if($action == "ajax"){
 <td style="background:#c9e8e8">
 	<div style="display: flex; justify-content: space-between; align-items: center;">
 		<input type="text" style="width:200px;" class="form-control" id="RFC_PROVEEDOR_2" value="<?php echo $RFC_PROVEEDOR; ?>"/>
-		<select style="width:80px;" id="RFC_PROVEEDOR_orden" onchange="load2('<?php echo $_POST['page']; ?>')">
+		<select style="width:80px;" id="RFC_PROVEEDOR_orden" onchange="load('<?php echo $_POST['page']; ?>')">
 			<option value="">NORMAL</option>
 			<option value="asc" <?php if($_POST['RFC_PROVEEDOR_orden']=='asc'){echo 'selected';} ?>>ASC</option>
 			<option value="desc" <?php if($_POST['RFC_PROVEEDOR_orden']=='desc'){echo 'selected';} ?>>DESC</option>
@@ -561,7 +580,7 @@ if($action == "ajax"){
 <td style="background:#c9e8e8">
 	<div style="display: flex; justify-content: space-between; align-items: center;">
 		<input type="text" style="width:200px;" class="form-control" id="NUMERO_EVENTO_2" value="<?php echo $NUMERO_EVENTO; ?>">
-		<select style="width:80px;" id="NUMERO_EVENTO_orden" onchange="load2('<?php echo $_POST['page']; ?>')">
+		<select style="width:80px;" id="NUMERO_EVENTO_orden" onchange="load('<?php echo $_POST['page']; ?>')">
 			<option value="">NORMAL</option>
 			<option value="asc" <?php if($_POST['NUMERO_EVENTO_orden']=='asc'){echo 'selected';} ?>>ASC</option>
 			<option value="desc" <?php if($_POST['NUMERO_EVENTO_orden']=='desc'){echo 'selected';} ?>>DESC</option>
@@ -585,7 +604,7 @@ if($action == "ajax"){
 <td style="background:#c9e8e8">
 	<div style="display: flex; justify-content: space-between; align-items: center;">
 		<input type="text" style="width:200px;" class="form-control" id="MONTO_FACTURA_2" value="<?php echo $MONTO_FACTURA; ?>">
-		<select style="width:80px;" id="MONTO_FACTURA_orden" onchange="load2('<?php echo $_POST['page']; ?>')">
+		<select style="width:80px;" id="MONTO_FACTURA_orden" onchange="load('<?php echo $_POST['page']; ?>')">
 			<option value="">NORMAL</option>
 			<option value="asc" <?php if($_POST['MONTO_FACTURA_orden']=='asc'){echo 'selected';} ?>>ASC</option>
 			<option value="desc" <?php if($_POST['MONTO_FACTURA_orden']=='desc'){echo 'selected';} ?>>DESC</option>
@@ -613,7 +632,7 @@ if($action == "ajax"){
 <?php } ?>
 <?php if($database->plantilla_filtro($nombreTabla,"TIPO_DE_MONEDA",$altaeventos,$DEPARTAMENTO)=="si"){ ?>
 <td style="background:#c9e8e8">
-	<select class="form-select mb-3" id="TIPO_DE_MONEDA_2" name="TIPO_DE_MONEDA" onchange="load2(1);">
+	<select class="form-select mb-3" id="TIPO_DE_MONEDA_2" name="TIPO_DE_MONEDA" onchange="load(1);">
 		<option value="">TODOS</option>
 		<option style="background:#c9e8e8" value="MXN" <?php if($TIPO_DE_MONEDA=='MXN'){echo "selected";} ?>>MXN (Peso mexicano)</option>
 		<option style="background:#a3e4d7" value="USD" <?php if($TIPO_DE_MONEDA=='USD'){echo "selected";} ?>>USD (Dólar estadounidense)</option>
@@ -657,7 +676,7 @@ if($action == "ajax"){
 <?php } ?>
 <?php if($database->plantilla_filtro($nombreTabla,"STATUS_DE_PAGO",$altaeventos,$DEPARTAMENTO)=="si"){ ?>
 <td style="background:#f48a81">
-	<select class="form-select mb-3" id="STATUS_DE_PAGO_2" onchange="load2(1);">
+	<select class="form-select mb-3" id="STATUS_DE_PAGO_2" onchange="load(1);">
 	<option value="">TODOS</option>
 	<option value="SOLICITADO" <?php if($_POST['STATUS_DE_PAGO']=='SOLICITADO'){echo 'selected';} ?>>SOLICITADO</option>
 	<option value="APROBADO" <?php if($_POST['STATUS_DE_PAGO']=='APROBADO'){echo 'selected';} ?>>APROBADO</option>
@@ -1221,12 +1240,19 @@ if($database->plantilla_filtro($nombreTabla,"PENDIENTE_PAGO",$altaeventos,$DEPAR
 	</div>
 </td>
 <?php } ?>
+
 <?php if($database->plantilla_filtro($nombreTabla,"ADJUNTAR_ARCHIVO_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php echo $ADJUNTAR_ARCHIVO_1; $colspan2 += 1; ?></td>
 <?php } ?>
+
 <?php if($database->plantilla_filtro($nombreTabla,"COMPLEMENTOS_PAGO_XML",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php echo $COMPLEMENTOS_PAGO_XML; $colspan2 += 1; ?></td>
 <?php } ?>
-<?php if($database->plantilla_filtro($nombreTabla,"COMPLEMENTOS_PAGO_PDF",$altaeventos,$DEPARTAMENTO)=="si"){ ?><?php echo $COMPLEMENTOS_PAGO_PDF; $colspan2 += 1; ?>
+
+
+<?php if($database->plantilla_filtro($nombreTabla,"COMPLEMENTOS_PAGO_PDF",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php echo $COMPLEMENTOS_PAGO_PDF; $colspan2 += 1; ?></td>
 <?php } ?>
+
+
+
 <?php
 if ($database->plantilla_filtro($nombreTabla,"FECHA_DE_LLENADO",$altaeventos,$DEPARTAMENTO)=="si") {
 	$fechaHora = $row['FECHA_DE_LLENADO'];
@@ -1375,6 +1401,7 @@ if (in_array($row['VIATICOSOPRO'], ['VIATICOS','REEMBOLSO','PAGO A PROVEEDOR CON
 <?php if ($p_boton_sinxml_ver) { ?>
 <?php if ($row["VIATICOSOPRO"] != "PAGOS CON UNA SOLA FACTURA" && $row["VIATICOSOPRO"] != "PAGO A PROVEEDOR") { ?>
 	<td style="text-align:center; color:#7a7a7a;">No aplica</td>
+	<?php $colspan2 += 1; ?>
 <?php } else {
 	$idFila2 = (int)$row["02SUBETUFACTURAid"];
 	$estaSi2 = ($row["STATUS_SINXML"] == 'si');
@@ -1395,6 +1422,7 @@ if (in_array($row['VIATICOSOPRO'], ['VIATICOS','REEMBOLSO','PAGO A PROVEEDOR CON
 			data-prev2="<?php echo $estaSi2 ? 'si' : 'no'; ?>"
 			onclick="STATUS_SINXML(<?php echo $idFila2; ?>)" />
 	</td>
+	<?php $colspan2 += 1; ?>
 <?php } ?>
 <?php } ?>
 
@@ -1494,6 +1522,12 @@ if ($explodeDatosBancarios['FOTO_ESTADO_PROVEE']==2 or $explodeDatosBancarios['F
 		<button style="text-align:center;width:160px" class="btn btn-info btn-xs" type="button">PAGO PROVEEDOR</button>
 	</a>
 <?php endif; ?>
+</td>
+<!-- BITÁCORA -->
+<td <?php echo $fondo_existe_xml; ?>>
+<?php if ($p_bitacora_ver) { ?>
+	<input type="button" name="view_bitacora" value="BITÁCORA" id="<?php echo $row["02SUBETUFACTURAid"]; ?>" class="btn btn-outline-primary btn-xs view_dataPAGOPROVEEbitacora" />
+<?php } ?>
 </td>
 
 <!-- MODIFICAR -->
