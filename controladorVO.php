@@ -260,23 +260,31 @@ if($pdfFacturaInvalido){
 // ── PRE-CARGA DEL XML (sin IPventasoperar aún) ────────────────────────────
 
 if( $_FILES["ADJUNTAR_FACTURA_XML"] == true){
-	$ADJUNTAR_FACTURA_XML2 = $ventasoperaciones->solocargartemp('ADJUNTAR_FACTURA_XML');
-	$url = __ROOT1__.'/includes/archivos/'.$ADJUNTAR_FACTURA_XML2;	
-	$regreso = $conexion2->lectorxml($url);
-	$rfcE = $regreso['rfcE'];					
-	$nombreE = $regreso['nombreE'];	
+    $ADJUNTAR_FACTURA_XML2 = $ventasoperaciones->solocargartemp('ADJUNTAR_FACTURA_XML');
+    $url = __ROOT1__.'/includes/archivos/'.$ADJUNTAR_FACTURA_XML2;	
+    $regreso = $conexion2->lectorxml($url);
 
-	if ($ventasoperaciones->verificar_rfc($conn, $rfcE) != '') {
-		$idwebc = $ventasoperaciones->verificar_rfc($conn, $rfcE);
-	} elseif ($ventasoperaciones->verificar_usuario($conn, $nombreE) != '') {
-		$idwebc = $ventasoperaciones->verificar_usuario($conn, $nombreE);
-	} elseif (isset($_SESSION["idPROV"]) && $_SESSION["idPROV"] != '') {
-		$idwebc = $_SESSION["idPROV"];
-	} else {
-		$idwebc = 1;
-	}
+    // ── VALIDACIÓN: XML vacío o sin contenido válido ─────
+    if(empty($regreso) || !isset($regreso['UUID']) || trim($regreso['UUID']) === '') {
+        echo '5^^';
+        UNLINK($url);
+        $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML2);
+        exit;
+    }
+    // ─────────────────────────────────────────────────────
 
-	$_SESSION["idPROV"] = $idwebc;
+    $rfcE = $regreso['rfcE'];					
+    $nombreE = $regreso['nombreE'];	
+    if ($ventasoperaciones->verificar_rfc($conn, $rfcE) != '') {
+        $idwebc = $ventasoperaciones->verificar_rfc($conn, $rfcE);
+    } elseif ($ventasoperaciones->verificar_usuario($conn, $nombreE) != '') {
+        $idwebc = $ventasoperaciones->verificar_usuario($conn, $nombreE);
+    } elseif (isset($_SESSION["idPROV"]) && $_SESSION["idPROV"] != '') {
+        $idwebc = $_SESSION["idPROV"];
+    } else {
+        $idwebc = 1;
+    }
+    $_SESSION["idPROV"] = $idwebc;
 }
 
 $idPROV = isset($_SESSION["idPROV"]) ? $_SESSION["idPROV"] : $idwebc;
@@ -292,9 +300,7 @@ foreach($_FILES AS $ETQIETA => $VALOR){
 	$errorArchivo = isset($VALOR['error']) ? intval($VALOR['error']) : 1;
 	$nombreArchivoOriginal = isset($VALOR['name']) ? $VALOR['name'] : '';
 
-	// ⚠️ Para PDF: la limpieza previa es segura (no depende de validación posterior).
-	// Para XML: NO se limpia aquí — se limpia más abajo SOLO si el UUID es válido,
-	// para evitar borrar el XML ya registrado en caso de UUID duplicado.
+
 	if($errorArchivo === 0 && $nombreArchivoOriginal != '' && $ETQIETA == 'ADJUNTAR_FACTURA_PDF'){
 		$ventasoperaciones->limpiarAdjuntoFacturaUnico($ETQIETA,$IPventasoperar,$idPROV);
 	}
@@ -308,36 +314,41 @@ foreach($_FILES AS $ETQIETA => $VALOR){
 		}		
 	}
 
-	$url = '';
-	if($_FILES['ADJUNTAR_FACTURA_XML']==true){
-		$url = __ROOT1__.'/includes/archivos/'.$ADJUNTAR_FACTURA_XML;
-		if( file_exists($url) ){
-			$regreso   = $conexion2->lectorxml($url);
-			$resultado = $ventasoperaciones->VALIDA02XMLUUID($regreso['UUID']);
-
-			if($resultado == 'S'){
-				// ✅ UUID válido — limpiar anterior y guardar nuevo
-				$pagoproveedores->borrar_xmls(__ROOT1__.'/includes/archivos/',$IPventasoperar,$ADJUNTAR_FACTURA_XML,'02XML','02SUBETUFACTURADOCTOS');
-				echo $ADJUNTAR_FACTURA_XML.'^^'.$regreso['UUID'];
-				ob_start();
-				$pagoproveedores->guardarxmlDB2($IPventasoperar,$idPROV,'02XML', $url);
-				ob_end_clean();
-
-			} elseif(strpos($resultado, 'UUID_DUPLICADO:') === 0) {
-				// ❌ UUID duplicado — NO tocar el XML anterior, solo eliminar el intento fallido
-				$numeroSolicitud = str_replace('UUID_DUPLICADO:', '', $resultado);
-				echo '3^^'.$numeroSolicitud;
-				UNLINK($url);
-				$ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
-
-			} else {
-				// ❌ UUID duplicado sin número de solicitud — preservar el anterior
-				echo '3^^';
-				UNLINK($url);
-				$ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
-			}
-		}
-	}else{echo $ADJUNTAR_FACTURA_XML;}
+$url = '';
+if($_FILES['ADJUNTAR_FACTURA_XML']==true){
+    $url = __ROOT1__.'/includes/archivos/'.$ADJUNTAR_FACTURA_XML;
+    if( file_exists($url) ){
+        $regreso   = $conexion2->lectorxml($url);
+        
+        // ── VALIDACIÓN: XML vacío o sin UUID ─────────────────
+        if(empty(trim($regreso['UUID']))) {
+            echo '5^^';
+            UNLINK($url);
+            $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
+            continue; // salta al siguiente archivo del foreach
+        }
+        // ─────────────────────────────────────────────────────
+        
+        $resultado = $ventasoperaciones->VALIDA02XMLUUID($regreso['UUID']);
+        if($resultado == 'S'){
+            // ✅ UUID válido — limpiar anterior y guardar nuevo
+            $pagoproveedores->borrar_xmls(__ROOT1__.'/includes/archivos/',$IPventasoperar,$ADJUNTAR_FACTURA_XML,'02XML','02SUBETUFACTURADOCTOS');
+            echo $ADJUNTAR_FACTURA_XML.'^^'.$regreso['UUID'];
+            ob_start();
+            $pagoproveedores->guardarxmlDB2($IPventasoperar,$idPROV,'02XML', $url);
+            ob_end_clean();
+        } elseif(strpos($resultado, 'UUID_DUPLICADO:') === 0) {
+            $numeroSolicitud = str_replace('UUID_DUPLICADO:', '', $resultado);
+            echo '3^^'.$numeroSolicitud;
+            UNLINK($url);
+            $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
+        } else {
+            echo '3^^';
+            UNLINK($url);
+            $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
+        }
+    }
+}else{echo $ADJUNTAR_FACTURA_XML;}
 
 }
 }else{ echo "no hay usuario seleccionado"; }

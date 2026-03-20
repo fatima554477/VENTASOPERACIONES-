@@ -96,33 +96,32 @@ function ajax_file_upload1(file_obj, nombre) {
     },
     success: function (response) {
       var resp = $.trim(response);
-
       if (resp === '2') {
         $('#1' + nombre).html('<p style="color:red;">Error, archivo diferente a PDF, JPG o GIF.</p>');
         $('#' + nombre).val('');
-
       } else if (resp.indexOf('3^^') === 0) {
-        // ⚠️ UUID duplicado — NO se toca el valor del campo para no borrar el archivo ya cargado
         var partes          = resp.split('^^');
         var numeroSolicitud = partes[1] ? $.trim(partes[1]) : '';
         var msgDuplicado    = numeroSolicitud !== ''
           ? '<p style="color:red;font-weight:600;">⚠️ UUID YA REGISTRADO — Se encuentra en la solicitud: <strong>' + numeroSolicitud + '</strong></p>'
           : '<p style="color:red;font-weight:600;">⚠️ UUID PREVIAMENTE CARGADO.</p>';
         $('#1' + nombre).html(msgDuplicado);
-        // ✅ NO se hace $('#' + nombre).val('') aquí para preservar el archivo existente
-
       } else if (resp === '4') {
         var formatoEsperado = nombre === 'ADJUNTAR_FACTURA_XML' ? 'XML' : 'PDF';
         $('#1' + nombre).html('<p style="color:red;">ESTE ARCHIVO TIENE QUE SER EN FORMATO ' + formatoEsperado + '.</p>');
         $('#' + nombre).val('');
 
+      // ── XML vacío o sin contenido válido ──────────────────
+      } else if (resp.indexOf('5^^') === 0) {
+        $('#1' + nombre).html('<p style="color:red;font-weight:600;">⚠️ EL ARCHIVO XML ESTÁ VACÍO O NO CONTIENE INFORMACIÓN VÁLIDA. Verifica que sea un CFDI timbrado correctamente e inténtalo de nuevo.</p>');
+        $('#' + nombre).val('');
+      // ──────────────────────────────────────────────────────
+
       } else {
         $('#' + nombre).val(response);
         $('#1' + nombre).html('<p style="color:green;">✅ ¡Archivo cargado con éxito!</p>');
         $('#mensajeADJUNTOCOL').html('<p style="color:green;">✅ ¡Actualizado!</p>');
-
         recargarElemento('#2ADJUNTAR_FACTURA_XML');
-
         if (nombre === 'ADJUNTAR_FACTURA_XML') {
           var camposXML = [
             '#RAZON_SOCIAL2', '#RFC_PROVEEDOR2', '#CONCEPTO_PROVEE2',
@@ -133,14 +132,12 @@ function ajax_file_upload1(file_obj, nombre) {
           ];
           camposXML.forEach(recargarElemento);
         }
-
         recargarElemento('#2' + nombre);
         recargarElemento('#resettabla');
       }
     }
   });
 }
-
 
 
 /* -------------------------------------------------------
@@ -212,6 +209,15 @@ function activarTarget(num) {
   }
 }
 
+/* -------------------------------------------------------
+   ✅ CORRECCIÓN 1: función guardarYIrATarget2 (faltaba en script 1)
+------------------------------------------------------- */
+function guardarYIrATarget2() {
+  activarTarget(2);
+  var el = document.getElementById('target2');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 
 $(document).ready(function () {
 
@@ -234,6 +240,24 @@ $(document).ready(function () {
   }
   $('#mostrartodos,  #mostrartodos2').on('click', function () { toggleTodos('show'); });
   $('#ocultartodos, #ocultartodos2').on('click', function () { toggleTodos('hide'); });
+
+  /* -------------------------------------------------------
+     ✅ CORRECCIÓN 2: al cerrar modal fullscreen regresa a target2
+        (faltaba en script 1, copiado de script 2)
+  ------------------------------------------------------- */
+  $('#dataModal').on('hidden.bs.modal', function () {
+    activarTarget(2);
+    var el = document.getElementById('target2');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  /* -------------------------------------------------------
+     ✅ CORRECCIÓN 3: limpia el handler de btnYes al cerrar
+        modal de confirmación (faltaba en script 1)
+  ------------------------------------------------------- */
+  $('#dataModal3').on('hidden.bs.modal', function () {
+    $('#btnYes').off('click');
+  });
 
 
   /* ---------------------------------------------------
@@ -290,16 +314,26 @@ $(document).ready(function () {
       contentType: false,
       processData: false
     }).done(function (data) {
-      if ($.trim(data) === 'Ingresado' || $.trim(data) === 'Actualizado') {
-        $('#mensajeventasoperaciones').html('<span id="ACTUALIZADO">' + data + '</span>').fadeIn().delay(3000).fadeOut();
+      /* ✅ CORRECCIÓN 4: usar indexOf igual que script 2 para tolerar
+         espacios, saltos de línea o texto extra en la respuesta       */
+      var respuesta = $.trim(data).replace(/[\r\n\t]/g, '');
+      if (respuesta.indexOf('Ingresado') !== -1 || respuesta.indexOf('Actualizado') !== -1) {
+        $('#mensajeventasoperaciones').html('<span id="ACTUALIZADO">Ingresado</span>').fadeIn().delay(3000).fadeOut();
         limpiarFormularioVO();
         recargarElemento('#resettabla');
         recargarElemento('#reset_totales');
-        activarTarget(2);
-        var el = document.getElementById('target2');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(function () { guardarYIrATarget2(); }, 600);
       } else {
-        $('#mensajeventasoperaciones').html(data).fadeIn().delay(3000).fadeOut();
+        // Eliminar cualquier código técnico del servidor antes de mostrar al usuario
+        var dataLimpia = data
+          .replace(/5\^\^/g, '')   // quita solo el prefijo 5^^
+          .replace(/3\^\^/g, '')   // quita solo el prefijo 3^^
+          .replace(/^[234]\s*$/mg, '')  // quita líneas que solo tienen 2, 3 o 4
+          .trim();
+
+        if (dataLimpia !== '') {
+          $('#mensajeventasoperaciones').html('<span style="color:red;">' + dataLimpia + '</span>').show().delay(4000).fadeOut();
+        }
       }
     }).fail(function () {
       console.error('[enviarVENTASOPERACIONES] Error en la petición AJAX.');

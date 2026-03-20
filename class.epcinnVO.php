@@ -731,7 +731,7 @@ public function solocargartemp($archivo)
 		return mysqli_query($conn, "select * from 02SUBETUFACTURA where idRelacion = '".$_SESSION['idPROV']."' order by id desc ");
 	}
 
-public function Listado_pagoproveedor(){ $conn = $this->db(); $variablequery = "select * from 02SUBETUFACTURA where idRelacion = '".$_SESSION['idPROV']."' order by id desc "; return $arrayquery = mysqli_query($conn,$variablequery); } 
+
 
 public function Listado_bitacora_pagoproveedor_array($idcomprobacion){
 	$conn = $this->db();
