@@ -336,8 +336,11 @@ function STATUS_RECHAZADO(RECHAZADO_id){
 	var $checkBox = $(checkBox);
 	var RECHAZADO_text = checkBox.checked ? "si" : "no";
 	if(RECHAZADO_text === 'no'){ $checkBox.data('forzarAgregarMotivo', 'si'); }
-	else if(RECHAZADO_text === 'si' && $checkBox.data('forzarAgregarMotivo') !== 'si'){ $checkBox.removeData('forzarAgregarMotivo'); }
+	else if(RECHAZADO_text === 'si' && $checkBox.data('forzarAgregarMotivo') !== 'si'){ $checkBox.removeData('forzarAgregarMotivo'); 
+	}
+
 	actualizarBotonesRechazo(RECHAZADO_id, RECHAZADO_text);
+	actualizarEstadoVentasPorRechazo(RECHAZADO_id, RECHAZADO_text);
 	load(obtenerPaginaActualFiltro());
 	$.ajax({
 		url:'pagoproveedores/controladorPP.php',
@@ -350,11 +353,42 @@ function STATUS_RECHAZADO(RECHAZADO_id){
 			if(result[1]=='si') $('#color_RECHAZADO'+RECHAZADO_id).css('background-color', '#ceffcc');
 			if(result[1]=='no') $('#color_RECHAZADO'+RECHAZADO_id).css('background-color', '#e9d8ee');
 			if(result[1] == 'si' || result[1] == 'no'){
-				if(result[1] == 'si' && $checkBox.data('forzarAgregarMotivo') !== 'si'){ $checkBox.removeData('forzarAgregarMotivo'); }
+			if(result[1] == 'si' && $checkBox.data('forzarAgregarMotivo') !== 'si'){
+					$checkBox.removeData('forzarAgregarMotivo');
+				}
 				actualizarBotonesRechazo(RECHAZADO_id, result[1]);
+				actualizarEstadoVentasPorRechazo(RECHAZADO_id, result[1]);
 			}
 		}
 	});
+}
+
+
+function actualizarEstadoVentasPorRechazo(RECHAZADO_id, statusRechazado){
+	var $ventas = $('#STATUS_VENTAS'+RECHAZADO_id);
+	if($ventas.length === 0){ return; }
+	var permisoPrincipal = ($ventas.data('permiso-principal') === 'si');
+	if(statusRechazado === 'si'){
+		$ventas.prop('disabled', true)
+			.css('cursor', 'not-allowed')
+			.attr('title', 'No se puede autorizar por ventas: pago rechazado');
+		return;
+	}
+	if($ventas.is(':checked')){
+		$ventas.prop('disabled', true)
+			.css('cursor', 'not-allowed')
+			.attr('title', 'Ya autorizado por ventas');
+		return;
+	}
+	if(permisoPrincipal){
+		$ventas.prop('disabled', false)
+			.css('cursor', 'pointer')
+			.attr('title', '');
+	} else {
+		$ventas.prop('disabled', true)
+			.css('cursor', 'not-allowed')
+			.attr('title', 'Sin permiso principal para autorizar por ventas');
+	}
 }
 
 function abrirFormularioRechazo(RECHAZADO_id){

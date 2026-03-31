@@ -938,12 +938,19 @@ while ($rowDOCTOS = mysqli_fetch_array($querycontrasDOCTOS)) {
 </td>
 
 <!-- VENTAS -->
+<?php
+$statusRechazado = isset($row["STATUS_RECHAZADO"]) ? $row["STATUS_RECHAZADO"] : 'no';
+$numeroEventoRegistro = isset($row["NUMERO_EVENTO"]) ? strtoupper(trim((string)$row["NUMERO_EVENTO"])) : '';
+$tienePermisoVenta = $numeroEventoRegistro !== '' && isset($eventosAutorizadosVentas[$numeroEventoRegistro]);
+?>
+<!-- VENTAS -->
 <td style="text-align:center; background:<?php echo ($row["STATUS_VENTAS"] == 'si') ? '#ceffcc' : '#e9d8ee'; ?>;"
 	id="color_VENTAS<?php echo $row["02SUBETUFACTURAid"]; ?>">
 	<input type="checkbox" style="width:30px;" class="form-check-input"
 		id="STATUS_VENTAS<?php echo $row["02SUBETUFACTURAid"]; ?>"
 		name="STATUS_VENTAS<?php echo $row["02SUBETUFACTURAid"]; ?>"
 		value="<?php echo $row["02SUBETUFACTURAid"]; ?>"
+		data-permiso-principal="<?php echo $tienePermisoVenta ? 'si' : 'no'; ?>"
 		onclick="STATUS_VENTAS(<?php echo $row["02SUBETUFACTURAid"]; ?>)"
 		<?php
 		$atributosVentas = [];
@@ -951,9 +958,13 @@ while ($rowDOCTOS = mysqli_fetch_array($querycontrasDOCTOS)) {
 			$atributosVentas[] = 'checked';
 			$atributosVentas[] = 'disabled';
 		} else {
-			$numeroEventoRegistro = isset($row["NUMERO_EVENTO"]) ? strtoupper(trim((string)$row["NUMERO_EVENTO"])) : '';
-			$tienePermisoVenta = $numeroEventoRegistro !== '' && isset($eventosAutorizadosVentas[$numeroEventoRegistro]);
-			if (!$tienePermisoVenta) $atributosVentas[] = 'disabled';
+			if ($statusRechazado === 'si') {
+				$atributosVentas[] = 'disabled';
+				$atributosVentas[] = 'style="cursor:not-allowed;"';
+				$atributosVentas[] = 'title="No se puede autorizar por ventas: pago rechazado"';
+			} elseif (!$tienePermisoVenta) {
+				$atributosVentas[] = 'disabled';
+			}
 		}
 		echo implode(' ', $atributosVentas);
 		?> />
@@ -1044,11 +1055,9 @@ while ($rowDOCTOS = mysqli_fetch_array($querycontrasDOCTOS)) {
 	<?php $colspan += 1; ?>
 </td>
 
-<!-- RECHAZADO -->
 <?php if ($p_rechazo_ver) { ?>
 <td style="text-align:center; background:
-	<?php $statusRechazado = isset($row["STATUS_RECHAZADO"]) ? $row["STATUS_RECHAZADO"] : 'no';
-	echo ($statusRechazado == 'si') ? '#ceffcc' : '#e9d8ee'; ?>;"
+	<?php echo ($statusRechazado == 'si') ? '#ceffcc' : '#e9d8ee'; ?>;"
 	id="color_RECHAZADO<?php echo $row["02SUBETUFACTURAid"]; ?>">
 	<?php
 	$motivoRechazo = $database->obtener_motivo_rechazo($row["02SUBETUFACTURAid"]);
@@ -1288,14 +1297,33 @@ if ($mostrarXML) { $TUA12 += $row['TUA']; $totales2 = 'si'; }
 <?php if($database->plantilla_filtro($nombreTabla,"total",$altaeventos,$DEPARTAMENTO)=="si"){ ?>
 <td style="text-align:center" id="montoOriginal_<?php echo $row['02SUBETUFACTURAid']; ?>"><?php
 if ($mostrarXML) {
-	$total123 = isset($row['totalf']) ? $row['totalf'] : '';
-	$MONTO_DEPOSITAR123 = isset($row['MONTO_DEPOSITAR']) ? $row['MONTO_DEPOSITAR'] : '';
-	if ($total123 > 0) { $porfalta = number_format($total123, 2, '.', ','); $porfalta2 = $total123; }
-	else { $porfalta = number_format($MONTO_DEPOSITAR123, 2, '.', ','); $porfalta2 = $MONTO_DEPOSITAR123; }
-	$totalf12 += $porfalta2;
-	echo $porfalta;
-	$totales2 = 'si';
-} else { $porfalta = ''; $porfalta2 = 0; }
+    $STATUS_RECHAZADO = isset($row['STATUS_RECHAZADO']) ? $row['STATUS_RECHAZADO'] : '';
+    if (isset($STATUS_RECHAZADO) && $STATUS_RECHAZADO == "si") {
+        $porfalta  = '0.00';
+        $porfalta2 = 0;
+        $totalf12 += 0;
+        echo $porfalta;
+        $totales2 = 'si';
+    } else {
+        $total123          = isset($row['totalf'])          ? $row['totalf']          : '';
+        $MONTO_DEPOSITAR123 = isset($row['MONTO_DEPOSITAR']) ? $row['MONTO_DEPOSITAR'] : '';
+
+        if ($total123 > 0) { 
+            $porfalta  = number_format($total123, 2, '.', ','); 
+            $porfalta2 = $total123; 
+        } else { 
+            $porfalta  = number_format($MONTO_DEPOSITAR123, 2, '.', ','); 
+            $porfalta2 = $MONTO_DEPOSITAR123; 
+        }
+
+        $totalf12 += $porfalta2;
+        echo $porfalta;
+        $totales2 = 'si';
+    }
+} else { 
+    $porfalta  = ''; 
+    $porfalta2 = 0; 
+}
 ?></td>
 <?php } ?>
 

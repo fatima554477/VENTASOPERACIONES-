@@ -49,91 +49,120 @@ class orders extends accesoclase {
                 return $cleanRfc !== '' && preg_match('/^[A-Z&Ñ]{3,4}[0-9]{6}[A-Z0-9]{3}$/i', $cleanRfc);
         }
 
-    public function datos_bancarios_xml($rfc, $idRelacion = null, $nombreComercial = null){
-                $conn = $this->db();
-                $filtros = [];
+public function datos_bancarios_xml($rfc, $idRelacion = null, $nombreComercial = null){
+    // ✅ CACHÉ
+    static $cache = [];
+    $cacheKey = $rfc . '|' . $idRelacion . '|' . $nombreComercial;
+    if (array_key_exists($cacheKey, $cache)) {
+        return $cache[$cacheKey];
+    }
 
-                if($this->isValidRfc($rfc)){
-                        $valueRfc = mysqli_real_escape_string($conn, strtoupper($rfc));
-                        $filtros[] = "P_RFC_MTDP = '".$valueRfc."'";
-                }
+    $conn = $this->db();
+    $filtros = [];
 
-                $nombreComercial = trim((string)$nombreComercial);
-                if($nombreComercial !== ''){
-                        $valueNombre = mysqli_real_escape_string($conn, $nombreComercial);
-                        $filtros[] = "02direccionproveedor1.P_NOMBRE_COMERCIAL_EMPRESA = '".$valueNombre."'";
-                }
+    if($this->isValidRfc($rfc)){
+        $valueRfc = mysqli_real_escape_string($conn, strtoupper($rfc));
+        $filtros[] = "P_RFC_MTDP = '".$valueRfc."'";
+    }
 
-                if(is_numeric($idRelacion)){
-                        $filtros[] = "02usuarios.id = '".intval($idRelacion)."'";
-                }
+    $nombreComercial = trim((string)$nombreComercial);
+    if($nombreComercial !== ''){
+        $valueNombre = mysqli_real_escape_string($conn, $nombreComercial);
+        $filtros[] = "02direccionproveedor1.P_NOMBRE_COMERCIAL_EMPRESA = '".$valueNombre."'";
+    }
 
-                if(empty($filtros)){
-                        return null;
-                }
+    if(is_numeric($idRelacion)){
+        $filtros[] = "02usuarios.id = '".intval($idRelacion)."'";
+    }
 
-                $variable = "SELECT 02DATOSBANCARIOS1.idRelacion AS idRelacion FROM 02usuarios "
-                        ."LEFT JOIN 02direccionproveedor1 ON 02usuarios.id = 02direccionproveedor1.idRelacion "
-                        ."LEFT JOIN 02DATOSBANCARIOS1 ON 02DATOSBANCARIOS1.idRelacion = 02usuarios.id "
-                        ."WHERE ".implode(' AND ', $filtros)." "
-                        ."ORDER BY 02DATOSBANCARIOS1.checkbox = 'si' DESC, 02DATOSBANCARIOS1.id DESC LIMIT 1";
-                $query = mysqli_query($conn,$variable);
-                $row = mysqli_fetch_array($query, MYSQLI_ASSOC);
-                return $row ? $row['idRelacion'] : null;
-        }
+    if(empty($filtros)){
+        $cache[$cacheKey] = null;
+        return null;
+    }
 
-        public function datos_bancarios_todo($idRelacion, $nombreComercial = null){
-                $conn = $this->db();
-                $filtros = [];
+    $variable = "SELECT 02DATOSBANCARIOS1.idRelacion AS idRelacion FROM 02usuarios "
+        ."LEFT JOIN 02direccionproveedor1 ON 02usuarios.id = 02direccionproveedor1.idRelacion "
+        ."LEFT JOIN 02DATOSBANCARIOS1 ON 02DATOSBANCARIOS1.idRelacion = 02usuarios.id "
+        ."WHERE ".implode(' AND ', $filtros)." "
+        ."ORDER BY 02DATOSBANCARIOS1.checkbox = 'si' DESC, 02DATOSBANCARIOS1.id DESC LIMIT 1";
 
-                if(is_numeric($idRelacion)){
-                        $filtros[] = "02DATOSBANCARIOS1.idRelacion = '".intval($idRelacion)."'";
-                }
+    $query = mysqli_query($conn, $variable);
+    $row   = mysqli_fetch_array($query, MYSQLI_ASSOC);
 
-                $nombreComercial = trim((string)$nombreComercial);
-                if($nombreComercial !== ''){
-                        $valueNombre = mysqli_real_escape_string($conn, $nombreComercial);
-                        $filtros[] = "02direccionproveedor1.P_NOMBRE_COMERCIAL_EMPRESA = '".$valueNombre."'";
-                }
+    // ✅ Guardar en caché antes de retornar
+    $cache[$cacheKey] = $row ? $row['idRelacion'] : null;
+    return $cache[$cacheKey];
+}
 
-                if(empty($filtros)){
-                        return [];
-                }
-              $variable2 = "SELECT 02DATOSBANCARIOS1.* FROM 02DATOSBANCARIOS1 "
-                        ."LEFT JOIN 02usuarios ON 02usuarios.id = 02DATOSBANCARIOS1.idRelacion "
-                        ."LEFT JOIN 02direccionproveedor1 ON 02usuarios.id = 02direccionproveedor1.idRelacion "
-                        ."WHERE (".implode(' AND ', $filtros).") "
-                        ."AND 02DATOSBANCARIOS1.checkbox = 'si' ORDER BY 02DATOSBANCARIOS1.id DESC LIMIT 1";
-                $query2 = mysqli_query($conn,$variable2);
-                $row2 = mysqli_fetch_array($query2, MYSQLI_ASSOC);
-                return $row2 ? $row2 : [];
-        }
+public function datos_bancarios_todo($idRelacion, $nombreComercial = null){
+    // ✅ CACHÉ
+    static $cache = [];
+    $cacheKey = $idRelacion . '|' . $nombreComercial;
+    if (array_key_exists($cacheKey, $cache)) {
+        return $cache[$cacheKey];
+    }
+
+    $conn = $this->db();
+    $filtros = [];
+
+    if(is_numeric($idRelacion)){
+        $filtros[] = "02DATOSBANCARIOS1.idRelacion = '".intval($idRelacion)."'";
+    }
+
+    $nombreComercial = trim((string)$nombreComercial);
+    if($nombreComercial !== ''){
+        $valueNombre = mysqli_real_escape_string($conn, $nombreComercial);
+        $filtros[] = "02direccionproveedor1.P_NOMBRE_COMERCIAL_EMPRESA = '".$valueNombre."'";
+    }
+
+    if(empty($filtros)){
+        $cache[$cacheKey] = [];
+        return [];
+    }
+
+    $variable2 = "SELECT 02DATOSBANCARIOS1.* FROM 02DATOSBANCARIOS1 "
+        ."LEFT JOIN 02usuarios ON 02usuarios.id = 02DATOSBANCARIOS1.idRelacion "
+        ."LEFT JOIN 02direccionproveedor1 ON 02usuarios.id = 02direccionproveedor1.idRelacion "
+        ."WHERE (".implode(' AND ', $filtros).") "
+        ."AND 02DATOSBANCARIOS1.checkbox = 'si' ORDER BY 02DATOSBANCARIOS1.id DESC LIMIT 1";
+
+    $query2 = mysqli_query($conn, $variable2);
+    $row2   = mysqli_fetch_array($query2, MYSQLI_ASSOC);
+
+    // ✅ Guardar en caché antes de retornar
+    $cache[$cacheKey] = $row2 ? $row2 : [];
+    return $cache[$cacheKey];
+}
    
 
-	public function DOCUMENTOSFISCALES_PAGOA($idRelacion, $documento , $documento2=FALSE){
-		$conn = $this->db();
-		$variable2 = "select * from 02DOCUMENTOSFISCALES where idRelacion = '".$idRelacion."' and 
-		(DOCUMENTO_LEGAL = '".$documento."' OR DOCUMENTO_LEGAL = '".$documento2."' ) LIMIT 1  ";
-		$query2 = mysqli_query($conn,$variable2);
-		$ADJUNTAR_DOCUMENTO_LEGAL = "";
-		while($row2 = mysqli_fetch_array($query2, MYSQLI_ASSOC)){
-			if($row2['ADJUNTAR_DOCUMENTO_LEGAL']!=2 or 
-			$row2['ADJUNTAR_DOCUMENTO_LEGAL']!='' or 
-			$row2['ADJUNTAR_DOCUMENTO_LEGAL']!=1)
-			{
-				 $ADJUNTAR_DOCUMENTO_LEGAL .= "<a target='_blank'  href='includes/archivos/".$row2['ADJUNTAR_DOCUMENTO_LEGAL']."'>ver</a><br>";
-			}else{
-				 $ADJUNTAR_DOCUMENTO_LEGAL .= "<br>";
-			}
-		}
-		return $ADJUNTAR_DOCUMENTO_LEGAL;
-	}
+public function DOCUMENTOSFISCALES_PAGOA($idRelacion, $documento, $documento2 = FALSE){
+    // ✅ CACHÉ
+    static $cache = [];
+    $cacheKey = $idRelacion . '|' . $documento . '|' . $documento2;
+    if (array_key_exists($cacheKey, $cache)) {
+        return $cache[$cacheKey];
+    }
 
-	public function countAll($sql){
-		$query=$this->mysqli->query($sql);
-		$count=$query->num_rows;
-		return $count;
-	}
+    $conn = $this->db();
+    $variable2 = "SELECT * FROM 02DOCUMENTOSFISCALES WHERE idRelacion = '".$idRelacion."' AND "
+        ."(DOCUMENTO_LEGAL = '".$documento."' OR DOCUMENTO_LEGAL = '".$documento2."') LIMIT 1";
+    $query2 = mysqli_query($conn, $variable2);
+
+    $ADJUNTAR_DOCUMENTO_LEGAL = "";
+    while($row2 = mysqli_fetch_array($query2, MYSQLI_ASSOC)){
+        if($row2['ADJUNTAR_DOCUMENTO_LEGAL'] != 2 ||
+           $row2['ADJUNTAR_DOCUMENTO_LEGAL'] != '' ||
+           $row2['ADJUNTAR_DOCUMENTO_LEGAL'] != 1){
+            $ADJUNTAR_DOCUMENTO_LEGAL .= "<a target='_blank' href='includes/archivos/".$row2['ADJUNTAR_DOCUMENTO_LEGAL']."'>ver</a><br>";
+        } else {
+            $ADJUNTAR_DOCUMENTO_LEGAL .= "<br>";
+        }
+    }
+
+    // ✅ Guardar en caché antes de retornar
+    $cache[$cacheKey] = $ADJUNTAR_DOCUMENTO_LEGAL;
+    return $cache[$cacheKey];
+}
 	
 	
 	
