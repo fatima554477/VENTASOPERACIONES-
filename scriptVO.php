@@ -337,6 +337,7 @@ function limpiarFormularioVO() {
         limpiarFormularioVO();
         recargarElemento('#resettabla');
         recargarElemento('#reset_totales');
+        $btn.prop('disabled', false);
         setTimeout(function () { guardarYIrATarget2(); }, 600);
       } else {
         // Eliminar cualquier código técnico del servidor antes de mostrar al usuario
