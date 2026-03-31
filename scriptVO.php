@@ -314,6 +314,10 @@ function limpiarFormularioVO() {
      ENVIAR VENTAS OPERACIONES
   --------------------------------------------------- */
   $('#enviarVENTASOPERACIONES').on('click', function () {
+	      var $btn = $(this);
+    if ($btn.prop('disabled')) return;
+    $btn.prop('disabled', true);
+
     var formData = new FormData($('#ventasoperacionesform')[0]);
 
     $.ajax({
@@ -333,6 +337,8 @@ function limpiarFormularioVO() {
         limpiarFormularioVO();
         recargarElemento('#resettabla');
         recargarElemento('#reset_totales');
+		 $btn.prop('disabled', false);
+
         setTimeout(function () { guardarYIrATarget2(); }, 600);
       } else {
         // Eliminar cualquier código técnico del servidor antes de mostrar al usuario
@@ -345,9 +351,13 @@ function limpiarFormularioVO() {
         if (dataLimpia !== '') {
           $('#mensajeventasoperaciones').html('<span style="color:red;">' + dataLimpia + '</span>').show().delay(4000).fadeOut();
         }
+		 $btn.prop('disabled', false);
+
       }
     }).fail(function () {
       console.error('[enviarVENTASOPERACIONES] Error en la petición AJAX.');
+	  $btn.prop('disabled', false);
+
     });
   });
 
