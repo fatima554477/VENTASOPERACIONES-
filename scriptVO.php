@@ -218,6 +218,33 @@ function guardarYIrATarget2() {
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+function recargarTodosLosElementos() {
+    $.get(location.href, function(html) {
+        var doc = $(html);
+        var selectores = [
+            'ADJUNTAR_FACTURA_XML', '1ADJUNTAR_FACTURA_XML', '2ADJUNTAR_FACTURA_XML',
+            'ADJUNTAR_FACTURA_PDF', '1ADJUNTAR_FACTURA_PDF', '2ADJUNTAR_FACTURA_PDF',
+            '2ADJUNTAR_COTIZACION', '2CONPROBANTE_TRANSFERENCIA', '2ADJUNTAR_ARCHIVO_1',
+            'RAZON_SOCIAL2', 'RFC_PROVEEDOR2', 'CONCEPTO_PROVEE2',
+            'TIPO_DE_MONEDA2', 'FECHA_DE_PAGO2', 'NUMERO_CONSECUTIVO_PROVEE2',
+            'NOMBRE_COMERCIAL2', '2MONTO_FACTURA', '2MONTO_DEPOSITAR',
+            '2PFORMADE_PAGO', '2TImpuestosRetenidosIVA', 'TImpuestosRetenidosIVA',
+            '2TImpuestosRetenidosISR', 'TImpuestosRetenidosISR',
+            '2descuentos', 'descuentos', '2IVA', 'IVA',
+            'IMPUESTO_HOSPEDAJE', 'MONTO_PROPINA',
+            'resettabla', 'reset_totales',
+            'NUMERO_CONSECUTIVO_PROVEE2', 'mensajeADJUNTOCOL'
+        ];
+        selectores.forEach(function(id) {
+            var remoto = doc.find('#' + id);
+            var local  = $('#' + id);
+            if (remoto.length && local.length) {
+                local.html(remoto.html());
+            }
+        });
+        inicializarCalculoTotales();
+    });
+}
 
 $(document).ready(function () {
 
@@ -246,7 +273,8 @@ $(document).ready(function () {
         (faltaba en script 1, copiado de script 2)
   ------------------------------------------------------- */
   $('#dataModal').on('hidden.bs.modal', function () {
-    activarTarget(2);
+     $('#target2').show('swing');
+
     var el = document.getElementById('target2');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
@@ -263,40 +291,23 @@ $(document).ready(function () {
   /* ---------------------------------------------------
      HELPER: limpia el formulario de ventas operaciones
   --------------------------------------------------- */
-  function limpiarFormularioVO() {
+function limpiarFormularioVO() {
     var form = document.getElementById('ventasoperacionesform');
     if (form) form.reset();
 
     var camposVacios = [
-      '#RAZON_SOCIAL2', '#CONCEPTO_PROVEE', '#RFC_PROVEEDOR2',
-      '#TIPO_DE_MONEDA', '#FECHA_DE_PAGO', '#NUMERO_CONSECUTIVO_PROVEE',
-      '#ADJUNTAR_FACTURA_XML', '#2MONTO_FACTURA', '#2MONTO_DEPOSITAR',
-      '#2ADJUNTAR_FACTURA_PDF', '#2TImpuestosRetenidos'
+        '#RAZON_SOCIAL2', '#CONCEPTO_PROVEE', '#RFC_PROVEEDOR2',
+        '#TIPO_DE_MONEDA', '#FECHA_DE_PAGO', '#NUMERO_CONSECUTIVO_PROVEE',
+        '#ADJUNTAR_FACTURA_XML', '#2MONTO_FACTURA', '#2MONTO_DEPOSITAR',
+        '#2ADJUNTAR_FACTURA_PDF', '#2TImpuestosRetenidos'
     ];
     camposVacios.forEach(function (id) { $(id).val(''); });
 
     $('#NOMBRE_COMERCIAL').empty().trigger('change');
 
-    var elementosRecargar = [
-      '#2ADJUNTAR_FACTURA_XML', '#ADJUNTAR_FACTURA_XML', '#1ADJUNTAR_FACTURA_XML',
-      '#ADJUNTAR_FACTURA_PDF',  '#1ADJUNTAR_FACTURA_PDF',
-      '#1ADJUNTAR_COTIZACION',  '#1COMPROBANTE_DE_DEVOLUCION',
-      '#1CONPROBANTE_TRANSFERENCIA', '#1ADJUNTAR_ARCHIVO_1',
-      '#2COMPROBANTE_DE_DEVOLUCION',
-      '#IMPUESTO_HOSPEDAJE', '#MONTO_PROPINA', '#IVA',
-      '#2ADJUNTAR_FACTURA_PDF', '#2ADJUNTAR_COTIZACION',
-      '#2CONPROBANTE_TRANSFERENCIA', '#2ADJUNTAR_ARCHIVO_1',
-      '#NUMERO_CONSECUTIVO_PROVEE2',
-      '#2MONTO_FACTURA', '#2MONTO_DEPOSITAR', '#2IVA', '#2PFORMADE_PAGO',
-      '#2TImpuestosRetenidosIVA', '#TImpuestosRetenidosIVA',
-      '#2TImpuestosRetenidosISR', '#TImpuestosRetenidosISR',
-      '#2descuentos', '#descuentos',
-      '#RAZON_SOCIAL2', '#RFC_PROVEEDOR2',
-      '#TIPO_DE_MONEDA2', '#FECHA_DE_PAGO2', '#CONCEPTO_PROVEE2',
-      '#NOMBRE_COMERCIAL2'
-    ];
-    elementosRecargar.forEach(recargarElemento);
-  }
+    // UNA SOLA petición en lugar de 33 peticiones separadas
+    recargarTodosLosElementos();
+}
 
 
   /* ---------------------------------------------------

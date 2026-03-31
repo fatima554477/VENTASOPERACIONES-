@@ -163,68 +163,6 @@ elseif($borraventasoperaciones == 'borraventasoperaciones'){
 	echo  $ventasoperaciones->borraventasoperaciones($borra_id_VO);
 }
 
-elseif($validaDATOSBANCARIOS1 == 'validaDATOSBANCARIOS1' or $ENVIARRdatosbancario1p == 'ENVIARRdatosbancario1p'){            
-
-if( $_FILES["FOTO_ESTADO_PROVEE"] == true){
-$FOTO_ESTADO_PROVEE = $conexion->solocargar("FOTO_ESTADO_PROVEE");
-}if($FOTO_ESTADO_PROVEE=='2' or $FOTO_ESTADO_PROVEE=='' or $FOTO_ESTADO_PROVEE=='1'){
-	$FOTO_ESTADO_PROVEE1="";
-} else{
- $FOTO_ESTADO_PROVEE1 = $FOTO_ESTADO_PROVEE;
-}
-
-$P_TIPO_DE_MONEDA_1 = isset($_POST["P_TIPO_DE_MONEDA_1"])?$_POST["P_TIPO_DE_MONEDA_1"]:"";
-$P_INSTITUCION_FINANCIERA_1 = isset($_POST["P_INSTITUCION_FINANCIERA_1"])?$_POST["P_INSTITUCION_FINANCIERA_1"]:"";
-$P_NUMERO_DE_CUENTA_DB_1 = isset($_POST["P_NUMERO_DE_CUENTA_DB_1"])?$_POST["P_NUMERO_DE_CUENTA_DB_1"]:"";
-$P_NUMERO_CLABE_1 = isset($_POST["P_NUMERO_CLABE_1"])?$_POST["P_NUMERO_CLABE_1"]:"";
-$P_NUMERO_DE_SUCURSAL_1 = isset($_POST["P_NUMERO_DE_SUCURSAL_1"])?$_POST["P_NUMERO_DE_SUCURSAL_1"]:"";
-$P_NUMERO_IBAN_1 = isset($_POST["P_NUMERO_IBAN_1"])?$_POST["P_NUMERO_IBAN_1"]:"";
-$P_NUMERO_CUENTA_SWIFT_1 = isset($_POST["P_NUMERO_CUENTA_SWIFT_1"])?$_POST["P_NUMERO_CUENTA_SWIFT_1"]:"";
-$ULTIMA_CARGA_DATOBANCA = isset($_POST["ULTIMA_CARGA_DATOBANCA"])?$_POST["ULTIMA_CARGA_DATOBANCA"]:"";
-$IPdatosbancario1p = isset($_POST["IPdatosbancario1p"])?$_POST["IPdatosbancario1p"]:"";
-
-	echo $ventasoperaciones->enviarDATOSBANCARIOS1($P_TIPO_DE_MONEDA_1 , $P_INSTITUCION_FINANCIERA_1 , $P_NUMERO_DE_CUENTA_DB_1 , $P_NUMERO_CLABE_1 ,$P_NUMERO_DE_SUCURSAL_1 , $P_NUMERO_IBAN_1 , $P_NUMERO_CUENTA_SWIFT_1, $FOTO_ESTADO_PROVEE1,$ULTIMA_CARGA_DATOBANCA,$ENVIARRdatosbancario1p,
-	$IPdatosbancario1p );
-}	
-
-elseif($DAbancaPRO_ENVIAR_IMAIL ==true){
-$conexion2 = new herramientas();
-$NOMBRE_1 = 'Peticion';
-$EMAILnombre = array($DAbancaPRO_ENVIAR_IMAIL=>$NOMBRE_1);
-$adjuntos = array(''=>'');
-$Subject = 'DATOS SOLICITADOS';
-$array = isset($_POST['datosbancPRO'])?$_POST['datosbancPRO']:'';
-if($array != ''){
-$loopcuenta = count($array) - 1;$loopcuenta2 = count($array) - 2;
-$or1='';
-for($rrr=0;$rrr<=$loopcuenta;$rrr++){
-	if($rrr<=$loopcuenta2){$or1 = ' or ';}else{$or1 = '';}
-	$query1 .= ' id= '.$array[$rrr].$or1;
-}
-$query2 = str_replace('[object Object]','',$query1);
-$query2 = "and (".$query2.") ";
-}else{
-	echo "SELECCIONA UNA CASILLA DEL LISTADO DE ABAJO."; exit;
-}
-
-$MANDA_INFORMACION = $ventasoperaciones->MANDA_INFORMACION('P_TIPO_DE_MONEDA_1,P_INSTITUCION_FINANCIERA_1,P_NUMERO_DE_CUENTA_DB_1,P_NUMERO_CLABE_1,P_NUMERO_DE_SUCURSAL_1,P_NUMERO_IBAN_1,P_NUMERO_CUENTA_SWIFT_1,FOTO_ESTADO_PROVEE',
-'TIPO DE MONEDA ,NOMBRE DE LA INSTITUCIÓN FINANCIERA,NUMERO DE CUENTA,CLABE,NÚMERO DE SUCURSAL,NUMERO IBAN,NUMERO DE CUENTA SWIFT,FOTO DE ESTADO DE CUENTA', '02DATOSBANCARIOS1',  " where idRelacion = '".$_SESSION['idPROV']."' 
-".$query2 );
-
-$variables = 'FOTO_ESTADO_PROVEE, ';
-$cadenacompleta = substr($variables, 0, -2);
-$adjuntos = $ventasoperaciones->ADJUNTA_IMAGENES_EMAIL($cadenacompleta,'02DATOSBANCARIOS1', " where idRelacion = '".$_SESSION['idPROV']."' ".$query2 );
-$html = $ventasoperaciones->html2(' DATOS BANCARIOS',$MANDA_INFORMACION );
-$idlogo = $ventasoperaciones->variable_comborelacion1a();
-$logo = $ventasoperaciones->variables_informacionfiscal_logo($idlogo);
-$embebida = array('../includes/archivos/'.$logo => 'ver');
-echo $conexion2->email($EMAILnombre, $html, $adjuntos, $embebida, $Subject);
-}
-
-elseif($borra_datos_bancario1 == 'borra_datos_bancario1'){
-	$borra_id_bancaP = isset($_POST["borra_id_bancaP"])?$_POST["borra_id_bancaP"]:"";   
-	echo  $ventasoperaciones->borra_datos_bancario1($borra_id_bancaP);
-}
 
 elseif($borrasbdoc =='borrasbdoc'){
 	$borra_id_sb = isset($_POST["borra_id_sb"])?$_POST["borra_id_sb"]:"";   

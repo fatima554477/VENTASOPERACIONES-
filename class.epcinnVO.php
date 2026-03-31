@@ -5,9 +5,6 @@ CREADO : 10/mayo/2023
 fecha sandor: 21/ABRIL/2025
 fecha fatis : 05/04/2025
 
-se agregaron estos campos nuevos:
-idRelacionU int(50)
-TIPOARCHIVO varchar(3)
 */
 	define('__ROOT3__', dirname(dirname(__FILE__)));
 	require __ROOT3__."/includes/class.epcinn.php";	
@@ -688,6 +685,7 @@ public function solocargartemp($archivo)
 		mysqli_query($conn, "DELETE FROM 02SUBETUFACTURA where id = '".$id."' ") or die('P44'.mysqli_error($conn));
 		mysqli_query($conn, "DELETE FROM `02XML` WHERE `ultimo_id` = '".$id."' ") or die('P44'.mysqli_error($conn));
 		mysqli_query($conn, "DELETE FROM `02SUBETUFACTURADOCTOS` WHERE `idTemporal` = '".$id."' ") or die('P44'.mysqli_error($conn));
+		mysqli_query($conn, "DELETE FROM `02SUBETUFACTURA_BITACORA` WHERE `id_subetufactura` = '".$id."' ") or die('P44'.mysqli_error($conn));
 		echo "ELEMENTO BORRADO";
 	}
 
@@ -825,76 +823,7 @@ $variablequery = "SELECT
 		mysqli_query($conn, "delete from 02SUBETUFACTURADOCTOS where ADJUNTAR_FACTURA_XML = '".$nombre."' ");
 	}
 
-	// ── DATOS BANCARIOS ────────────────────────────────────────────────────
 
-	public function variable_DATOSBANCARIOS1(){
-		$conn = $this->db();
-		$variablequery = "select * from 02DATOSBANCARIOS1 where idRelacion = '".$_SESSION['idPROV']."' ";
-		$arrayquery = mysqli_query($conn,$variablequery);
-		return mysqli_fetch_array($arrayquery, MYSQLI_ASSOC);
-	}
-
-	public function revisar_DATOSBANCARIOS1(){
-		$conn = $this->db();
-		$var1 = 'select id from 02DATOSBANCARIOS1 where idRelacion = "'.$_SESSION['idPROV'].'" ';
-		$query = mysqli_query($conn,$var1) or die('P44'.mysqli_error($conn));
-		$row = mysqli_fetch_array($query, MYSQLI_ASSOC);
-		return $row['id'];
-	}
-
-	public function enviarDATOSBANCARIOS1($P_TIPO_DE_MONEDA_1, $P_INSTITUCION_FINANCIERA_1,
-		$P_NUMERO_DE_CUENTA_DB_1, $P_NUMERO_CLABE_1, $P_NUMERO_DE_SUCURSAL_1,
-		$P_NUMERO_IBAN_1, $P_NUMERO_CUENTA_SWIFT_1, $FOTO_ESTADO_PROVEE,
-		$ULTIMA_CARGA_DATOBANCA, $ENVIARRdatosbancario1p, $IPdatosbancario1p){
-
-		$conn    = $this->db();
-		$session = isset($_SESSION['idPROV']) ? $_SESSION['idPROV'] : '';
-		if($session == ''){ echo "NO HAY UN PROVEEDOR SELECCIONADO"; return; }
-
-		$var1 = "update 02DATOSBANCARIOS1 set
-		P_TIPO_DE_MONEDA_1 = '".$P_TIPO_DE_MONEDA_1."',
-		P_INSTITUCION_FINANCIERA_1 = '".$P_INSTITUCION_FINANCIERA_1."',
-		P_NUMERO_DE_CUENTA_DB_1 = '".$P_NUMERO_DE_CUENTA_DB_1."',
-		P_NUMERO_CLABE_1 = '".$P_NUMERO_CLABE_1."',
-		P_NUMERO_DE_SUCURSAL_1 = '".$P_NUMERO_DE_SUCURSAL_1."',
-		P_NUMERO_IBAN_1 = '".$P_NUMERO_IBAN_1."',
-		P_NUMERO_CUENTA_SWIFT_1 = '".$P_NUMERO_CUENTA_SWIFT_1."',
-		ULTIMA_CARGA_DATOBANCA = '".$ULTIMA_CARGA_DATOBANCA."'
-		where id = '".$IPdatosbancario1p."';";
-
-		$var2 = "insert into 02DATOSBANCARIOS1 (
-		P_TIPO_DE_MONEDA_1, P_INSTITUCION_FINANCIERA_1, P_NUMERO_DE_CUENTA_DB_1,
-		P_NUMERO_CLABE_1, P_NUMERO_DE_SUCURSAL_1, P_NUMERO_IBAN_1,
-		P_NUMERO_CUENTA_SWIFT_1, FOTO_ESTADO_PROVEE, ULTIMA_CARGA_DATOBANCA, idRelacion
-		) values (
-		'".$P_TIPO_DE_MONEDA_1."', '".$P_INSTITUCION_FINANCIERA_1."', '".$P_NUMERO_DE_CUENTA_DB_1."',
-		'".$P_NUMERO_CLABE_1."', '".$P_NUMERO_DE_SUCURSAL_1."', '".$P_NUMERO_IBAN_1."',
-		'".$P_NUMERO_CUENTA_SWIFT_1."', '".$FOTO_ESTADO_PROVEE."', '".$ULTIMA_CARGA_DATOBANCA."', '".$session."');";
-
-		if($ENVIARRdatosbancario1p == 'ENVIARRdatosbancario1p'){
-			mysqli_query($conn,$var1) or die('P1563'.mysqli_error($conn));
-			return "Actualizado";
-		}else{
-			mysqli_query($conn,$var2) or die('P1604'.mysqli_error($conn));
-			return "Ingresado";
-		}
-	}
-
-	public function Listado_datos_bancariosPRO(){
-		$conn = $this->db();
-		return mysqli_query($conn, "select * from 02DATOSBANCARIOS1 where idRelacion = '".$_SESSION['idPROV']."' order by id desc ");
-	}
-
-	public function Listado_datos_bancariosPRO2($id){
-		$conn = $this->db();
-		return mysqli_query($conn, "select * from 02DATOSBANCARIOS1 where id = '".$id."' ");
-	}
-
-	public function borra_datos_bancario1($id){
-		$conn = $this->db();
-		mysqli_query($conn, "delete from 02DATOSBANCARIOS1 where id = '".$id."' ");
-		return "<P style='color:green; font-size:18px;'>ELEMENTO BORRADO</P>";
-	}
 
 	public function borrar_historico_xml($nombretabla,$idusuario){
 		$conn = $this->db();
