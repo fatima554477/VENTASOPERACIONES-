@@ -491,10 +491,30 @@ if($xmlFacturaCargada){
 	
 	$rfcE = $regreso['rfcE'];					
 	$nombreE = $regreso['nombreE'];	
+
 	$regimenE = $regreso['regimenE'];
 	
 	$rfcR = $regreso['rfcR'];
 	$nombreR = $regreso['nombreR'];
+	$nombreR = isset($regreso['nombreR']) ? trim($regreso['nombreR']) : '';
+
+function normalizarTextoEmpresa($texto) {
+    $texto = mb_strtoupper(trim($texto), 'UTF-8');
+    $texto = preg_replace('/\s+/', ' ', $texto);
+    return $texto;
+}
+
+$empresasCorporativo = array(
+    normalizarTextoEmpresa('EVENTOS PROMOCIONES Y CONVENCIONES'),
+    normalizarTextoEmpresa('INNOVA CONGRESOS Y CONVENCIONES'),
+    normalizarTextoEmpresa('EVENTOS 520')
+);
+
+if ($nombreR !== '' && !in_array(normalizarTextoEmpresa($nombreR), $empresasCorporativo)) {
+    echo '<div class="alert alert-danger mt-2" role="alert" style="font-weight:bold; text-transform:uppercase;">
+            EL RECEPTOR DE LA FACTURA NO ES: EPC, INN, EVE520; FAVOR DE SOLICITAR EL CAMBIO.
+          </div>';
+}
 	$UsoCFDI = $regreso['UsoCFDI'];
 	$DomicilioFiscalReceptor = $regreso['DomicilioFiscalReceptor'];
 	$RegimenFiscalReceptor = $regreso['RegimenFiscalReceptor'];
