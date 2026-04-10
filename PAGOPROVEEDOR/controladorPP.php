@@ -13,6 +13,24 @@ $conexion = NEW colaboradores();
 $conexion2 = new herramientas();
 
 
+
+function normalizarTextoEmpresaVO($texto){
+    $texto = mb_strtoupper(trim((string)$texto), 'UTF-8');
+    $texto = preg_replace('/\s+/', ' ', $texto);
+    return $texto;
+}
+
+function receptorPermitidoEmpresaVO($nombreReceptor){
+    $empresasCorporativo = array(
+        normalizarTextoEmpresaVO('EVENTOS PROMOCIONES Y CONVENCIONES'),
+        normalizarTextoEmpresaVO('INNOVA CONGRESOS Y CONVENCIONES'),
+        normalizarTextoEmpresaVO('EVENTOS 520')
+    );
+
+    $nombreReceptorNormalizado = normalizarTextoEmpresaVO($nombreReceptor);
+    return $nombreReceptorNormalizado !== '' && in_array($nombreReceptorNormalizado, $empresasCorporativo, true);
+}
+
 $hiddenpagoproveedores = isset($_POST["hiddenpagoproveedores"])?$_POST["hiddenpagoproveedores"]:"";
 $validaDATOSBANCARIOS1 = isset($_POST["validaDATOSBANCARIOS1"])?$_POST["validaDATOSBANCARIOS1"]:"";
 $ENVIARRdatosbancario1p = isset($_POST["ENVIARRdatosbancario1p"])?$_POST["ENVIARRdatosbancario1p"]:"";
@@ -435,6 +453,15 @@ if( $_FILES["ADJUNTAR_FACTURA_XML"] == true){
 	//$explotado = explode('^',$ADJUNTAR_FACTURA_XML2);
 	$url = __ROOT1__.'/includes/archivos/'.$ADJUNTAR_FACTURA_XML2;	
 	$regreso = $conexion2->lectorxml($url);
+	$nombreR = isset($regreso['nombreR']) ? $regreso['nombreR'] : '';
+	if(!receptorPermitidoEmpresaVO($nombreR)){
+		echo '6^^'.trim((string)$nombreR);
+		if(file_exists($url)){
+			UNLINK($url);
+		}
+		$pagoproveedores->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML2);
+		exit;
+	}
 	$rfcE = $regreso['rfcE'];					
 	$nombreE = $regreso['nombreE'];
 	$conn = $conexion->db();//verificar_usuario	
