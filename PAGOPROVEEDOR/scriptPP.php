@@ -1,605 +1,541 @@
 <?php
 /*
-fecha sandor: 
-fecha fatis : 05/04/2024
 
-*/
+ * Programer: Fatima Arellano
+ * Propietario: EPC
+ * fecha sandor;
+ * fecha fatima:23/03/2026
+
+
+ */
 ?>
 
-<!-- ===================== MODALES ===================== -->
 
+
+<!-- Modal: Detalles pequeño (14) -->
+<div id="dataModal14" class="modal fade">
+  <div class="modal-dialog" style="width:80% !important; max-width:100% !important;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Detalles</h4>
+      </div>
+      <div class="modal-body" id="personal_detalles14"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Detalles secundario -->
 <div id="add_data_Modal" class="modal fade">
- <div class="modal-dialog">
-  <div class="modal-content">
-   <div class="modal-header">
-    <h4 class="modal-title">Detalles</h4>
-   </div>
-   <div class="modal-body" id="personal_detalles2"></div>
-   <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-   </div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Detalles</h4>
+      </div>
+      <div class="modal-body" id="personal_detalles2"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
   </div>
- </div>
 </div>
 
+<!-- Modal: Personal (ID renombrado — antes duplicado) -->
+<div id="add_data_Modal_personal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Detalles</h4>
+      </div>
+      <div class="modal-body" id="personal"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Fullscreen principal -->
 <div id="dataModal" class="modal fade">
- <div class="modal-dialog modal-fullscreen">
-  <div class="modal-content">
-   <div class="modal-header">
-    <h4 class="modal-title">ACTUALIZA PAGO A PROVEEDORES</h4>
-   </div>
-   <div class="modal-body" id="personal_detalles"></div>
-   <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></button>
-   </div>
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Detalles</h4>
+      </div>
+      <div class="modal-body" id="personal_detalles"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
   </div>
- </div>
 </div>
 
+<!-- Modal: Confirmar borrado -->
 <div id="dataModal3" class="modal fade">
- <div class="modal-dialog modal-lg">
-  <div class="modal-content">
-   <div class="modal-header">
-    <h4 class="modal-title">Confirmación</h4>
-   </div>
-   <div class="modal-body" id="personal_detalles3">
-    ¿ESTÁS SEGURO DE BORRAR ESTE REGISTRO?
-   </div>
-   <div class="modal-footer">
-    <button id="btnYes" value="btnYes" class="btn confirm">SI BORRAR</button>
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-   </div>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Confirmación</h4>
+      </div>
+      <div class="modal-body" id="personal_detalles3">
+        ¿ESTÁS SEGURO DE BORRAR ESTE REGISTRO?
+      </div>
+      <div class="modal-footer">
+        <button id="btnYes" class="btn confirm">SI BORRAR</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
   </div>
- </div>
 </div>
 
+<!-- Modal: EFECTIVO (ID corregido — antes body tenía mismo id que el modal) -->
+<div id="modalEFECTIVO" class="modal fade">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Detalles</h4>
+      </div>
+      <div class="modal-body" id="bodyEFECTIVO">
+        ¿ESTÁS SEGURO DE BORRAR ESTE REGISTRO?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Registro modificado -->
 <div id="dataModal4" class="modal fade">
- <div class="modal-dialog modal-lg">
-  <div class="modal-content">
-   <div class="modal-header">
-    <h4 class="modal-title">Detalles</h4>
-   </div>
-   <div class="modal-body" id="personal_detalles4">
-    SE HA MODIFICADO EL REGISTRO
-   </div>
-   <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-   </div>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Detalles</h4>
+      </div>
+      <div class="modal-body" id="personal_detalles4">
+        SE HA MODIFICADO EL REGISTRO
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
   </div>
- </div>
 </div>
-
 
 
 <script type="text/javascript">
 
 
-function recargarElemento(selector) {
-    $(selector).load(location.href + ' ' + selector);
-}
-
-
-function recargarElementos(selectores) {
-    if (!selectores || selectores.length === 0) return;
-
-    $.ajax({
-        url: location.href,
-        method: 'GET',
-        success: function(htmlCompleto) {
-            var $doc = $($.parseHTML(htmlCompleto, document, true));
-            selectores.forEach(function(sel) {
-                var contenido = $doc.find(sel);
-                if (contenido.length) {
-                    $(sel).html(contenido.html());
-                }
-            });
-        }
-    });
-}
-
-
-
 var fileobj;
 
 function upload_file(e, name) {
-    e.preventDefault();
-    fileobj = e.dataTransfer.files[0];
-    ajax_file_upload1(fileobj, name);
+  e.preventDefault();
+  fileobj = e.dataTransfer.files[0];
+  ajax_file_upload1(fileobj, name);
 }
 
 function file_explorer(name) {
-    document.getElementsByName(name)[0].click();
-    document.getElementsByName(name)[0].onchange = function () {
-        fileobj = document.getElementsByName(name)[0].files[0];
-        ajax_file_upload1(fileobj, name);
-    };
+  document.getElementsByName(name)[0].click();
+  document.getElementsByName(name)[0].onchange = function () {
+    fileobj = document.getElementsByName(name)[0].files[0];
+    ajax_file_upload1(fileobj, name);
+  };
 }
 
 function ajax_file_upload1(file_obj, nombre) {
-    if (!file_obj) return;
+  if (!file_obj) return;
 
-    var form_data = new FormData();
-    form_data.append(nombre, file_obj);
+  var form_data = new FormData();
+  form_data.append(nombre, file_obj);
 
-    $.ajax({
-        type: 'POST',
-        url: 'pagoproveedores/controladorPP.php',
-        contentType: false,
-        processData: false,
-        data: form_data,
-        beforeSend: function () {
-            $('#1' + nombre).html('<p style="color:green;"><span class="spinner-border spinner-border-sm"></span>&nbsp;Cargando archivo...</p>');
-            $('#mensajeADJUNTOCOL').html('<p style="color:green;"><span class="spinner-border spinner-border-sm"></span>&nbsp;Cargando archivo...</p>');
-        },
-        success: function (response) {
-            var resp = $.trim(response);
+  $.ajax({
+    type: 'POST',
+    url: 'comprobaciones/controladorPP.php',
+    contentType: false,
+    processData: false,
+    data: form_data,
+    beforeSend: function () {
+      $('#1' + nombre).html('<p style="color:green;">Cargando archivo!</p>');
+      $('#mensajeADJUNTOCOL').html('<p style="color:green;">Actualizado!</p>');
+    },
+    success: function (response) {
+      var resp = $.trim(response);
 
-            if (resp === '2') {
-                $('#1' + nombre).html('<p style="color:red;">Error, archivo diferente a PDF, JPG o GIF.</p>');
-                $('#' + nombre).val('');
-
-            } else if (resp.indexOf('3^^') === 0) {
-                var partes = resp.split('^^');
-                var numeroSolicitud = partes[1] ? $.trim(partes[1]) : '';
-                var msgDuplicado = numeroSolicitud !== ''
-                    ? '<p style="color:red;font-weight:600;">⚠️ UUID YA REGISTRADO — Se encuentra en la solicitud: <strong>' + numeroSolicitud + '</strong></p>'
-                    : '<p style="color:red;font-weight:600;">⚠️ UUID PREVIAMENTE CARGADO.</p>';
-                $('#1' + nombre).html(msgDuplicado);
-                $('#' + nombre).val('');
-
-            } else if (resp === '3') {
-                $('#1' + nombre).html('<p style="color:red;font-weight:600;">⚠️ UUID PREVIAMENTE CARGADO.</p>');
-                $('#' + nombre).val('');
-
-            } else if (resp === '4') {
-                var formatoEsperado = (nombre === 'ADJUNTAR_FACTURA_XML') ? 'XML' : 'PDF';
-                $('#1' + nombre).html('<p style="color:red;">ESTE ARCHIVO TIENE QUE SER EN FORMATO ' + formatoEsperado + '.</p>');
-                $('#' + nombre).val('');
-
-            } else if (resp.indexOf('5^^') === 0) {
-                $('#1' + nombre).html('<p style="color:red;font-weight:600;">⚠️ EL ARCHIVO XML ESTÁ VACÍO O NO CONTIENE INFORMACIÓN VÁLIDA. Verifica que sea un CFDI timbrado correctamente e inténtalo de nuevo.</p>');
-                $('#' + nombre).val('');
-
-            } else {
-                $('#' + nombre).val(response);
-                $('#1' + nombre).html('<p style="color:green;">✅ ¡Archivo cargado con éxito!</p>');
-                $('#mensajeADJUNTOCOL').html('<p style="color:green;">✅ ¡Actualizado!</p>');
-
-                // ── FIX: una sola petición en lugar de múltiples $.load() ──
-                if (nombre === 'ADJUNTAR_FACTURA_XML') {
-                    recargarElementos([
-                        '#2ADJUNTAR_FACTURA_XML',
-                        '#RAZON_SOCIAL2', '#RFC_PROVEEDOR2', '#CONCEPTO_PROVEE2',
-                        '#TIPO_DE_MONEDA2', '#FECHA_DE_PAGO2', '#NUMERO_CONSECUTIVO_PROVEE2',
-                        '#2MONTO_FACTURA', '#2MONTO_DEPOSITAR', '#2PFORMADE_PAGO',
-                        '#2IVA', '#2TImpuestosRetenidosIVA', '#2TImpuestosRetenidosISR',
-                        '#2descuentos', '#NOMBRE_COMERCIAL2', '#resettabla'
-                    ]);
-                } else {
-                    recargarElemento('#2' + nombre);
-                    recargarElemento('#resettabla');
-                }
-
-                $.getScript(load(1));
-            }
+   if (resp === '3' || resp.indexOf('3|') === 0) {
+        var partesDuplicado = resp.split('|');
+        var idDuplicado = partesDuplicado.length > 1 ? partesDuplicado[1] : '';
+        var numeroEventoDuplicado = partesDuplicado.length > 2 ? partesDuplicado[2] : '';
+        var mensajeDuplicado = 'UUID PREVIAMENTE CARGADO ';
+        if (idDuplicado !== '') {
+          mensajeDuplicado += 'CON EL ID:  ' + idDuplicado + '.';
         }
-    });
-}
-
-
-/* -------------------------------------------------------
- Checkbox monto a pagar
-------------------------------------------------------- */
-function myFunction(montoapagar_id) {
-    var checkBox = document.getElementById('montoapagar' + montoapagar_id);
-    var montoapagar_text = checkBox.checked ? 'enter' : 'none';
-
-    $.ajax({
-        url: 'pagoproveedores/fetch_pagesPP.php',
-        method: 'POST',
-        data: { montoapagar_id: montoapagar_id, montoapagar_text: montoapagar_text },
-        beforeSend: function () { $('#mensajemontoapagar').html('cargando'); },
-        success: function () {
-            // ── FIX: 2 selectores en una sola petición ──
-            recargarElementos(['#montoapagartotal', '#montoapagartotal2']);
+        if (numeroEventoDuplicado !== '') {
+          mensajeDuplicado += 'Y EN EL NÚMERO DE EVENTO: ' + numeroEventoDuplicado + '.';
         }
-    });
-}
+        $('#1' + nombre).html('<p style="color:red;"><strong>' + mensajeDuplicado + '</strong></p>');
+        $('#' + nombre).val('');
+      } else if (resp === '4') {
+        $('#1' + nombre).html('<p style="color:red;">Ya existe un archivo adjunto. Primero bórralo para subir uno nuevo.</p>');
+        $('#' + nombre).val('');
 
+      } else if (resp === 'El archivo debe estar en formato XML.') {
+        $('#1' + nombre).html('<p style="color:red;">' + resp + '</p>');
+        $('#' + nombre).val('');
 
-/* -------------------------------------------------------
- Pasar a pagado
-------------------------------------------------------- */
-function pasarpagado(pasarpagado_id) {
-    var checkBox = document.getElementById('pasarpagado1a' + pasarpagado_id);
-    var pasarpagado_text = checkBox.checked ? 'si' : 'no';
+      } else {
+        $('#' + nombre).val(response);
+        $('#1' + nombre).html('<a target="_blank" href="includes/archivos/' + resp + '"></a>');
 
-    $.ajax({
-        url: 'pagoproveedores/controladorPP.php',
-        method: 'POST',
-        data: { pasarpagado_id: pasarpagado_id, pasarpagado_text: pasarpagado_text },
-        beforeSend: function () { $('#pasarpagado').html('cargando'); },
-        success: function (data) {
-            $.getScript(load2(1));
-            $('#pasarpagado').html('<span id="ACTUALIZADO">' + data + '</span>');
+        recargarElemento('#2ADJUNTAR_FACTURA_XML');
+
+        if (nombre === 'ADJUNTAR_FACTURA_XML') {
+          ['#RAZON_SOCIAL2','#RFC_PROVEEDOR2','#CONCEPTO_PROVEE2',
+           '#TIPO_DE_MONEDA2','#FECHA_DE_PAGO2','#NUMERO_CONSECUTIVO_PROVEE2',
+           '#2MONTO_FACTURA','#2MONTO_DEPOSITAR','#2PFORMADE_PAGO',
+           '#2IVA','#2TImpuestosRetenidosIVA','#2TImpuestosRetenidosISR','#2descuentos'
+          ].forEach(recargarElemento);
         }
-    });
-}
 
-
-/* -------------------------------------------------------
- Formato de comas en inputs numéricos
-------------------------------------------------------- */
-function comasainput(name) {
-    const numberNoCommas   = (x) => x.toString().replace(/,/g, '');
-    const numberWithCommas = (x) => {
-        const num = parseFloat(x);
-        if (isNaN(num)) return '';
-        return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    };
-
-    const inputElement = document.getElementsByName(name)[0];
-
-    inputElement.addEventListener('keydown', function (e) {
-        const keyCode = e.keyCode || e.which;
-        const isNumberKey =
-            (keyCode >= 48 && keyCode <= 57)  ||
-            (keyCode >= 96 && keyCode <= 105) ||
-            keyCode === 46 || keyCode === 8;
-
-        if (isNumberKey) {
-            setTimeout(() => {
-                const originalValue     = inputElement.value;
-                const originalCursorPos = inputElement.selectionStart;
-                const countCommasBefore = originalValue.slice(0, originalCursorPos).split(',').length - 1;
-
-                const numericValue   = numberNoCommas(originalValue);
-                const formattedValue = numberWithCommas(numericValue);
-                inputElement.value   = formattedValue;
-
-                let newCursorPos = originalCursorPos - countCommasBefore;
-                let i = 0, charsPassed = 0;
-                while (charsPassed < newCursorPos && i < formattedValue.length) {
-                    if (formattedValue[i] !== ',') charsPassed++;
-                    i++;
-                }
-                inputElement.setSelectionRange(i, i);
-            }, 0);
-        }
-    });
-}
-
-function comasainput2(name) { comasainput(name); }
-
-
-/* -------------------------------------------------------
- Mostrar / ocultar targets
-------------------------------------------------------- */
-function activarTarget(num) {
-    var allTargets = [];
-    for (var i = 1; i <= 15; i++) allTargets.push(i);
-    allTargets.push('VIDEO');
-    allTargets.forEach(function (t) { $('#target' + t).hide('linear'); });
-    if (num !== null) {
-        $('#target' + num).show('swing');
-        if (num === 2 && typeof load === 'function') {
-            setTimeout(function () { load(1); }, 100);
-        }
+        recargarElemento('#2' + nombre);
+        recargarElemento('#resettabla');
+      }
     }
-}
-
-function guardarYIrATarget2() {
-    activarTarget(2);
-    var el = document.getElementById('target2');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 }
 
 
-/* -------------------------------------------------------
- Document ready
-------------------------------------------------------- */
+var _recargarXHR = {};
+
+function recargarElemento(selector) {
+    if (_recargarXHR[selector]) {
+    _recargarXHR[selector].abort();
+  }
+  _recargarXHR[selector] = $.get(location.href, function(data) {
+    var $match = $('<div>').html(data).find(selector);
+    if ($match.length) {
+      $(selector).html($match.html());
+    }
+    delete _recargarXHR[selector];
+  }).fail(function(jqXHR) {
+    if (jqXHR.statusText !== 'abort') {
+      console.error('recargarElemento error:', selector);
+    }
+    delete _recargarXHR[selector];
+  });
+
+}
+
+
+
+function comasainput(name) {
+  var el    = document.getElementsByName(name)[0];
+  var clean = el.value.replace(/,/g, '');
+  el.value  = clean.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+
+
+function actualizarFechaDeLlenado() {
+  var fechaInput = document.querySelector('input[name="FECHA_DE_LLENADO"]');
+  if (!fechaInput) return;
+  var now = new Date();
+  var pad = function (v) { return v.toString().padStart(2, '0'); };
+  fechaInput.value = pad(now.getDate()) + '-' + pad(now.getMonth() + 1) + '-' + now.getFullYear()
+    + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+}
+
+
+
+function activarTarget(num) {
+  var allTargets = [];
+  for (var i = 1; i <= 47; i++) allTargets.push(i);
+  allTargets.push('VIDEO');
+
+  allTargets.forEach(function (t) { $('#target' + t).hide('linear'); });
+
+  if (num !== null) {
+    $('#target' + num).show('swing');
+    if (num === 2 && typeof load === 'function') {
+      setTimeout(function () { load(1); }, 100);
+    }
+  }
+}
+
+
+function mostrarMensajePago(html) {
+  $('#mensajepagoproveedores')
+    .stop(true, true).html(html).show().fadeIn(150).delay(2000).fadeOut(600);
+}
+
+
 $(document).ready(function () {
 
-    activarTarget(null);
 
-    var allNums = [];
-    for (var n = 1; n <= 15; n++) allNums.push(n);
-    allNums.push('VIDEO');
+  activarTarget(null);
 
-    allNums.forEach(function (num) {
-        $('#mostrar' + num).on('click', function () {
-            $('#target' + num).show('swing');
-            if (num === 2 && typeof load === 'function') { load(1); }
-        });
-        $('#ocultar' + num).on('click', function () { $('#target' + num).hide('linear'); });
+
+  var allNums = [];
+  for (var n = 1; n <= 47; n++) allNums.push(n);
+  allNums.push('VIDEO');
+
+  allNums.forEach(function (num) {
+    $('#mostrar' + num).on('click', function () {
+      $('#target' + num).show('swing');
+      if (num === 2 && typeof load === 'function') { load(1); }
     });
+    $('#ocultar' + num).on('click', function () { $('#target' + num).hide('linear'); });
+  });
 
-    function toggleTodos(accion) {
-        allNums.forEach(function (n) {
-            $('#target' + n)[accion](accion === 'show' ? 'swing' : 'linear');
-        });
-    }
-    $('#mostrartodos').on('click', function () { toggleTodos('show'); });
-    $('#ocultartodos').on('click', function () { toggleTodos('hide'); });
 
-    $('#dataModal').on('hidden.bs.modal', function () {
-        $('#target2').show('swing');
+  $('#mostrar303').off('click').on('click', function () { $('#target33').show('swing'); });
+
+
+  function toggleTodos(accion) {
+    allNums.forEach(function (n) {
+      $('#target' + n)[accion](accion === 'show' ? 'swing' : 'linear');
+    });
+  }
+  $('#mostrartodos, #mostrartodos2').on('click',  function () { toggleTodos('show'); });
+  $('#ocultartodos, #ocultartodos2').on('click', function () { toggleTodos('hide'); });
+
+
+  function limpiarFormularioPago() {
+    var form = document.getElementById('pagoaproveedoresform');
+    if (form) form.reset();
+
+
+    ['#RAZON_SOCIAL','#CONCEPTO_PROVEE','#RFC_PROVEEDOR',
+     '#TIPO_DE_MONEDA','#FECHA_DE_PAGO','#NUMERO_CONSECUTIVO_PROVEE',
+     '#ADJUNTAR_FACTURA_XML','#ADJUNTAR_FACTURA_PDF',
+     '#PFORMADE_PAGO','#NOMBRE_COMERCIAL',
+     '#2MONTO_FACTURA','#2MONTO_DEPOSITAR','#2ADJUNTAR_FACTURA_PDF'
+    ].forEach(function (id) { $(id).val(''); });
+
+
+    ['#1ADJUNTAR_FACTURA_XML','#1ADJUNTAR_FACTURA_PDF',
+     '#1ADJUNTAR_COTIZACION','#1CONPROBANTE_TRANSFERENCIA',
+     '#1ADJUNTAR_ARCHIVO_1','#mensajeADJUNTOCOL'
+    ].forEach(function (id) { $(id).html(''); });
+
+
+    ['#CONCEPTO_PROVEE2','#2ADJUNTAR_FACTURA_XML','#ADJUNTAR_FACTURA_XML',
+     '#ADJUNTAR_FACTURA_PDF','#1ADJUNTAR_FACTURA_PDF',
+     '#IMPUESTO_HOSPEDAJE','#MONTO_PROPINA','#IVA','#NOMBRE_COMERCIAL',
+     '#2ADJUNTAR_FACTURA_PDF','#2ADJUNTAR_COTIZACION',
+     '#2CONPROBANTE_TRANSFERENCIA','#2ADJUNTAR_ARCHIVO_1',
+     '#NUMERO_CONSECUTIVO_PROVEE2',
+     '#2MONTO_FACTURA','#2MONTO_DEPOSITAR','#2IVA','#2PFORMADE_PAGO',
+     '#2TImpuestosRetenidosIVA','#TImpuestosRetenidosIVA',
+     '#2TImpuestosRetenidosISR','#TImpuestosRetenidosISR',
+     '#2descuentos','#descuentos',
+     '#RAZON_SOCIAL2','#RFC_PROVEEDOR2','#TIPO_DE_MONEDA2','#FECHA_DE_PAGO2',
+     '#2COMPLEMENTOS_PAGO_PDF','#2COMPLEMENTOS_PAGO_XML',
+     '#2CANCELACIONES_PDF','#2CANCELACIONES_XML',
+     '#2ADJUNTAR_FACTURA_DE_COMISION_PDF','#2ADJUNTAR_FACTURA_DE_COMISION_XML',
+     '#2COMPROBANTE_DE_DEVOLUCION','#2CALCULO_DE_COMISION','#2NOTA_DE_CREDITO_COMPRA'
+    ].forEach(recargarElemento);
+  }
+
+
+
+  $('#enviarPAGOPROVEEDORES').off('click').on('click', function () {
+	      var $btn = $(this);
+    if ($btn.prop('disabled')) return;
+    $btn.prop('disabled', true).text('Guardando...');
+
+    actualizarFechaDeLlenado();
+    var formData = new FormData($('#pagoaproveedoresform')[0]);
+
+    $.ajax({
+      url: 'comprobaciones/controladorPP.php',
+      type: 'POST',
+      dataType: 'html',
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false
+    }).done(function (data) {
+      if ($.trim(data) === 'Ingresado' || $.trim(data) === 'Actualizado') {
+
+
+        mostrarMensajePago("<span id='ACTUALIZADO'>" + data + "</span>");
+
+
+        limpiarFormularioPago();
+
+
+        setTimeout(function () {
+          $('#resettabla').load(location.href + ' #resettabla');
+          $('#reset_totales').load(location.href + ' #reset_totales');
+          if (typeof load === 'function') load(1);
+        }, 300);
+
+   
+        activarTarget(2);
         var el = document.getElementById('target2');
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } else {
+        mostrarMensajePago(data);
+      }
+    }).fail(function () {
+      mostrarMensajePago("<span id='ERROR'>Error en AJAX</span>");
+      console.error('[enviarPAGOPROVEEDORES] Error en la petición.');
+	      }).always(function () {
+      $btn.prop('disabled', false).text('GUARDAR');
+
+    });
+  });
+
+
+
+
+
+
+
+  window.pasarpagado = function (pasarpagado_id) {
+    var checkBox = document.getElementById('pasarpagado1a' + pasarpagado_id);
+    if (!checkBox) return;
+    var text = checkBox.checked ? 'si' : 'no';
+
+    // Llamada 1 — controladorPP de comprobaciones
+    $.ajax({
+      url: 'comprobaciones/controladorPP.php',
+      method: 'POST',
+      data: { pasarpagado_id: pasarpagado_id, pasarpagado_text: text },
+      beforeSend: function () { $('#pasarpagado').html('cargando...'); },
+      success: function (data) {
+        $('#pasarpagado').html("<span id='ACTUALIZADO'>" + data + "</span>");
+      }
     });
 
-    $('#dataModal3').on('hidden.bs.modal', function () {
-        $('#btnYes').off('click');
+    // Llamada 2 — controladorPP de pagoproveedores (original tenía ambas)
+    $.ajax({
+      url: 'pagoproveedores/controladorPP.php',
+      method: 'POST',
+      data: { pasarpagado_id: pasarpagado_id, pasarpagado_text: text }
     });
+  };
 
 
-    /* -------------------------------------------------------
-     limpiarFormularioPP — FIX principal:
-     30+ recargarElemento individuales → 1 sola petición GET
-     que trae todos los fragmentos de una vez.
-    ------------------------------------------------------- */
-    function limpiarFormularioPP() {
-        var form = document.getElementById('pagoaproveedoresform');
-        if (form) form.reset();
 
-        // Limpiar valores de campos ocultos
-        ['#RAZON_SOCIAL2','#RFC_PROVEEDOR2','#CONCEPTO_PROVEE2','#TIPO_DE_MONEDA2',
-         '#FECHA_DE_PAGO2','#NUMERO_CONSECUTIVO_PROVEE2','#ADJUNTAR_FACTURA_XML',
-         '#2MONTO_FACTURA','#2MONTO_DEPOSITAR','#2ADJUNTAR_FACTURA_PDF',
-         '#2TImpuestosRetenidos'].forEach(function(id) { $(id).val(''); });
+  $(document).on('click', '.view_dataSBborrar2', function () {
+    var borra_id_sb = $(this).attr('id');
+    $('#dataModal3').modal('show');
 
-        $('#NOMBRE_COMERCIAL').empty().trigger('change');
+    $('#btnYes').off('click').on('click', function () {
+      $.ajax({
+        url: 'comprobaciones/controladorPP.php',
+        method: 'POST',
+        data: { borra_id_sb: borra_id_sb, borrasbdoc: 'borrasbdoc' },
+        beforeSend: function () { $('#mensajepagoproveedores').html('cargando...'); },
+        success: function (data) {
+          $('#dataModal3').modal('hide');
+          $('#mensajepagoproveedores').html("<span id='ACTUALIZADO'>" + data + "</span>");
+          recargarElemento('#' + borra_id_sb);
+          recargarElemento('#A' + borra_id_sb);
+		  limpiarFormularioPago();
 
-        // ── FIX: UNA sola petición para todos los fragmentos ──────────────
-        recargarElementos([
-            '#2ADJUNTAR_FACTURA_XML', '#ADJUNTAR_FACTURA_XML', '#1ADJUNTAR_FACTURA_XML',
-            '#ADJUNTAR_FACTURA_PDF',  '#1ADJUNTAR_FACTURA_PDF',
-            '#1ADJUNTAR_COTIZACION',  '#1COMPROBANTE_DE_DEVOLUCION',
-            '#1CONPROBANTE_TRANSFERENCIA', '#1ADJUNTAR_ARCHIVO_1',
-            '#2COMPROBANTE_DE_DEVOLUCION',
-            '#IMPUESTO_HOSPEDAJE', '#MONTO_PROPINA', '#IVA',
-            '#2ADJUNTAR_FACTURA_PDF', '#2ADJUNTAR_COTIZACION',
-            '#2CONPROBANTE_TRANSFERENCIA', '#2ADJUNTAR_ARCHIVO_1',
-            '#NUMERO_CONSECUTIVO_PROVEE2',
-            '#2MONTO_FACTURA', '#2MONTO_DEPOSITAR', '#2IVA', '#2PFORMADE_PAGO',
-            '#2TImpuestosRetenidosIVA', '#TImpuestosRetenidosIVA',
-            '#2TImpuestosRetenidosISR', '#TImpuestosRetenidosISR',
-            '#2descuentos', '#descuentos',
-            '#RAZON_SOCIAL2', '#RFC_PROVEEDOR2',
-            '#TIPO_DE_MONEDA2', '#FECHA_DE_PAGO2', '#CONCEPTO_PROVEE2',
-            '#NOMBRE_COMERCIAL2', '#resettabla'
-        ]);
-    }
-
-
-    /* -------------------------------------------------------
-     Enviar pago a proveedor
-    ------------------------------------------------------- */
-    $('#enviarPAGOPROVEEDORES').on('click', function () {
-        var formData = new FormData($('#pagoaproveedoresform')[0]);
-
-        $.ajax({
-            url: 'pagoproveedores/controladorPP.php',
-            type: 'POST',
-            dataType: 'html',
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false
-        }).done(function (data) {
-            var respuesta = $.trim(data).replace(/[\r\n\t]/g, '');
-            if (respuesta.indexOf('Ingresado') !== -1 || respuesta.indexOf('Actualizado') !== -1) {
-                $('#mensajepagoproveedores').html('<span id="ACTUALIZADO">Ingresado</span>').fadeIn().delay(3000).fadeOut();
-                limpiarFormularioPP();
-                recargarElemento('#resettabla');
-                setTimeout(function () { guardarYIrATarget2(); }, 600);
-            } else {
-                $('#mensajepagoproveedores').html('<span style="color:red;">' + data + '</span>');
-            }
-        }).fail(function (xhr) {
-            console.error('[enviarPAGOPROVEEDORES] Error en la petición.', xhr.responseText);
-        });
+        }
+      });
     });
+  });
 
 
-    /* -------------------------------------------------------
-     Borrar documento adjunto
-    ------------------------------------------------------- */
-    $(document).on('click', '.view_dataSBborrar2', function () {
-        var borra_id_sb = $(this).attr('id');
-        $('#dataModal3').modal('show');
 
-        $('#btnYes').off('click').on('click', function () {
-            $.ajax({
-                url: 'pagoproveedores/controladorPP.php',
-                method: 'POST',
-                data: { borra_id_sb: borra_id_sb, borrasbdoc: 'borrasbdoc' },
-                beforeSend: function () { $('#mensajepagoproveedores').html('cargando...'); },
-                success: function (data) {
-                    $('#dataModal3').modal('hide');
-                    $('#mensajepagoproveedores').html('<span id="ACTUALIZADO">' + data + '</span>');
-                    recargarElemento('#' + borra_id_sb);
-                    recargarElemento('#A' + borra_id_sb);
-                }
-            });
-        });
+  $(document).on('click', '.view_dataSBborrar', function () {
+    var borra_id_PAGOP = $(this).attr('id');
+    $('#dataModal3').modal('show');
+
+    $('#btnYes').off('click').on('click', function () {
+      $.ajax({
+        url: 'comprobaciones/controladorPP.php',
+        method: 'POST',
+        data: { borra_id_PAGOP: borra_id_PAGOP, borrapagoaproveedores: 'borrapagoaproveedores' },
+        beforeSend: function () { $('#mensajepagoproveedores').html('cargando...'); },
+        success: function (data) {
+          $('#dataModal3').modal('hide');
+          $('#mensajepagoproveedores').html("<span id='ACTUALIZADO'>" + data + "</span>");
+          recargarElemento('#reset_totales');
+          if (typeof load === 'function') load(1);
+        }
+      });
     });
+  });
 
 
-    /* -------------------------------------------------------
-     Borrar pago a proveedor
-    ------------------------------------------------------- */
-    $(document).on('click', '.view_dataSBborrar', function () {
-        var borra_id_PAGOP = $(this).attr('id');
-        $('#dataModal3').modal('show');
-
-        $('#btnYes').off('click').on('click', function () {
-            $.ajax({
-                url: 'pagoproveedores/controladorPP.php',
-                method: 'POST',
-                data: { borra_id_PAGOP: borra_id_PAGOP, borrapagoaproveedores: 'borrapagoaproveedores' },
-                beforeSend: function () { $('#mensajepagoproveedores').html('cargando...'); },
-                success: function (data) {
-                    $('#dataModal3').modal('hide');
-                    $('#mensajepagoproveedores').html('<span id="ACTUALIZADO">' + data + '</span>');
-                    if (typeof load === 'function') { load(1); }
-                }
-            });
-        });
+  /* ---------------------------------------------------
+     VER / MODIFICAR registros
+  --------------------------------------------------- */
+  $(document).on('click', '.view_dataPAGOPROVEEmodifica', function () {
+    var personal_id = $(this).attr('id');
+    $.ajax({
+      url: 'comprobaciones/VistaPreviapagoproveedor.php',
+      method: 'POST',
+      data: { personal_id: personal_id },
+      beforeSend: function () { $('#mensajepagoproveedores').html('cargando...'); },
+      success: function (data) {
+        $('#personal_detalles').html(data);
+        $('#dataModal').modal('toggle');
+        recargarElemento('#reset_totales');
+      }
     });
+  });
 
 
-    /* -------------------------------------------------------
-     Abrir modal de modificación de pago
-    ------------------------------------------------------- */
-    $(document).on('click', '.view_dataPAGOPROVEEmodifica', function () {
-        var personal_id = $(this).attr('id');
-        $.ajax({
-            url: 'pagoproveedores/VistaPreviapagoproveedor.php',
-            method: 'POST',
-            data: { personal_id: personal_id },
-            beforeSend: function () { $('#mensajepagoproveedores').html('cargando...'); },
-            success: function (data) {
-                $('#personal_detalles').html(data);
-                $('#dataModal').modal('toggle');
-            }
-        });
+
+
+  /* ---------------------------------------------------
+     BORRAR DOCUMENTO (SBborrar2) — comportamiento original
+  --------------------------------------------------- */
+  $(document).on('click', '.view_dataSBborrar2', function () {
+    var borra_id_sb = $(this).attr('id');
+    $('#dataModal3').modal('show');
+
+    $('#btnYes').off('click').on('click', function () {
+      $.ajax({
+        url: 'comprobaciones/controladorPP.php',
+        method: 'POST',
+        data: { borra_id_sb: borra_id_sb, borrasbdoc: 'borrasbdoc' },
+        beforeSend: function () { $('#mensajepagoproveedores').html('cargando...'); },
+        success: function (data) {
+          $('#dataModal3').modal('hide');
+          $('#mensajepagoproveedores').html('<span id="ACTUALIZADO">' + data + '</span>');
+          // Recarga solo la fila afectada y su par (comportamiento original)
+          $('#' + borra_id_sb).load(location.href + ' #' + borra_id_sb);
+          $('#A' + borra_id_sb).load(location.href + ' #A' + borra_id_sb);
+		  location.reload();
+        }
+      });
     });
+  });
 
 
-    /* -------------------------------------------------------
-     Enviar datos bancarios
-    ------------------------------------------------------- */
-    $('#enviarDATOSBANCARIOS1').on('click', function () {
-        var formData = new FormData($('#DATOSBANCARIOS1form')[0]);
-
-        $.ajax({
-            url: 'pagoproveedores/controladorPP.php',
-            type: 'POST',
-            dataType: 'html',
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false
-        }).done(function (data) {
-            if ($.trim(data) === 'Ingresado' || $.trim(data) === 'Actualizado') {
-                $('#mensajeDATOSBANCARIOS1').html('<span id="ACTUALIZADO">' + data + '</span>');
-                recargarElemento('#resetBancario1p');
-            } else {
-                $('#mensajeDATOSBANCARIOS1').html(data);
-            }
-        }).fail(function () {
-            console.error('[enviarDATOSBANCARIOS1] Error en la petición.');
-        });
+  /* ---------------------------------------------------
+     MATCH: INBURSA / BBVA / AMEX / SANTANDER — centralizados
+  --------------------------------------------------- */
+  function bindMatch(selector, url) {
+    $(document).on('click', selector, function () {
+      var personal_id = $(this).attr('id');
+      $.ajax({
+        url: url,
+        method: 'POST',
+        data: { personal_id: personal_id },
+        beforeSend: function () { $('#mensajeDATOSBANCARIOS1').html('cargando...'); },
+        success: function (data) {
+          $('#personal_detalles14').html(data);
+          $('#dataModal14').modal('toggle');
+        }
+      });
     });
+  }
 
-    $(document).on('click', '.view_dataNUEVO', function () {
-        var personal_id = $(this).attr('id');
-        $.ajax({
-            url: 'pagoproveedores/VistaPreviaDatosBancario1.php',
-            method: 'POST',
-            data: { personal_id: personal_id },
-            beforeSend: function () { $('#mensajepagoproveedores').html('cargando...'); },
-            success: function (data) {
-                $('#personal_detalles2').html(data);
-                $('#dataModal').modal('toggle');
-            }
-        });
-    });
+  bindMatch('.view_MATCH2filtroinbursa', 'comprobacionesVYO/VistaPreviamatchinbursa.php');
+  bindMatch('.view_MATCH2filtrobbva',    'comprobacionesVYO/VistaPreviamatchBBVA.php');
+  bindMatch('.view_MATCH2filtroAMEX',   'comprobacionesVYO/VistaPreviamatchAMEX.php');
+  bindMatch('.view_MATCH2filtroSIVALE', 'comprobacionesVYO/VistaPreviamatchSANTANDER.php');
 
-    $(document).on('click', '.view_data_bancario1p_modifica', function () {
-        var personal_id = $(this).attr('id');
-        $.ajax({
-            url: 'pagoproveedores/VistaPreviaDatosBancario1.php',
-            method: 'POST',
-            data: { personal_id: personal_id },
-            beforeSend: function () { $('#mensajeDATOSBANCARIOS1').html('cargando...'); },
-            success: function (data) {
-                $('#personal_detalles').html(data);
-                $('#dataModal').modal('toggle');
-            }
-        });
-    });
-
-    $(document).on('click', '.view_databancario1borrar', function () {
-        var borra_id_bancaP = $(this).attr('id');
-        $('#dataModal3').modal('show');
-
-        $('#btnYes').off('click').on('click', function () {
-            $.ajax({
-                url: 'pagoproveedores/controladorPP.php',
-                method: 'POST',
-                data: { borra_id_bancaP: borra_id_bancaP, borra_datos_bancario1: 'borra_datos_bancario1' },
-                beforeSend: function () { $('#mensajeREFERENCIAS').html('cargando...'); },
-                success: function (data) {
-                    $('#dataModal3').modal('hide');
-                    $('#mensajeDATOSBANCARIOS1').html('<span id="ACTUALIZADO">' + data + '</span>');
-                    recargarElemento('#resetBancario1p');
-                }
-            });
-        });
-    });
-
-    $(document).on('click', '#enviar_email_bancarios', function () {
-        var DAbancaPRO_ENVIAR_IMAIL = $('#DAbancaPRO_ENVIAR_IMAIL').val();
-        var dataString = $('#form_emai_DATOSBpro').serialize();
-
-        $.ajax({
-            url: 'pagoproveedores/controladorPP.php',
-            method: 'POST',
-            dataType: 'html',
-            data: dataString + '&DAbancaPRO_ENVIAR_IMAIL=' + encodeURIComponent(DAbancaPRO_ENVIAR_IMAIL),
-            beforeSend: function () { $('#mensajeDATOSBANCARIOS1').html('cargando...'); },
-            success: function (data) {
-                $('#mensajeDATOSBANCARIOS1').html('<span id="ACTUALIZADO">' + data + '</span>');
-            }
-        });
-    });
-
-});
-
-
-
-//NOMBRE DEL BOTÓN
-$(document).on('click', '.view_dataPAGOPROVEEmodifica', function(){
-var personal_id = $(this).attr('id');
-$.ajax({
-url:'pagoproveedores/VistaPreviapagoproveedor.php',
-method:'POST',
-data:{personal_id:personal_id},
-beforeSend:function(){
-$('#mensajepagoproveedores').html('cargando');
-},
-success:function(data){
-$('#personal_detalles').html(data);
-$('#dataModal').modal('toggle');
-}
-});
-});
-
-
-
-
-//NOMBRE DEL BOTÓN
-$(document).on('click', '.view_dataSUBIRF', function(){
-var personal_id = $(this).attr('id');
-$.ajax({
-url:'pagoproveedores/VistaPreviapagoproveedor3.php',
-method:'POST',
-data:{personal_id:personal_id},
-beforeSend:function(){
-$('#mensajeventasoperaciones').html('cargando');
-},
-success:function(data){
-$('#personal_detalles').html(data);
-
-$('#dataModal').modal('toggle');
-$("#reset_totales").load(location.href + " #reset_totales");
-
-}
-});
-});
-
-
-
+}); // END $(document).ready
 </script>
