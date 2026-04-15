@@ -49,6 +49,28 @@ class orders extends accesoclase {
                 return $cleanRfc !== '' && preg_match('/^[A-Z&Ñ]{3,4}[0-9]{6}[A-Z0-9]{3}$/i', $cleanRfc);
         }
 
+        private function normalizaFechaPagoSQL($fechaPago){
+                $fechaPago = trim((string)$fechaPago);
+                if($fechaPago === ''){
+                        return '';
+                }
+
+                $formatos = array('Y-m-d', 'd/m/Y', 'd-m-Y');
+                foreach($formatos as $formato){
+                        $dt = DateTime::createFromFormat($formato, $fechaPago);
+                        if($dt && $dt->format($formato) === $fechaPago){
+                                return $dt->format('Y-m-d');
+                        }
+                }
+
+                $timestamp = strtotime($fechaPago);
+                if($timestamp){
+                        return date('Y-m-d', $timestamp);
+                }
+
+                return '';
+        }
+
 public function datos_bancarios_xml($rfc, $idRelacion = null, $nombreComercial = null){
     // ✅ CACHÉ
     static $cache = [];
@@ -129,8 +151,59 @@ public function datos_bancarios_todo($idRelacion, $nombreComercial = null){
     $query2 = mysqli_query($conn, $variable2);
     $row2   = mysqli_fetch_array($query2, MYSQLI_ASSOC);
 
-    // ✅ Guardar en caché antes de retornar
-    $cache[$cacheKey] = $row2 ? $row2 : [];
+   $cache[$cacheKey] = $row2 ? $row2 : [];
+    return $cache[$cacheKey];
+}
+
+public function datos_bancarios_pagado($rfc, $nombreComercial = null, $fechaPago = '', $idRelacion = null){
+    static $cache = [];
+    $cacheKey = $rfc . '|' . $nombreComercial . '|' . $fechaPago . '|' . $idRelacion;
+    if (array_key_exists($cacheKey, $cache)) {
+        return $cache[$cacheKey];
+    }
+
+    $conn = $this->db();
+    $filtros = [];
+
+    if($this->isValidRfc($rfc)){
+        $valueRfc = mysqli_real_escape_string($conn, strtoupper($rfc));
+        $filtros[] = "dp.P_RFC_MTDP = '".$valueRfc."'";
+    }
+
+    $nombreComercial = trim((string)$nombreComercial);
+    if($nombreComercial !== ''){
+        $valueNombre = mysqli_real_escape_string($conn, $nombreComercial);
+        $filtros[] = "dp.P_NOMBRE_COMERCIAL_EMPRESA = '".$valueNombre."'";
+    }
+
+    if(is_numeric($idRelacion)){
+        $filtros[] = "db.idRelacion = '".intval($idRelacion)."'";
+    }
+
+    if(empty($filtros)){
+        $cache[$cacheKey] = [];
+        return [];
+    }
+
+    $fechaPagoSQL = $this->normalizaFechaPagoSQL($fechaPago);
+
+    $where = implode(' AND ', $filtros);
+    $orden = "db.checkbox = 'si' DESC, db.id DESC";
+    if($fechaPagoSQL !== ''){
+        $fechaPagoEsc = mysqli_real_escape_string($conn, $fechaPagoSQL);
+        $where .= " AND (db.ULTIMA_CARGA_DATOBANCA IS NULL OR db.ULTIMA_CARGA_DATOBANCA = '' OR DATE(db.ULTIMA_CARGA_DATOBANCA) <= '".$fechaPagoEsc."')";
+        $orden = "DATE(db.ULTIMA_CARGA_DATOBANCA) DESC, db.id DESC";
+    }
+
+    $sql = "SELECT db.* FROM 02DATOSBANCARIOS1 db "
+        ."LEFT JOIN 02usuarios u ON u.id = db.idRelacion "
+        ."LEFT JOIN 02direccionproveedor1 dp ON u.id = dp.idRelacion "
+        ."WHERE ".$where." ORDER BY ".$orden." LIMIT 1";
+
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_array($query, MYSQLI_ASSOC);
+
+    $cache[$cacheKey] = $row ? $row : [];
     return $cache[$cacheKey];
 }
    

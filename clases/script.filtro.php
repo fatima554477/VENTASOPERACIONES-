@@ -518,30 +518,41 @@ actualizarFechaHora();
 setInterval(actualizarFechaHora, 1000);
 
 function LIMPIAR(){
-	var campos = ["UUID","metodoDePago","totalf","serie","folio","regimenE","UsoCFDI",
-		"TImpuestosTrasladados","TImpuestosRetenidos","Version","tipoDeComprobante",
-		"condicionesDePago","fechaTimbrado","nombreR","rfcR","Moneda","TipoCambio",
-		"ValorUnitarioConcepto","DescripcionConcepto","ClaveUnidadConcepto",
-		"ClaveProdServConcepto","CantidadConcepto","ImporteConcepto","UnidadConcepto",
-		"TUA","TuaTotalCargos","Descuento","ID_RELACIONADO","IVA","IEPS",
-		"NUMERO_CONSECUTIVO_PROVEE_2","NOMBRE_COMERCIAL_2","RAZON_SOCIAL_2",
-		"RFC_PROVEEDOR_2","NUMERO_EVENTO_2","NOMBRE_EVENTO_2","MOTIVO_GASTO_2",
-		"CONCEPTO_PROVEE_2","MONTO_TOTAL_COTIZACION_ADEUDO_2","MONTO_FACTURA_2",
-		"MONTO_PROPINA_2","MONTO_DEPOSITAR_2","TIPO_DE_MONEDA_2","PFORMADE_PAGO_2",
-		"ID_RELACIONADO_2","FECHA_DE_PAGO","FECHA_DE_PAGO2a","FECHA_A_DEPOSITAR_2",
-		"STATUS_DE_PAGO_2","ACTIVO_FIJO_2","GASTO_FIJO_2","PAGAR_CADA_2","FECHA_PPAGO_2",
+	var filtros = [
+		"NUMERO_CONSECUTIVO_PROVEE_2","NOMBRE_COMERCIAL_2","VIATICOSOPRO_2",
+		"RAZON_SOCIAL_2","RFC_PROVEEDOR_2","NUMERO_EVENTO_2","NOMBRE_EVENTO_2",
+		"MOTIVO_GASTO_2","CONCEPTO_PROVEE_2","MONTO_TOTAL_COTIZACION_ADEUDO_2",
+		"MONTO_FACTURA_2","MONTO_PROPINA_2","MONTO_DEPOSITAR_2","MONTO_DEPOSITADO_2",
+		"TIPO_DE_MONEDA_2","PFORMADE_PAGO_2","FECHA_A_DEPOSITAR_2","STATUS_DE_PAGO_2",
+		"ACTIVO_FIJO_2","GASTO_FIJO_2","PAGAR_CADA_2","FECHA_PPAGO_2",
 		"FECHA_TPROGRAPAGO_2","NUMERO_EVENTOFIJO_2","CLASI_GENERAL_2","SUB_GENERAL_2",
-		"MONTO_DEPOSITADO_2","NUMERO_EVENTO1_2","CLASIFICACION_GENERAL_2",
-		"CLASIFICACION_ESPECIFICA_2","PLACAS_VEHICULO_2","MONTO_DE_COMISION_2",
-		"POLIZA_NUMERO_2","NOMBRE_DEL_EJECUTIVO_2","NOMBRE_DEL_AYUDO_2","OBSERVACIONES_2",
-		"FECHA_DE_LLENADO_2","subTotal11","TIPO_CAMBIOP","TOTAL_ENPESOS",
-		"IMPUESTO_HOSPEDAJE","propina","IVAXML","IEPSXML","P_TIPO_DE_MONEDA_1",
+		"NUMERO_EVENTO1_2","CLASIFICACION_GENERAL_2","CLASIFICACION_ESPECIFICA_2",
+		"PLACAS_VEHICULO_2","MONTO_DE_COMISION_2","POLIZA_NUMERO_2",
+		"NOMBRE_DEL_EJECUTIVO_2","NOMBRE_DEL_AYUDO_2","OBSERVACIONES_1_2",
+		"FECHA_DE_LLENADO_2","FECHA_DE_PAGO","FECHA_DE_PAGO2a",
+		"FECHA_INICIO_EVENTO","FECHA_FINAL_EVENTO",
+		"TIPO_CAMBIOP","TOTAL_ENPESOS","IMPUESTO_HOSPEDAJE","ID_RELACIONADO",
+		"IVA_1","IEPS","TImpuestosRetenidosIVA_3","TImpuestosRetenidosISR_3",
+		"descuentos_3","NUMERO_EVENTO_orden","UUID_1","metodoDePago_1","totalf_1",
+		"serie_1","folio_1","regimenE_1","UsoCFDI_1","TImpuestosTrasladados_1",
+		"TImpuestosRetenidos_1","Version_1","tipoDeComprobante_1","condicionesDePago_1",
+		"fechaTimbrado_1","nombreR_1","rfcR_1","Moneda_1","TipoCambio_1",
+		"ValorUnitarioConcepto_1","DescripcionConcepto_1","ClaveUnidadConcepto_1",
+		"ClaveProdServConcepto_1","CantidadConcepto_1","ImporteConcepto_1",
+		"UnidadConcepto_1","TUA_1","TuaTotalCargos_1","Descuento_1","subTotal11",
+		"propina_1","IVAXML_1","IEPSXML_1","P_TIPO_DE_MONEDA_1",
 		"P_INSTITUCION_FINANCIERA_1","P_NUMERO_DE_CUENTA_DB_1","P_NUMERO_CLABE_1",
-		"P_NUMERO_IBAN_1","P_NUMERO_CUENTA_SWIFT_1","FOTO_ESTADO_PROVEE",
-		"ULTIMA_CARGA_DATOBANCA","TImpuestosRetenidos"];
-	campos.forEach(function(id){ var el = document.getElementById(id); if(el) el.value = ''; });
-	var vacio = document.getElementById("FECHA_DE_PAGO_VACIO");
-	if(vacio) vacio.checked = false;
+		"P_NUMERO_IBAN_1","P_NUMERO_CUENTA_SWIFT_2","FOTO_ESTADO_PROVEE",
+		"ULTIMA_CARGA_DATOBANCA","RAZON_SOCIAL_orden","RFC_PROVEEDOR_orden",
+		"MONTO_FACTURA_orden","NOMBRE_EVENTO","DEPARTAMENTO2WE",
+		"hiddenpagoproveedores_2"
+	];
+	filtros.forEach(function(id){
+		var el = document.getElementById(id);
+		if(el){ el.value = ''; }
+	});
+	$("#FECHA_DE_PAGO_VACIO").prop("checked", false);
+	load(1);
 }
 
 $(function() {
