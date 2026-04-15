@@ -106,221 +106,249 @@ function numberNoCommas(x) {
                        fechaInput.value = formatted;
                }
                 document.addEventListener("DOMContentLoaded", inicializarCalculoTotales);
-                function toggleFacturaFields() {
-                        const select = document.querySelector('select[name="VIATICOSOPRO"]');
-                        if(!select) {
-                                return;
-                        }
-                        const shouldHideFacturaFields = [
-                                'VIATICOS',
-                                'REEMBOLSO',
-                                'PAGO A PROVEEDOR CON DOS O MAS FACTURAS'
-                        ].includes(select.value);
-                        const shouldHideBeneficiaryFields = [
-                                'VIATICOS',
-                                'REEMBOLSO'
-                        ].includes(select.value);
-           const toggleableItems = [
-        
-                                {
-                                        element: document.getElementById('row-adjuntar-factura-xml'),
-                                        inputs: [
-                                                document.getElementById('ADJUNTAR_FACTURA_XML'),
-                                                document.querySelector('input[type="file"][name="ADJUNTAR_FACTURA_XML"]')
-                                        ]
-                                },
-                                {
-                                        element: document.getElementById('row-adjuntar-factura-pdf'),
-                                        inputs: [
-                                                document.getElementById('ADJUNTAR_FACTURA_PDF'),
-                                                document.querySelector('input[type="file"][name="ADJUNTAR_FACTURA_PDF"]')
-                                        ]
-                                },
-                                {
-                                        element: document.getElementById('row-iva'),
-                                        inputs: [document.getElementById('IVA')]
-                                },
-                                {
-                                        element: document.getElementById('row-ret-iva'),
-                                        inputs: [document.getElementById('TImpuestosRetenidosIVA')]
-                                },
-                                {
-                                        element: document.getElementById('row-ret-isr'),
-                                        inputs: [document.getElementById('TImpuestosRetenidosISR')]
-                                },
-                                {
-                                        element: document.getElementById('row-monto-propina'),
-                                        inputs: [document.getElementById('MONTO_PROPINA')]
-                                },
-                                {
-                                        element: document.getElementById('row-imp-hospedaje'),
-                                        inputs: [document.getElementById('IMPUESTO_HOSPEDAJE')]
-                                },
-                                {
-                                        element: document.getElementById('row-descuentos'),
-                                        inputs: [document.getElementById('descuentos')]
-                                },
-                                {
-                                        element: document.getElementById('row-tipo-cambio'),
-                                        inputs: [document.getElementById('TIPO_CAMBIOP')]
-                                },
-                                {
-                                        element: document.getElementById('row-total-en-pesos'),
-                                        inputs: [document.getElementById('TOTAL_ENPESOS')]
-                                }
-                        ];
+				///////
+function toggleFacturaFields() {
+    const select = document.querySelector('select[name="VIATICOSOPRO"]');
+    if(!select) {
+        return;
+    }
+    const shouldHideFacturaFields = [
+        'VIATICOS',
+        'REEMBOLSO',
+        'PAGO A PROVEEDOR CON DOS O MAS FACTURAS'
+    ].includes(select.value);
+    const shouldHideBeneficiaryFields = [
+        'VIATICOS',
+        'REEMBOLSO'
+    ].includes(select.value);
 
-                        toggleableItems.forEach(({element, inputs = []}) => {
-                                if(!element) {
-                                        return;
-                                }
-                                inputs.forEach(input => {
-                                        if(input && !input.dataset.originalRequired) {
-                                                input.dataset.originalRequired = input.hasAttribute('required') ? 'true' : 'false';
-                                        }
-										
-										
-										
+    const toggleableItems = [
+        {
+            element: document.getElementById('row-adjuntar-factura-xml'),
+            inputs: [
+                document.getElementById('ADJUNTAR_FACTURA_XML'),
+                document.querySelector('input[type="file"][name="ADJUNTAR_FACTURA_XML"]')
+            ]
+        },
+        {
+            element: document.getElementById('row-adjuntar-factura-pdf'),
+            inputs: [
+                document.getElementById('ADJUNTAR_FACTURA_PDF'),
+                document.querySelector('input[type="file"][name="ADJUNTAR_FACTURA_PDF"]')
+            ]
+        },
+        {
+            element: document.getElementById('row-iva'),
+            inputs: [document.getElementById('IVA')]
+        },
+        {
+            element: document.getElementById('row-ret-iva'),
+            inputs: [document.getElementById('TImpuestosRetenidosIVA')]
+        },
+        {
+            element: document.getElementById('row-ret-isr'),
+            inputs: [document.getElementById('TImpuestosRetenidosISR')]
+        },
+        {
+            element: document.getElementById('row-monto-propina'),
+            inputs: [document.getElementById('MONTO_PROPINA')]
+        },
+        {
+            element: document.getElementById('row-imp-hospedaje'),
+            inputs: [document.getElementById('IMPUESTO_HOSPEDAJE')]
+        },
+        {
+            element: document.getElementById('row-descuentos'),
+            inputs: [document.getElementById('descuentos')]
+        },
+        {
+            element: document.getElementById('row-tipo-cambio'),
+            inputs: [document.getElementById('TIPO_CAMBIOP')]
+        },
+        {
+            element: document.getElementById('row-total-en-pesos'),
+            inputs: [document.getElementById('TOTAL_ENPESOS')]
+        }
+    ];
+
+    toggleableItems.forEach(({element, inputs = []}) => {
+        if(!element) {
+            return;
+        }
+        inputs.forEach(input => {
+            if(input && !input.dataset.originalRequired) {
+                input.dataset.originalRequired = input.hasAttribute('required') ? 'true' : 'false';
+            }
+        });
+
+        if(shouldHideFacturaFields) {
+            element.style.display = 'none';
+        } else {
+            element.style.display = '';
+        }
+
+        inputs.forEach(input => {
+            if(!input) {
+                return;
+            }
+            if(shouldHideFacturaFields) {
+                input.setAttribute('disabled', 'disabled');
+                input.removeAttribute('required');
+            } else {
+                input.removeAttribute('disabled');
+                if(input.dataset.originalRequired === 'true') {
+                    input.setAttribute('required', '');
+                }
+            }
+        });
     });
 
-                                if(shouldHideFacturaFields) {
-                                        element.style.display = 'none';
-                                } else {
-                                        element.style.display = '';
-                                }
-
-                                inputs.forEach(input => {
-                                        if(!input) {
-                                                return;
-                                        }
-                                        if(shouldHideFacturaFields) {
-                                                input.setAttribute('disabled', 'disabled');
-                                                input.removeAttribute('required');
-                                        } else {
-                                                input.removeAttribute('disabled');
-                                                if(input.dataset.originalRequired === 'true') {
-                                                        input.setAttribute('required', '');
-                                                }
-                                        }
-                                });
-                        });
-
-                       const resetTable = document.getElementById('resettabla');
-                        if(resetTable) {
-                                const tableFields = resetTable.querySelectorAll('input, select, textarea');
-                                tableFields.forEach(field => {
-                                        if(!field.dataset.originalRequired) {
-                                                field.dataset.originalRequired = field.hasAttribute('required') ? 'true' : 'false';
-                                        }
-                                            if(shouldHideFacturaFields) {
-                                                field.setAttribute('disabled', 'disabled');
-                                                field.removeAttribute('required');
-                                        } else {
-                                                field.removeAttribute('disabled');
-                                                if(field.dataset.originalRequired === 'true') {
-                                                        field.setAttribute('required', '');
-                                                }
-												
-												
-                  }
-                                });
-              resetTable.style.display = shouldHideFacturaFields ? 'none' : '';
-                        }
-
-                        const beneficiaryToggleItems = [
-                                {
-                                        element: document.getElementById('row-rfc-proveedor'),
-                                        inputs: [document.getElementById('RFC_PROVEEDOR')]
-                                },
-								{
-                                        element: document.getElementById('row-monto-total-cotizacion'),
-                                        inputs: [document.querySelector('input[name="MONTO_TOTAL_COTIZACION_ADEUDO"]')]
-                                },
-                                {
-                                        element: document.getElementById('row-concepto-provee'),
-                                        inputs: [document.getElementById('CONCEPTO_PROVEE')]
-                                },
-                                {
-                                        element: document.getElementById('row-comprobante-transferencia'),
-                                        inputs: [
-                                                document.getElementById('CONPROBANTE_TRANSFERENCIA_DISPLAY'),
-                                                document.querySelector('input[type="file"][name="CONPROBANTE_TRANSFERENCIA"]')
-                                        ]
-                                }
-
-                        ];
-
-                        beneficiaryToggleItems.forEach(({ element, inputs }) => {
-                                if(!element) {
-                                        return;
-                                }
-
-                                inputs.forEach(input => {
-                                        if(input && !input.dataset.originalRequired) {
-                                                input.dataset.originalRequired = input.hasAttribute('required') ? 'true' : 'false';
-                                        }
-                                });
-
-                                if(shouldHideBeneficiaryFields) {
-                                        element.style.display = 'none';
-                                } else {
-                                        element.style.display = '';
-                                }
-
-                                inputs.forEach(input => {
-                                        if(!input) {
-                                                return;
-                                        }
-                                        if(shouldHideBeneficiaryFields) {
-                                                input.setAttribute('disabled', 'disabled');
-                                                input.removeAttribute('required');
-                                        } else {
-                                                input.removeAttribute('disabled');
-                                                if(input.dataset.originalRequired === 'true') {
-                                                        input.setAttribute('required', '');
-                                                }
-                                        }
-                                });
-                        });
-
-                        const nombreLabelSpan = document.getElementById('label-nombre-comercial-text');
-                        const rfcLabelSpan = document.getElementById('label-rfc-proveedor-text');
-                        const rfcInput = document.getElementById('RFC_PROVEEDOR');
-
-                        if(nombreLabelSpan && !nombreLabelSpan.dataset.defaultText) {
-                                nombreLabelSpan.dataset.defaultText = nombreLabelSpan.textContent.trim();
-                        }
-                        if(rfcLabelSpan && !rfcLabelSpan.dataset.defaultText) {
-                                rfcLabelSpan.dataset.defaultText = rfcLabelSpan.textContent.trim();
-                        }
-                        if(rfcInput && !rfcInput.dataset.defaultPlaceholder) {
-                                rfcInput.dataset.defaultPlaceholder = rfcInput.getAttribute('placeholder') || '';
-                        }
-
-                        let nombreLabelText = nombreLabelSpan ? nombreLabelSpan.dataset.defaultText : '';
-                        let rfcLabelText = rfcLabelSpan ? rfcLabelSpan.dataset.defaultText : '';
-                        let rfcPlaceholder = rfcInput ? rfcInput.dataset.defaultPlaceholder : '';
-
-                        if(select.value === 'REEMBOLSO') {
-                                nombreLabelText = 'NOMBRE DEL BENEFICIARIO DEL REEMBOLSO';
-                                rfcLabelText = 'RFC DEL BENEFICIARIO DEL REEMBOLSO';
-                                rfcPlaceholder = 'RFC DEL BENEFICIARIO DEL REEMBOLSO';
-                        } else if(select.value === 'VIATICOS') {
-                                nombreLabelText = 'NOMBRE DEL BENEFICIARIO DEL VIATICO';
-                                rfcLabelText = 'RFC DEL BENEFICIARIO DEL VIATICO';
-                                rfcPlaceholder = 'RFC DEL BENEFICIARIO DEL VIATICO';
-                        }
-
-                        if(nombreLabelSpan) {
-                                nombreLabelSpan.textContent = nombreLabelText;
-                        }
-                        if(rfcLabelSpan) {
-                                rfcLabelSpan.textContent = rfcLabelText;
-                        }
-                        if(rfcInput) {
-                                rfcInput.setAttribute('placeholder', rfcPlaceholder);
-                        }
+    const resetTable = document.getElementById('resettabla');
+    if(resetTable) {
+        const tableFields = resetTable.querySelectorAll('input, select, textarea');
+        tableFields.forEach(field => {
+            if(!field.dataset.originalRequired) {
+                field.dataset.originalRequired = field.hasAttribute('required') ? 'true' : 'false';
+            }
+            if(shouldHideFacturaFields) {
+                field.setAttribute('disabled', 'disabled');
+                field.removeAttribute('required');
+            } else {
+                field.removeAttribute('disabled');
+                if(field.dataset.originalRequired === 'true') {
+                    field.setAttribute('required', '');
                 }
+            }
+        });
+        resetTable.style.display = shouldHideFacturaFields ? 'none' : '';
+    }
+
+    const beneficiaryToggleItems = [
+        {
+            element: document.getElementById('row-rfc-proveedor'),
+            inputs: [document.getElementById('RFC_PROVEEDOR')]
+        },
+        {
+            element: document.getElementById('row-monto-total-cotizacion'),
+            inputs: [document.querySelector('input[name="MONTO_TOTAL_COTIZACION_ADEUDO"]')]
+        },
+        {
+            element: document.getElementById('row-concepto-provee'),
+            inputs: [document.getElementById('CONCEPTO_PROVEE')]
+        },
+        {
+            element: document.getElementById('row-comprobante-transferencia'),
+            inputs: [
+                document.getElementById('CONPROBANTE_TRANSFERENCIA_DISPLAY'),
+                document.querySelector('input[type="file"][name="CONPROBANTE_TRANSFERENCIA"]')
+            ]
+        }
+    ];
+
+    beneficiaryToggleItems.forEach(({ element, inputs }) => {
+        if(!element) {
+            return;
+        }
+
+        inputs.forEach(input => {
+            if(input && !input.dataset.originalRequired) {
+                input.dataset.originalRequired = input.hasAttribute('required') ? 'true' : 'false';
+            }
+        });
+
+        if(shouldHideBeneficiaryFields) {
+            element.style.display = 'none';
+        } else {
+            element.style.display = '';
+        }
+
+        inputs.forEach(input => {
+            if(!input) {
+                return;
+            }
+            if(shouldHideBeneficiaryFields) {
+                input.setAttribute('disabled', 'disabled');
+                input.removeAttribute('required');
+            } else {
+                input.removeAttribute('disabled');
+                if(input.dataset.originalRequired === 'true') {
+                    input.setAttribute('required', '');
+                }
+            }
+        });
+    });
+
+    const nombreLabelSpan = document.getElementById('label-nombre-comercial-text');
+    const rfcLabelSpan    = document.getElementById('label-rfc-proveedor-text');
+    const rfcInput        = document.getElementById('RFC_PROVEEDOR');
+
+    if(nombreLabelSpan && !nombreLabelSpan.dataset.defaultText) {
+        nombreLabelSpan.dataset.defaultText = nombreLabelSpan.textContent.trim();
+    }
+    if(rfcLabelSpan && !rfcLabelSpan.dataset.defaultText) {
+        rfcLabelSpan.dataset.defaultText = rfcLabelSpan.textContent.trim();
+    }
+    if(rfcInput && !rfcInput.dataset.defaultPlaceholder) {
+        rfcInput.dataset.defaultPlaceholder = rfcInput.getAttribute('placeholder') || '';
+    }
+
+    let nombreLabelText  = nombreLabelSpan ? nombreLabelSpan.dataset.defaultText : '';
+    let rfcLabelText     = rfcLabelSpan    ? rfcLabelSpan.dataset.defaultText    : '';
+    let rfcPlaceholder   = rfcInput        ? rfcInput.dataset.defaultPlaceholder : '';
+
+    if(select.value === 'REEMBOLSO') {
+        nombreLabelText = 'NOMBRE DEL BENEFICIARIO DEL REEMBOLSO';
+        rfcLabelText    = 'RFC DEL BENEFICIARIO DEL REEMBOLSO';
+        rfcPlaceholder  = 'RFC DEL BENEFICIARIO DEL REEMBOLSO';
+    } else if(select.value === 'VIATICOS') {
+        nombreLabelText = 'NOMBRE DEL BENEFICIARIO DEL VIATICO';
+        rfcLabelText    = 'RFC DEL BENEFICIARIO DEL VIATICO';
+        rfcPlaceholder  = 'RFC DEL BENEFICIARIO DEL VIATICO';
+    }
+
+    if(nombreLabelSpan) { nombreLabelSpan.textContent = nombreLabelText; }
+    if(rfcLabelSpan)    { rfcLabelSpan.textContent    = rfcLabelText;    }
+    if(rfcInput)        { rfcInput.setAttribute('placeholder', rfcPlaceholder); }
+
+    // ── AUTO-ELIMINAR XML y PDF si cambian a VIATICOS o REEMBOLSO ────────
+    if (['VIATICOS', 'REEMBOLSO'].includes(select.value)) {
+
+        ['ADJUNTAR_FACTURA_XML', 'ADJUNTAR_FACTURA_PDF'].forEach(function(nombre) {
+
+            var inputDisplay = document.getElementById(nombre);
+
+            // Borrar cada archivo listado en #2ADJUNTAR_FACTURA_XML / #2ADJUNTAR_FACTURA_PDF
+            $('#2' + nombre + ' .view_dataSBborrar2').each(function() {
+                var borra_id_sb = $(this).attr('id');
+                $.ajax({
+                    url: 'ventasoperaciones/controladorVO.php',
+                    method: 'POST',
+                    data: { borra_id_sb: borra_id_sb, borrasbdoc: 'borrasbdoc' },
+                    success: function() {
+                        recargarElemento('#2' + nombre);
+                    }
+                });
+            });
+
+            // Limpiar el input display y el mensaje
+            if(inputDisplay) { inputDisplay.value = ''; }
+            $('#1' + nombre).html('');
+        });
+
+        // Recargar campos que se llenaron desde el XML
+        var camposXML = [
+            '#RAZON_SOCIAL2', '#RFC_PROVEEDOR2', '#CONCEPTO_PROVEE2',
+            '#TIPO_DE_MONEDA2', '#FECHA_DE_PAGO2', '#NUMERO_CONSECUTIVO_PROVEE2',
+            '#2MONTO_FACTURA', '#2MONTO_DEPOSITAR', '#2PFORMADE_PAGO',
+            '#2TImpuestosRetenidosIVA', '#2TImpuestosRetenidosISR',
+            '#2descuentos', '#2IVA', '#NOMBRE_COMERCIAL2',
+            '#resettabla'
+        ];
+        camposXML.forEach(recargarElemento);
+    }
+    // ─────────────────────────────────────────────────────────────────────
+}
+
 				
 				
                 document.addEventListener('DOMContentLoaded', () => {

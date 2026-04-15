@@ -112,8 +112,18 @@ function ajax_file_upload1(file_obj, nombre) {
         $('#' + nombre).val('');
 
       // ── XML vacío o sin contenido válido ──────────────────
-      } else if (resp.indexOf('5^^') === 0) {
+     } else if (resp.indexOf('5^^') === 0) {
         $('#1' + nombre).html('<p style="color:red;font-weight:600;">⚠️ EL ARCHIVO XML ESTÁ VACÍO O NO CONTIENE INFORMACIÓN VÁLIDA. Verifica que sea un CFDI timbrado correctamente e inténtalo de nuevo.</p>');
+        $('#' + nombre).val('');
+      // ──────────────────────────────────────────────────────
+
+      } else if (resp.indexOf('6^^') === 0) {
+        var partesReceptor = resp.split('^^');
+        var nombreReceptor = partesReceptor[1] ? $.trim(partesReceptor[1]) : '';
+        var detalleReceptor = nombreReceptor !== ''
+          ? ' Receptor detectado: <strong>' + nombreReceptor + '</strong>.'
+          : '';
+        $('#1' + nombre).html('<p style="color:red;font-weight:600;">⚠️ EL RECEPTOR DE LA FACTURA NO ES: EPC, INN, EVE520; FAVOR DE SOLICITAR EL CAMBIO.' + detalleReceptor + '</p>');
         $('#' + nombre).val('');
       // ──────────────────────────────────────────────────────
 
@@ -248,7 +258,7 @@ function recargarTodosLosElementos() {
 
 $(document).ready(function () {
 
-  activarTarget(1);
+  activarTarget(null);
 
   var allNums = [];
   for (var n = 1; n <= 15; n++) allNums.push(n);
