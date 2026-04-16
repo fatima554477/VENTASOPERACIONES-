@@ -57,19 +57,26 @@ class accesoclase extends colaboradores{
 		mysqli_query($conn, $insertBitacora);
 	}
 
-	private function etiqueta_bitacora_campo($campo){
-		$etiquetas = array(
-			'STATUS_DE_PAGO'    => 'ESTATUS DE PAGO',
-			'MONTO_DEPOSITAR'   => 'TOTAL A PAGAR',
-			'FECHA_A_DEPOSITAR' => 'FECHA EFECTIVA DE PAGO',
-			'FECHA_DE_PAGO'     => 'FECHA DE PROGRAMACIÓN DEL PAGO',
-			'PFORMADE_PAGO'     => 'FORMA DE PAGO'
-			
-		);
-		if(isset($etiquetas[$campo])){
-			return $etiquetas[$campo];
+// ✅ CÓDIGO CORRECTO
+private function etiqueta_bitacora_campo($campo){
+    $etiquetas = array(
+        'STATUS_DE_PAGO'    => 'ESTATUS DE PAGO',
+        'MONTO_DEPOSITAR'   => 'TOTAL A PAGAR',
+        'FECHA_A_DEPOSITAR' => 'FECHA EFECTIVA DE PAGO',
+        'FECHA_DE_PAGO'     => 'FECHA DE PROGRAMACIÓN DEL PAGO',
+        'PFORMADE_PAGO'     => 'FORMA DE PAGO'
+    );
+    if(isset($etiquetas[$campo])){
+        return $etiquetas[$campo];
+    }
+    return str_replace('_', ' ', $campo);
+}
+
+	private function escapar_xml_valores($conn, $valores){
+		foreach($valores as $llave => $valor){
+			$valores[$llave] = mysqli_real_escape_string($conn, (string)$valor);
 		}
-		return str_replace('_', ' ', $campo);
+		return $valores;
 	}
 
 public function solocargartemp($archivo)
@@ -175,13 +182,46 @@ public function solocargartemp($archivo)
 		return $row = mysqli_fetch_array($arrayquery, MYSQLI_ASSOC);
 	}
 
-	public function ActualizaxmlDB($FechaTimbrado, $tipoDeComprobante,
+public function ActualizaxmlDB($FechaTimbrado, $tipoDeComprobante,
 		$metodoDePago, $formaDePago, $condicionesDePago, $subTotal,
 		$TipoCambio, $Moneda, $total, $serie,
 		$folio, $LugarExpedicion, $rfcE, $nombreE,
 		$regimenE, $rfcR, $nombreR, $UsoCFDI,
 		$DomicilioFiscalReceptor, $RegimenFiscalReceptor, $UUID, $TImpuestosRetenidos,
 		$TImpuestosTrasladados, $session, $ultimo_id, $TuaTotalCargos, $TUA, $Descuento, $Propina, $conn, $actualiza){
+
+		$esc = $this->escapar_xml_valores($conn, array(
+			'FechaTimbrado' => $FechaTimbrado,
+			'tipoDeComprobante' => $tipoDeComprobante,
+			'metodoDePago' => $metodoDePago,
+			'formaDePago' => $formaDePago,
+			'condicionesDePago' => $condicionesDePago,
+			'subTotal' => $subTotal,
+			'TipoCambio' => $TipoCambio,
+			'Moneda' => $Moneda,
+			'total' => $total,
+			'serie' => $serie,
+			'folio' => $folio,
+			'LugarExpedicion' => $LugarExpedicion,
+			'rfcE' => $rfcE,
+			'nombreE' => $nombreE,
+			'regimenE' => $regimenE,
+			'rfcR' => $rfcR,
+			'nombreR' => $nombreR,
+			'UsoCFDI' => $UsoCFDI,
+			'DomicilioFiscalReceptor' => $DomicilioFiscalReceptor,
+			'RegimenFiscalReceptor' => $RegimenFiscalReceptor,
+			'UUID' => $UUID,
+			'TImpuestosRetenidos' => $TImpuestosRetenidos,
+			'TImpuestosTrasladados' => $TImpuestosTrasladados,
+			'session' => $session,
+			'ultimo_id' => $ultimo_id,
+			'TuaTotalCargos' => $TuaTotalCargos,
+			'TUA' => $TUA,
+			'Descuento' => $Descuento,
+			'Propina' => $Propina
+		));
+		extract($esc);
 
 		$var3 = "update `02XML` set
 		`Version` = 'no',
@@ -362,8 +402,50 @@ public function solocargartemp($archivo)
 		$ClaveProdServ         = $regreso['ClaveProdServ'];
 		$Unidad                = $regreso['Unidad'];
 		$Descripcion           = $regreso['Descripcion'];
-		$ClaveUnidad           = $regreso['ClaveUnidad'];
+	    $ClaveUnidad           = $regreso['ClaveUnidad'];
 		$NoIdentificacion      = $regreso['NoIdentificacion'];
+
+		$esc = $this->escapar_xml_valores($conn, array(
+			'Version' => $Version,
+			'FechaTimbrado' => $FechaTimbrado,
+			'tipoDeComprobante' => $tipoDeComprobante,
+			'metodoDePago' => $metodoDePago,
+			'formaDePago' => $formaDePago,
+			'condicionesDePago' => $condicionesDePago,
+			'subTotal' => $subTotal,
+			'TipoCambio' => $TipoCambio,
+			'Moneda' => $Moneda,
+			'total' => $total,
+			'serie' => $serie,
+			'folio' => $folio,
+			'LugarExpedicion' => $LugarExpedicion,
+			'rfcE' => $rfcE,
+			'nombreE' => $nombreE,
+			'regimenE' => $regimenE,
+			'rfcR' => $rfcR,
+			'nombreR' => $nombreR,
+			'UsoCFDI' => $UsoCFDI,
+			'DomicilioFiscalReceptor' => $DomicilioFiscalReceptor,
+			'RegimenFiscalReceptor' => $RegimenFiscalReceptor,
+			'UUID' => $UUID,
+			'Descuento' => $Descuento,
+			'TImpuestosRetenidos' => $TImpuestosRetenidos,
+			'TImpuestosTrasladados' => $TImpuestosTrasladados,
+			'session' => $session,
+			'ultimo_id' => $ultimo_id,
+			'TuaTotalCargos' => $TuaTotalCargos,
+			'TUA' => $TUA,
+			'Propina' => $Propina,
+			'Cantidad' => $Cantidad,
+			'ValorUnitario' => $ValorUnitario,
+			'Importe' => $Importe,
+			'ClaveProdServ' => $ClaveProdServ,
+			'Unidad' => $Unidad,
+			'Descripcion' => $Descripcion,
+			'ClaveUnidad' => $ClaveUnidad,
+			'NoIdentificacion' => $NoIdentificacion
+		));
+		extract($esc);
 
 		$var3 = "update ".$tabla." set
 		`Version` = '".$Version."',
@@ -473,10 +555,17 @@ public function solocargartemp($archivo)
 		foreach(array('MONTO_TOTAL_COTIZACION_ADEUDO','MONTO_DEPOSITAR','MONTO_FACTURA',
 			'MONTO_PROPINA','MONTO_DEPOSITADO','MONTO_DE_COMISION','PENDIENTE_PAGO',
 			'TOTAL_ENPESOS','TIPO_CAMBIOP','IMPUESTO_HOSPEDAJE','IVA') as $var){
-			$$var = str_replace(',', '', $$var);
+			$var = str_replace(',', '', $var);
 		}
 
-		$conn = $this->db();
+		            $conn = $this->db();
+
+    // ESCAPAR TEXTOS
+
+    $NOMBRE_COMERCIAL            = mysqli_real_escape_string($conn, $NOMBRE_COMERCIAL);
+    $RAZON_SOCIAL                = mysqli_real_escape_string($conn, $RAZON_SOCIAL);
+	$OBSERVACIONES_1             = mysqli_real_escape_string($conn, $OBSERVACIONES_1);
+	$nombreE             = mysqli_real_escape_string($conn, $nombreE);
 
 		$query_NOMBRE_COMERCIAL = mysqli_query($conn,
 			"SELECT * FROM `02direccionproveedor1` where idRelacion = '".$NOMBRE_COMERCIAL."' ")
@@ -502,7 +591,16 @@ public function solocargartemp($archivo)
 		$idem           = isset($_SESSION['idem']) ? $_SESSION['idem'] : '';
 		$usuarioBitacora = $this->nombre_usuario_bitacora();
 
-		if($idem != ''){
+	if($idem != ''){
+
+    // ✅ Escapar antes de construir los queries
+
+    $NOMBRE_COMERCIAL                   = mysqli_real_escape_string($conn, $NOMBRE_COMERCIAL);
+    $NOMBRE_COMERCIAL2                  = mysqli_real_escape_string($conn, $NOMBRE_COMERCIAL2);
+    $RAZON_SOCIAL                       = mysqli_real_escape_string($conn, $RAZON_SOCIAL);
+    $nombreE                       = mysqli_real_escape_string($conn, $nombreE);
+
+
 
 			$var1 = "update 02SUBETUFACTURA set
 			NUMERO_CONSECUTIVO_PROVEE = '".$NUMERO_CONSECUTIVO_PROVEE."',
@@ -801,11 +899,16 @@ $variablequery = "SELECT
 			"DELETE FROM 02SUBETUFACTURADOCTOS WHERE `fechaingreso` <= '".$nuevafecha2."'
 			and idRelacion = '".$_SESSION['idPROV']."' and idTemporal = 'si'");
 
+	$limit = '';
+		if($ADJUNTAR_COTIZACION === 'ADJUNTAR_FACTURA_XML' || $ADJUNTAR_COTIZACION === 'ADJUNTAR_FACTURA_PDF'){
+			$limit = ' LIMIT 1';
+		}
+
 		return mysqli_query($conn,
 			"select id,".$ADJUNTAR_COTIZACION.",fechaingreso from 02SUBETUFACTURADOCTOS
 			where idRelacion = '".$_SESSION['idPROV']."' and idTemporal = 'si'
 			and (".$ADJUNTAR_COTIZACION." is not null or ".$ADJUNTAR_COTIZACION." <> '')
-			ORDER BY id DESC");
+			ORDER BY id DESC".$limit);
 	}
 
 	public function delete_subefacturadocto2($id){
@@ -869,8 +972,79 @@ $variablequery = "SELECT
 		$variablequery = mysqli_query($conn,$variable);
 		$row2 = mysqli_fetch_array($variablequery, MYSQLI_ASSOC);
 		$_SESSION['idusuario12'] = $row2['idusuario'];
-		$_SESSION['P_NOMBRE_COMERCIAL_EMPRESA12'] = $row2['P_NOMBRE_COMERCIAL_EMPRESA'];
+	$_SESSION['P_NOMBRE_COMERCIAL_EMPRESA12'] = $row2['P_NOMBRE_COMERCIAL_EMPRESA'];
 		return $row2['idusuario'].'^^^^'.$row2['P_NOMBRE_COMERCIAL_EMPRESA'];
+	}
+
+	public function reemplazarAdjuntoFacturaUnico($campo, $idTemporal, $idRelacion, $nombreArchivo, $idRelacionU = ''){
+		$conn  = $this->db();
+		$ruta  = __ROOT3__.'/includes/archivos/';
+		$campo = trim((string)$campo);
+
+		$camposPermitidos = array(
+			'ADJUNTAR_FACTURA_XML',
+			'ADJUNTAR_FACTURA_PDF',
+		);
+		if(!in_array($campo, $camposPermitidos)){ return false; }
+
+		$idTemporal    = mysqli_real_escape_string($conn, trim((string)$idTemporal));
+		$idRelacion    = mysqli_real_escape_string($conn, trim((string)$idRelacion));
+		$idRelacionU   = mysqli_real_escape_string($conn, trim((string)$idRelacionU));
+		$nombreArchivo = trim((string)$nombreArchivo);
+		if($idTemporal === '' || $idRelacion === '' || $nombreArchivo === ''){ return false; }
+
+		$nombreArchivoSql = mysqli_real_escape_string($conn, $nombreArchivo);
+		$tipoArchivo      = ($campo === 'ADJUNTAR_FACTURA_XML') ? 'xml' : 'OTR';
+
+		$sqlPrincipal = "SELECT id, ".$campo." AS archivo
+			FROM 02SUBETUFACTURADOCTOS
+			WHERE idTemporal = '".$idTemporal."'
+			AND idRelacion   = '".$idRelacion."'
+			AND ".$campo." IS NOT NULL
+			AND ".$campo." <> ''
+			ORDER BY id DESC
+			LIMIT 1";
+		$queryPrincipal = mysqli_query($conn, $sqlPrincipal);
+		$rowPrincipal   = $queryPrincipal ? mysqli_fetch_array($queryPrincipal, MYSQLI_ASSOC) : null;
+
+		if($rowPrincipal && isset($rowPrincipal['id']) && intval($rowPrincipal['id']) > 0){
+			$archivoAnterior = isset($rowPrincipal['archivo']) ? trim((string)$rowPrincipal['archivo']) : '';
+			if($archivoAnterior !== '' && $archivoAnterior !== $nombreArchivo){
+				$rutaAnterior = $ruta.$archivoAnterior;
+				if(file_exists($rutaAnterior)){ unlink($rutaAnterior); }
+			}
+
+			mysqli_query($conn, "UPDATE 02SUBETUFACTURADOCTOS
+				SET ".$campo." = '".$nombreArchivoSql."', fechaingreso = NOW()
+				WHERE id = '".intval($rowPrincipal['id'])."' ");
+
+			$sqlDuplicados = "SELECT id, ".$campo." AS archivo
+				FROM 02SUBETUFACTURADOCTOS
+				WHERE idTemporal = '".$idTemporal."'
+				AND idRelacion   = '".$idRelacion."'
+				AND ".$campo." IS NOT NULL
+				AND ".$campo." <> ''
+				AND id <> '".intval($rowPrincipal['id'])."'
+				ORDER BY id DESC";
+			$queryDuplicados = mysqli_query($conn, $sqlDuplicados);
+			if($queryDuplicados){
+				while($rowDup = mysqli_fetch_array($queryDuplicados, MYSQLI_ASSOC)){
+					$archivoDup = isset($rowDup['archivo']) ? trim((string)$rowDup['archivo']) : '';
+					if($archivoDup !== '' && $archivoDup !== $nombreArchivo){
+						$rutaDup = $ruta.$archivoDup;
+						if(file_exists($rutaDup)){ unlink($rutaDup); }
+					}
+					mysqli_query($conn, "DELETE FROM 02SUBETUFACTURADOCTOS WHERE id = '".intval($rowDup['id'])."' ");
+				}
+			}
+		}else{
+			mysqli_query($conn, "INSERT INTO 02SUBETUFACTURADOCTOS
+				(idRelacion, idTemporal, ".$campo.", idRelacionU, TIPOARCHIVO, fechaingreso)
+				VALUES
+				('".$idRelacion."', '".$idTemporal."', '".$nombreArchivoSql."', '".$idRelacionU."', '".$tipoArchivo."', NOW())");
+		}
+
+		return true;
 	}
 	
 	public function limpiarAdjuntoFacturaUnico($campo, $IPventasoperar, $idPROV){

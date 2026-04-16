@@ -243,7 +243,7 @@ function recargarTodosLosElementos() {
             '2descuentos', 'descuentos', '2IVA', 'IVA',
             'IMPUESTO_HOSPEDAJE', 'MONTO_PROPINA',
             'resettabla', 'reset_totales',
-            'NUMERO_CONSECUTIVO_PROVEE2', 'mensajeADJUNTOCOL'
+            'NUMERO_CONSECUTIVO_PROVEE2','ventasoperacionesform' ,'mensajeADJUNTOCOL'
         ];
         selectores.forEach(function(id) {
             var remoto = doc.find('#' + id);
@@ -390,7 +390,10 @@ function limpiarFormularioVO() {
           $('#mensajeventasoperaciones').html('<span id="ACTUALIZADO">' + data + '</span>');
           $('#' + borra_id_sb).load(location.href + ' #' + borra_id_sb);
           $('#A' + borra_id_sb).load(location.href + ' #A' + borra_id_sb);
-          if (typeof load === 'function') load(1);
+		  
+          
+		  
+		  recargarTodosLosElementos();
         }
       });
     });
