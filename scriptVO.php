@@ -66,6 +66,13 @@ var fileobj;
 
 function upload_file(e, name) {
   e.preventDefault();
+  if (name === 'ADJUNTAR_FACTURA_XML' || name === 'ADJUNTAR_FACTURA_PDF') {
+    var tipo = name === 'ADJUNTAR_FACTURA_XML' ? 'XML' : 'PDF';
+    if ($('#' + name).val().trim() !== '' || $('#2' + name + ' .view_dataSBborrar2').length > 0) {
+      alert('Ya hay un archivo ' + tipo + ' cargado. Bórralo antes de subir otro.');
+      return;
+    }
+  }
   fileobj = e.dataTransfer.files[0];
   ajax_file_upload1(fileobj, name);
 }
@@ -80,6 +87,13 @@ function file_explorer(name) {
 
 function ajax_file_upload1(file_obj, nombre) {
   if (!file_obj) return;
+  if (nombre === 'ADJUNTAR_FACTURA_XML' || nombre === 'ADJUNTAR_FACTURA_PDF') {
+    var tipo = nombre === 'ADJUNTAR_FACTURA_XML' ? 'XML' : 'PDF';
+    if ($('#' + nombre).val().trim() !== '' || $('#2' + nombre + ' .view_dataSBborrar2').length > 0) {
+      alert('Ya hay un archivo ' + tipo + ' cargado. Bórralo antes de subir otro.');
+      return;
+    }
+  }
 
   var form_data = new FormData();
   form_data.append(nombre, file_obj);

@@ -181,11 +181,11 @@ var fileobj;
 
 function upload_file(e, name) {
   e.preventDefault();
-    // ⬇️ NUEVO: misma guardia que ajax_file_upload1
-  if (name === 'ADJUNTAR_FACTURA_XML') {
-    var valorActual = $('#ADJUNTAR_FACTURA_XML').val();
-    if (valorActual && valorActual.trim() !== '') {
-      alert('Ya hay un archivo XML cargado. Guarda el registro actual antes de subir otro XML.');
+  if (name === 'ADJUNTAR_FACTURA_XML' || name === 'ADJUNTAR_FACTURA_PDF') {
+    var tipo = name === 'ADJUNTAR_FACTURA_XML' ? 'XML' : 'PDF';
+    var valorActual = $('#' + name).val();
+    if ((valorActual && valorActual.trim() !== '') || $('#2' + name + ' .view_dataSBborrar2').length > 0) {
+      alert('Ya hay un archivo ' + tipo + ' cargado. Bórralo antes de subir otro.');
       return;
     }
   }
@@ -203,11 +203,11 @@ function file_explorer(name) {
 
 function ajax_file_upload1(file_obj, nombre) {
   if (!file_obj) return;
-    // ⬇️ NUEVO: bloquear si ya hay un XML cargado para este ciclo de guardado
-  if (nombre === 'ADJUNTAR_FACTURA_XML') {
-    var valorActual = $('#ADJUNTAR_FACTURA_XML').val();
-    if (valorActual && valorActual.trim() !== '') {
-      alert('Ya hay un archivo XML cargado. Guarda el registro actual antes de subir otro XML.');
+  if (nombre === 'ADJUNTAR_FACTURA_XML' || nombre === 'ADJUNTAR_FACTURA_PDF') {
+    var tipo = nombre === 'ADJUNTAR_FACTURA_XML' ? 'XML' : 'PDF';
+    var valorActual = $('#' + nombre).val();
+    if ((valorActual && valorActual.trim() !== '') || $('#2' + nombre + ' .view_dataSBborrar2').length > 0) {
+      alert('Ya hay un archivo ' + tipo + ' cargado. Bórralo antes de subir otro.');
       return;
     }
   }
