@@ -1,5 +1,6 @@
 <?php
 /*
+NOMBRE:scriptVO.php
 fecha sandor: 21/ABRIL/2025
 fecha fatis : 05/JUNIO/2025
 */
@@ -66,6 +67,14 @@ var fileobj;
 
 function upload_file(e, name) {
   e.preventDefault();
+    if (name === 'ADJUNTAR_FACTURA_XML' || name === 'ADJUNTAR_FACTURA_PDF') {
+    var tipo = name === 'ADJUNTAR_FACTURA_XML' ? 'XML' : 'PDF';
+    if ($('#' + name).val().trim() !== '' || $('#2' + name + ' .view_dataSBborrar2').length > 0) {
+      alert('Ya hay un archivo ' + tipo + ' cargado. Bórralo antes de subir otro.');
+      return;
+    }
+  }
+
   fileobj = e.dataTransfer.files[0];
   ajax_file_upload1(fileobj, name);
 }
@@ -80,6 +89,14 @@ function file_explorer(name) {
 
 function ajax_file_upload1(file_obj, nombre) {
   if (!file_obj) return;
+    if (nombre === 'ADJUNTAR_FACTURA_XML' || nombre === 'ADJUNTAR_FACTURA_PDF') {
+    var tipo = nombre === 'ADJUNTAR_FACTURA_XML' ? 'XML' : 'PDF';
+    if ($('#' + nombre).val().trim() !== '' || $('#2' + nombre + ' .view_dataSBborrar2').length > 0) {
+      alert('Ya hay un archivo ' + tipo + ' cargado. Bórralo antes de subir otro.');
+      return;
+    }
+  }
+
 
   var form_data = new FormData();
   form_data.append(nombre, file_obj);
@@ -117,7 +134,7 @@ function ajax_file_upload1(file_obj, nombre) {
         $('#' + nombre).val('');
       // ──────────────────────────────────────────────────────
 
-      } else if (resp.indexOf('6^^') === 0) {
+} else if (resp.indexOf('6^^') === 0) {
         var partesReceptor = resp.split('^^');
         var nombreReceptor = partesReceptor[1] ? $.trim(partesReceptor[1]) : '';
         var detalleReceptor = nombreReceptor !== ''
@@ -125,9 +142,21 @@ function ajax_file_upload1(file_obj, nombre) {
           : '';
         $('#1' + nombre).html('<p style="color:red;font-weight:600;">⚠️ EL RECEPTOR DE LA FACTURA NO ES: EPC, INN, EVE520; FAVOR DE SOLICITAR EL CAMBIO.' + detalleReceptor + '</p>');
         $('#' + nombre).val('');
+
+      // ── NUEVO: UUID duplicado en 07XML (Comprobación de Gastos) ──
+      } else if (resp.indexOf('7^^^') === 0) {
+        var partesGasto = resp.split('^^^');
+        var numeroGasto = partesGasto[1] ? $.trim(partesGasto[1]) : '';
+        var msgGasto = numeroGasto !== ''
+          ? '<p style="color:#9C2007;font-weight:600;">⚠️ UUID YA REGISTRADO EN COMPROBACIÓN DE GASTOS — CON EL ID: <strong>' + numeroGasto + '</strong></p>'
+          : '<p style="color:#9C2007;font-weight:600;">⚠️ UUID PREVIAMENTE CARGADO EN COMPROBACIÓN DE GASTOS.</p>';
+        $('#1' + nombre).html(msgGasto);
+        $('#' + nombre).val('');
+
+      } 
       // ──────────────────────────────────────────────────────
 
-      } else {
+       else {
         $('#' + nombre).val(response);
         $('#1' + nombre).html('<p style="color:green;">✅ ¡Archivo cargado con éxito!</p>');
         $('#mensajeADJUNTOCOL').html('<p style="color:green;">✅ ¡Actualizado!</p>');
@@ -243,7 +272,7 @@ function recargarTodosLosElementos() {
             '2descuentos', 'descuentos', '2IVA', 'IVA',
             'IMPUESTO_HOSPEDAJE', 'MONTO_PROPINA',
             'resettabla', 'reset_totales',
-            'NUMERO_CONSECUTIVO_PROVEE2','ventasoperacionesform' ,'mensajeADJUNTOCOL'
+            'NUMERO_CONSECUTIVO_PROVEE2', 'mensajeADJUNTOCOL'
         ];
         selectores.forEach(function(id) {
             var remoto = doc.find('#' + id);
@@ -390,10 +419,7 @@ function limpiarFormularioVO() {
           $('#mensajeventasoperaciones').html('<span id="ACTUALIZADO">' + data + '</span>');
           $('#' + borra_id_sb).load(location.href + ' #' + borra_id_sb);
           $('#A' + borra_id_sb).load(location.href + ' #A' + borra_id_sb);
-		  
-          
-		  
-		  recargarTodosLosElementos();
+          recargarTodosLosElementos();
         }
       });
     });
