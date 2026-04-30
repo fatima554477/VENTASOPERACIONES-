@@ -32,7 +32,7 @@ fecha fatis : 05/JUNIO/2025
       </div>
       <div class="modal-body" id="personal_detalles"></div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        
       </div>
     </div>
   </div>
@@ -404,8 +404,9 @@ function limpiarFormularioVO() {
   /* ---------------------------------------------------
      BORRAR DOCUMENTO (SBborrar2)
   --------------------------------------------------- */
-  $(document).on('click', '.view_dataSBborrar2', function () {
+ $(document).on('click', '.view_dataSBborrar2', function () {
     var borra_id_sb = $(this).attr('id');
+    var $botonBorrar = $(this);
     $('#dataModal3').modal('show');
 
     $('#btnYes').off('click').on('click', function () {
@@ -414,15 +415,19 @@ function limpiarFormularioVO() {
         method: 'POST',
         data: { borra_id_sb: borra_id_sb, borrasbdoc: 'borrasbdoc' },
         beforeSend: function () { $('#mensajeventasoperaciones').html('cargando...'); },
-        success: function (data) {
+      success: function (data) {
           $('#dataModal3').modal('hide');
           $('#mensajeventasoperaciones').html('<span id="ACTUALIZADO">' + data + '</span>');
-          $('#' + borra_id_sb).load(location.href + ' #' + borra_id_sb);
-          $('#A' + borra_id_sb).load(location.href + ' #A' + borra_id_sb);
+          // Oculta inmediatamente los controles del archivo borrado.
+          $botonBorrar.prev('a').remove();
+          $botonBorrar.next('span').remove();
+          $botonBorrar.next('br').remove();
+          $botonBorrar.remove();
           recargarTodosLosElementos();
         }
       });
     });
+
   });
 
 
