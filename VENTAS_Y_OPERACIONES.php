@@ -441,7 +441,7 @@ function toggleFacturaFields() {
 						
 						
 						<option style="background:#f571f7" value="PAGO A PROVEEDOR CON DOS O MAS FACTURAS" <?php if($VIATICOSOPRO=='PAGO A PROVEEDOR CON DOS O MAS FACTURAS' ){echo "selected";} ?>>SOLICITUD DE UN SOLO PAGO  CON DOS O MÁS FACTURAS</option>
-							<option style="background:#b3f39b" value="PAGOS CON UNA SOLA FACTURA" <?php if($VIATICOSOPRO=='PAGOS CON UNA SOLA FACTURA' ){echo "selected";} ?>>SOLICITUD DE VARIOS PAGOS CON UNA SOLA FACTURA</option>
+							
                        
 						
 						
@@ -745,7 +745,7 @@ if($rfcE == true){
 				 
 				 <div id="RAZON_SOCIAL2">
 				 
-			 <input type="text" class="form-control" id="RAZON_SOCIAL" required=""  value="<?php echo $nombreE; ?>" name="RAZON_SOCIAL" placeholder="RAZÓN SOCIAL" <?php echo $xmlFacturaCargada ? 'readonly="readonly"' : ''; ?>>
+			 <input type="text" class="form-control" id="RAZON_SOCIAL" required=""  value="<?php echo $nombreE; ?>" name="RAZON_SOCIAL" placeholder="RAZÓN SOCIAL" <?php echo $xmlFacturaCargada ? 'readonly="readonly"' : ''; ?>    readonly="readonly">
 				 </div>
 				 </td>
                  </tr>
@@ -757,7 +757,7 @@ if($rfcE == true){
                  <td>
 
             <div id="RFC_PROVEEDOR2">
-            <input type="text" class="form-control" id="RFC_PROVEEDOR"   value="<?php echo $rfcE; ?>" name="RFC_PROVEEDOR" placeholder="RFC DEL PROVEEDOR"  <?php echo $xmlFacturaCargada ? 'readonly="readonly"' : ''; ?>>
+            <input type="text" class="form-control" id="RFC_PROVEEDOR"   value="<?php echo $rfcE; ?>" name="RFC_PROVEEDOR" placeholder="RFC DEL PROVEEDOR"  <?php echo $xmlFacturaCargada ? 'readonly="readonly"' : ''; ?>  readonly="readonly">
 				 
 				 </div>
 				 </td>
@@ -779,7 +779,7 @@ if($rfcE == true){
 
 <div style="">
   <select class="form-select mb-3" id="NUMERO_EVENTO" name="NUMERO_EVENTO" onchange="buscanombreevento(1);">
-  <option value="<?php echo $numero_evento_get; ?>"><?php echo $numero_evento_get; ?></option>
+  <option value="<?php echo $numero_evento_get; ?>"  ><?php echo $numero_evento_get; ?></option>
   </select>
 </div>
 				 
@@ -841,7 +841,7 @@ var parametros = {
                  <tr  style="background:#fcf3cf">
 
                  <th scope="row"> <label for="validationCustom03" class="form-label">NOMBRE DEL EVENTO:</label></th>
-                 <td><input type="text" class="form-control" id="NOMBRE_EVENTO" required=""  value="<?php echo $NOMBRE_EVENTO_get ?>" name="NOMBRE_EVENTO" placeholder="NOMBRE DEL EVENTO"></td>
+                 <td><input type="text" class="form-control" id="NOMBRE_EVENTO" required=""  value="<?php echo $NOMBRE_EVENTO_get ?>" name="NOMBRE_EVENTO" placeholder="NOMBRE DEL EVENTO"  readonly="readonly"></td>
                  </tr>
 				 
 				

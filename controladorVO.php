@@ -320,8 +320,10 @@ $resultado = $ventasoperaciones->VALIDA02XMLUUID($regreso['UUID']);
             ob_end_clean();
         } elseif(strpos($resultado, '3^^') === 0) {
             // Duplicado en 02XML (Pago Proveedores)
-            $numeroSolicitud = str_replace('3^^', '', $resultado);
-            echo '3^^'.$numeroSolicitud;
+            $datosDuplicado = explode('^^', $resultado);
+            $numeroSolicitud = isset($datosDuplicado[1]) ? $datosDuplicado[1] : '';
+            $numeroEvento = isset($datosDuplicado[2]) ? $datosDuplicado[2] : '';
+            echo '3^^'.$numeroSolicitud.'^^'.$numeroEvento;
             UNLINK($url);
             $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
         } elseif(strpos($resultado, '7^^^') === 0) {
@@ -383,8 +385,10 @@ if($_FILES['ADJUNTAR_FACTURA_XML']==true){
 				echo $ADJUNTAR_FACTURA_XML;
 
 			} elseif(strpos($resultado, '3^^') === 0) {
-				$numeroSolicitud = str_replace('3^^', '', $resultado);
-				echo '3^^'.$numeroSolicitud;
+				$datosDuplicado = explode('^^', $resultado);
+				$numeroSolicitud = isset($datosDuplicado[1]) ? $datosDuplicado[1] : '';
+				$numeroEvento = isset($datosDuplicado[2]) ? $datosDuplicado[2] : '';
+				echo '3^^'.$numeroSolicitud.'^^'.$numeroEvento;
 				UNLINK($url);
 				$ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
 

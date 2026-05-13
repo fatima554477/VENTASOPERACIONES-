@@ -720,7 +720,7 @@ public function VALIDA02XMLUUID($uuid){
     $uuid = mysqli_real_escape_string($conn, $uuid);
 
     // ── Verificar en 02XML ──
-    $variablequery = "select 02XML.id, 02XML.UUID, 02SUBETUFACTURA.NUMERO_CONSECUTIVO_PROVEE
+    $variablequery = "select 02XML.id, 02XML.UUID, 02SUBETUFACTURA.NUMERO_CONSECUTIVO_PROVEE, 02SUBETUFACTURA.NUMERO_EVENTO
     from 02XML
     left join 02SUBETUFACTURA on 02XML.ultimo_id = 02SUBETUFACTURA.id
     where 02XML.UUID = '".$uuid."' ";
@@ -728,7 +728,8 @@ public function VALIDA02XMLUUID($uuid){
     $row = mysqli_fetch_array($arrayquery, MYSQLI_ASSOC);
     if($row['id']){
         $numero = ($row['NUMERO_CONSECUTIVO_PROVEE'] != '') ? $row['NUMERO_CONSECUTIVO_PROVEE'] : $row['id'];
-        return '3^^'.$numero;
+        $numeroEvento = isset($row['NUMERO_EVENTO']) ? trim((string)$row['NUMERO_EVENTO']) : '';
+        return '3^^'.$numero.'^^'.$numeroEvento;
     }
 
     // ── Verificar en 07XML (Comprobación de Gastos) ──
