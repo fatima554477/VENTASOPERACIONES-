@@ -67,14 +67,13 @@ var fileobj;
 
 function upload_file(e, name) {
   e.preventDefault();
-    if (name === 'ADJUNTAR_FACTURA_XML' || name === 'ADJUNTAR_FACTURA_PDF') {
+  if (name === 'ADJUNTAR_FACTURA_XML' || name === 'ADJUNTAR_FACTURA_PDF') {
     var tipo = name === 'ADJUNTAR_FACTURA_XML' ? 'XML' : 'PDF';
     if ($('#' + name).val().trim() !== '' || $('#2' + name + ' .view_dataSBborrar2').length > 0) {
       alert('Ya hay un archivo ' + tipo + ' cargado. Bórralo antes de subir otro.');
       return;
     }
   }
-
   fileobj = e.dataTransfer.files[0];
   ajax_file_upload1(fileobj, name);
 }
@@ -89,14 +88,14 @@ function file_explorer(name) {
 
 function ajax_file_upload1(file_obj, nombre) {
   if (!file_obj) return;
-    if (nombre === 'ADJUNTAR_FACTURA_XML' || nombre === 'ADJUNTAR_FACTURA_PDF') {
+
+  if (nombre === 'ADJUNTAR_FACTURA_XML' || nombre === 'ADJUNTAR_FACTURA_PDF') {
     var tipo = nombre === 'ADJUNTAR_FACTURA_XML' ? 'XML' : 'PDF';
     if ($('#' + nombre).val().trim() !== '' || $('#2' + nombre + ' .view_dataSBborrar2').length > 0) {
       alert('Ya hay un archivo ' + tipo + ' cargado. Bórralo antes de subir otro.');
       return;
     }
   }
-
 
   var form_data = new FormData();
   form_data.append(nombre, file_obj);
@@ -113,9 +112,51 @@ function ajax_file_upload1(file_obj, nombre) {
     },
     success: function (response) {
       var resp = $.trim(response);
-      if (resp === '2') {
-        $('#1' + nombre).html('<p style="color:red;">Error, archivo diferente a PDF, JPG o GIF.</p>');
+
+      // ── Archivo vacío (0 bytes) ─────────────────────────────────────────
+      if (resp.indexOf('VACIO^^') === 0) {
+        $('#1' + nombre).html(
+          '<p style="color:red;font-weight:600;">⚠️ EL ARCHIVO ESTÁ VACÍO (0 KB). ' +
+          'Verifica que el archivo tenga contenido antes de subirlo.</p>'
+        );
         $('#' + nombre).val('');
+
+      // ── Sin extensión ───────────────────────────────────────────────────
+      } else if (resp.indexOf('SIN_EXTENSION^^') === 0) {
+        $('#1' + nombre).html(
+          '<p style="color:red;font-weight:600;">⚠️ EL ARCHIVO NO TIENE EXTENSIÓN RECONOCIDA. ' +
+          'Asegúrate de que el nombre termine en .xml, .pdf, .jpg, etc.</p>'
+        );
+        $('#' + nombre).val('');
+
+      // ── Error de subida al servidor ─────────────────────────────────────
+      } else if (resp.indexOf('ERROR_SUBIDA^^') === 0) {
+        $('#1' + nombre).html(
+          '<p style="color:red;font-weight:600;">⚠️ ERROR AL RECIBIR EL ARCHIVO EN EL SERVIDOR. ' +
+          'Puede que sea demasiado grande o que la conexión se interrumpió. Intenta de nuevo.</p>'
+        );
+        $('#' + nombre).val('');
+
+      // ── Error al guardar en disco ───────────────────────────────────────
+      } else if (resp === '1') {
+        $('#1' + nombre).html(
+          '<p style="color:red;font-weight:600;">⚠️ ERROR AL GUARDAR EL ARCHIVO EN EL SERVIDOR. ' +
+          'Intenta de nuevo o contacta a soporte técnico.</p>'
+        );
+        $('#' + nombre).val('');
+
+      // ── Formato no permitido genérico ───────────────────────────────────
+      } else if (resp === '2') {
+        var exts = (nombre === 'ADJUNTAR_FACTURA_XML') ? 'XML' :
+                   (nombre === 'ADJUNTAR_FACTURA_PDF') ? 'PDF' :
+                   'PDF, JPG, PNG, DOCX, XML, XLSX, MP4, TXT u otro formato de documento';
+        $('#1' + nombre).html(
+          '<p style="color:red;">⚠️ FORMATO DE ARCHIVO NO PERMITIDO. ' +
+          'Este campo acepta únicamente: <strong>' + exts + '</strong>.</p>'
+        );
+        $('#' + nombre).val('');
+
+      // ── UUID duplicado en Pago Proveedores (02XML) ──────────────────────
       } else if (resp.indexOf('3^^') === 0) {
         var partes          = resp.split('^^');
         var numeroSolicitud = partes[1] ? $.trim(partes[1]) : '';
@@ -125,27 +166,38 @@ function ajax_file_upload1(file_obj, nombre) {
           ? '<p style="color:red;font-weight:600;">⚠️ UUID YA REGISTRADO — Se encuentra en la solicitud: <strong>' + numeroSolicitud + '</strong>' + detalleEvento + '</p>'
           : '<p style="color:red;font-weight:600;">⚠️ UUID PREVIAMENTE CARGADO.</p>';
         $('#1' + nombre).html(msgDuplicado);
+        $('#' + nombre).val('');
+
+      // ── Formato estricto XML/PDF ────────────────────────────────────────
       } else if (resp === '4') {
         var formatoEsperado = nombre === 'ADJUNTAR_FACTURA_XML' ? 'XML' : 'PDF';
-        $('#1' + nombre).html('<p style="color:red;">ESTE ARCHIVO TIENE QUE SER EN FORMATO ' + formatoEsperado + '.</p>');
+        $('#1' + nombre).html(
+          '<p style="color:red;">⚠️ ESTE ARCHIVO TIENE QUE SER EN FORMATO <strong>' + formatoEsperado + '</strong>.</p>'
+        );
         $('#' + nombre).val('');
 
-      // ── XML vacío o sin contenido válido ──────────────────
-     } else if (resp.indexOf('5^^') === 0) {
-        $('#1' + nombre).html('<p style="color:red;font-weight:600;">⚠️ EL ARCHIVO XML ESTÁ VACÍO O NO CONTIENE INFORMACIÓN VÁLIDA. Verifica que sea un CFDI timbrado correctamente e inténtalo de nuevo.</p>');
+      // ── XML vacío o sin timbre válido ───────────────────────────────────
+      } else if (resp.indexOf('5^^') === 0) {
+        $('#1' + nombre).html(
+          '<p style="color:red;font-weight:600;">⚠️ EL ARCHIVO XML ESTÁ VACÍO O NO CONTIENE INFORMACIÓN VÁLIDA. ' +
+          'Verifica que sea un CFDI timbrado correctamente e inténtalo de nuevo.</p>'
+        );
         $('#' + nombre).val('');
-      // ──────────────────────────────────────────────────────
 
-} else if (resp.indexOf('6^^') === 0) {
+      // ── Receptor no válido ──────────────────────────────────────────────
+      } else if (resp.indexOf('6^^') === 0) {
         var partesReceptor = resp.split('^^');
         var nombreReceptor = partesReceptor[1] ? $.trim(partesReceptor[1]) : '';
         var detalleReceptor = nombreReceptor !== ''
           ? ' Receptor detectado: <strong>' + nombreReceptor + '</strong>.'
           : '';
-        $('#1' + nombre).html('<p style="color:red;font-weight:600;">⚠️ EL RECEPTOR DE LA FACTURA NO ES: EPC, INN, EVE520; FAVOR DE SOLICITAR EL CAMBIO.' + detalleReceptor + '</p>');
+        $('#1' + nombre).html(
+          '<p style="color:red;font-weight:600;">⚠️ EL RECEPTOR DE LA FACTURA NO ES: EPC, INN, EVE520; ' +
+          'FAVOR DE SOLICITAR EL CAMBIO.' + detalleReceptor + '</p>'
+        );
         $('#' + nombre).val('');
 
-      // ── NUEVO: UUID duplicado en 07XML (Comprobación de Gastos) ──
+      // ── UUID duplicado en Comprobación de Gastos (07XML) ────────────────
       } else if (resp.indexOf('7^^^') === 0) {
         var partesGasto = resp.split('^^^');
         var numeroGasto = partesGasto[1] ? $.trim(partesGasto[1]) : '';
@@ -155,10 +207,8 @@ function ajax_file_upload1(file_obj, nombre) {
         $('#1' + nombre).html(msgGasto);
         $('#' + nombre).val('');
 
-      } 
-      // ──────────────────────────────────────────────────────
-
-       else {
+      // ── Éxito ───────────────────────────────────────────────────────────
+      } else {
         $('#' + nombre).val(response);
         $('#1' + nombre).html('<p style="color:green;">✅ ¡Archivo cargado con éxito!</p>');
         $('#mensajeADJUNTOCOL').html('<p style="color:green;">✅ ¡Actualizado!</p>');
@@ -233,15 +283,13 @@ function comasainput(name) {
 
 
 /* -------------------------------------------------------
-   SHOW/HIDE TARGETS — CENTRALIZADO (targets 1..15 + VIDEO)
+   SHOW/HIDE TARGETS
 ------------------------------------------------------- */
 function activarTarget(num) {
   var allTargets = [];
   for (var i = 1; i <= 15; i++) allTargets.push(i);
   allTargets.push('VIDEO');
-
   allTargets.forEach(function (t) { $('#target' + t).hide('linear'); });
-
   if (num !== null) {
     $('#target' + num).show('swing');
     if (num === 2 && typeof load === 'function') {
@@ -250,9 +298,6 @@ function activarTarget(num) {
   }
 }
 
-/* -------------------------------------------------------
-   ✅ CORRECCIÓN 1: función guardarYIrATarget2 (faltaba en script 1)
-------------------------------------------------------- */
 function guardarYIrATarget2() {
   activarTarget(2);
   var el = document.getElementById('target2');
@@ -260,31 +305,31 @@ function guardarYIrATarget2() {
 }
 
 function recargarTodosLosElementos() {
-    $.get(location.href, function(html) {
-        var doc = $(html);
-        var selectores = [
-            'ADJUNTAR_FACTURA_XML', '1ADJUNTAR_FACTURA_XML', '2ADJUNTAR_FACTURA_XML',
-            'ADJUNTAR_FACTURA_PDF', '1ADJUNTAR_FACTURA_PDF', '2ADJUNTAR_FACTURA_PDF',
-            '2ADJUNTAR_COTIZACION', '2CONPROBANTE_TRANSFERENCIA', '2ADJUNTAR_ARCHIVO_1',
-            'RAZON_SOCIAL2', 'RFC_PROVEEDOR2', 'CONCEPTO_PROVEE2',
-            'TIPO_DE_MONEDA2', 'FECHA_DE_PAGO2', 'NUMERO_CONSECUTIVO_PROVEE2',
-            'NOMBRE_COMERCIAL2', '2MONTO_FACTURA', '2MONTO_DEPOSITAR',
-            '2PFORMADE_PAGO', '2TImpuestosRetenidosIVA', 'TImpuestosRetenidosIVA',
-            '2TImpuestosRetenidosISR', 'TImpuestosRetenidosISR',
-            '2descuentos', 'descuentos', '2IVA', 'IVA',
-            'IMPUESTO_HOSPEDAJE', 'MONTO_PROPINA',
-            'resettabla', 'reset_totales',
-            'NUMERO_CONSECUTIVO_PROVEE2', 'mensajeADJUNTOCOL'
-        ];
-        selectores.forEach(function(id) {
-            var remoto = doc.find('#' + id);
-            var local  = $('#' + id);
-            if (remoto.length && local.length) {
-                local.html(remoto.html());
-            }
-        });
-        inicializarCalculoTotales();
+  $.get(location.href, function(html) {
+    var doc = $(html);
+    var selectores = [
+      'ADJUNTAR_FACTURA_XML', '1ADJUNTAR_FACTURA_XML', '2ADJUNTAR_FACTURA_XML',
+      'ADJUNTAR_FACTURA_PDF', '1ADJUNTAR_FACTURA_PDF', '2ADJUNTAR_FACTURA_PDF',
+      '2ADJUNTAR_COTIZACION', '2CONPROBANTE_TRANSFERENCIA', '2ADJUNTAR_ARCHIVO_1',
+      'RAZON_SOCIAL2', 'RFC_PROVEEDOR2', 'CONCEPTO_PROVEE2',
+      'TIPO_DE_MONEDA2', 'FECHA_DE_PAGO2', 'NUMERO_CONSECUTIVO_PROVEE2',
+      'NOMBRE_COMERCIAL2', '2MONTO_FACTURA', '2MONTO_DEPOSITAR',
+      '2PFORMADE_PAGO', '2TImpuestosRetenidosIVA', 'TImpuestosRetenidosIVA',
+      '2TImpuestosRetenidosISR', 'TImpuestosRetenidosISR',
+      '2descuentos', 'descuentos', '2IVA', 'IVA',
+      'IMPUESTO_HOSPEDAJE', 'MONTO_PROPINA',
+      'resettabla', 'reset_totales',
+      'NUMERO_CONSECUTIVO_PROVEE2', 'mensajeADJUNTOCOL'
+    ];
+    selectores.forEach(function(id) {
+      var remoto = doc.find('#' + id);
+      var local  = $('#' + id);
+      if (remoto.length && local.length) {
+        local.html(remoto.html());
+      }
     });
+    inicializarCalculoTotales();
+  });
 }
 
 $(document).ready(function () {
@@ -309,53 +354,42 @@ $(document).ready(function () {
   $('#mostrartodos,  #mostrartodos2').on('click', function () { toggleTodos('show'); });
   $('#ocultartodos, #ocultartodos2').on('click', function () { toggleTodos('hide'); });
 
-  /* -------------------------------------------------------
-     ✅ CORRECCIÓN 2: al cerrar modal fullscreen regresa a target2
-        (faltaba en script 1, copiado de script 2)
-  ------------------------------------------------------- */
   $('#dataModal').on('hidden.bs.modal', function () {
-     $('#target2').show('swing');
-
+    $('#target2').show('swing');
     var el = document.getElementById('target2');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
-  /* -------------------------------------------------------
-     ✅ CORRECCIÓN 3: limpia el handler de btnYes al cerrar
-        modal de confirmación (faltaba en script 1)
-  ------------------------------------------------------- */
   $('#dataModal3').on('hidden.bs.modal', function () {
     $('#btnYes').off('click');
   });
 
 
   /* ---------------------------------------------------
-     HELPER: limpia el formulario de ventas operaciones
+     HELPER: limpia el formulario
   --------------------------------------------------- */
-function limpiarFormularioVO() {
+  function limpiarFormularioVO() {
     var form = document.getElementById('ventasoperacionesform');
     if (form) form.reset();
 
     var camposVacios = [
-        '#RAZON_SOCIAL2', '#CONCEPTO_PROVEE', '#RFC_PROVEEDOR2',
-        '#TIPO_DE_MONEDA', '#FECHA_DE_PAGO', '#NUMERO_CONSECUTIVO_PROVEE',
-        '#ADJUNTAR_FACTURA_XML', '#2MONTO_FACTURA', '#2MONTO_DEPOSITAR',
-        '#2ADJUNTAR_FACTURA_PDF', '#2TImpuestosRetenidos'
+      '#RAZON_SOCIAL2', '#CONCEPTO_PROVEE', '#RFC_PROVEEDOR2',
+      '#TIPO_DE_MONEDA', '#FECHA_DE_PAGO', '#NUMERO_CONSECUTIVO_PROVEE',
+      '#ADJUNTAR_FACTURA_XML', '#2MONTO_FACTURA', '#2MONTO_DEPOSITAR',
+      '#2ADJUNTAR_FACTURA_PDF', '#2TImpuestosRetenidos'
     ];
     camposVacios.forEach(function (id) { $(id).val(''); });
 
     $('#NOMBRE_COMERCIAL').empty().trigger('change');
-
-    // UNA SOLA petición en lugar de 33 peticiones separadas
     recargarTodosLosElementos();
-}
+  }
 
 
   /* ---------------------------------------------------
      ENVIAR VENTAS OPERACIONES
   --------------------------------------------------- */
   $('#enviarVENTASOPERACIONES').on('click', function () {
-	      var $btn = $(this);
+    var $btn = $(this);
     if ($btn.prop('disabled')) return;
     $btn.prop('disabled', true);
 
@@ -370,68 +404,71 @@ function limpiarFormularioVO() {
       contentType: false,
       processData: false
     }).done(function (data) {
-      /* ✅ CORRECCIÓN 4: usar indexOf igual que script 2 para tolerar
-         espacios, saltos de línea o texto extra en la respuesta       */
       var respuesta = $.trim(data).replace(/[\r\n\t]/g, '');
       if (respuesta.indexOf('Ingresado') !== -1 || respuesta.indexOf('Actualizado') !== -1) {
         $('#mensajeventasoperaciones').html('<span id="ACTUALIZADO">Ingresado</span>').fadeIn().delay(3000).fadeOut();
         limpiarFormularioVO();
         recargarElemento('#resettabla');
         recargarElemento('#reset_totales');
-		 $btn.prop('disabled', false);
-
+        $btn.prop('disabled', false);
         setTimeout(function () { guardarYIrATarget2(); }, 600);
       } else {
-        // Eliminar cualquier código técnico del servidor antes de mostrar al usuario
         var dataLimpia = data
-          .replace(/5\^\^/g, '')   // quita solo el prefijo 5^^
-          .replace(/3\^\^/g, '')   // quita solo el prefijo 3^^
-          .replace(/^[234]\s*$/mg, '')  // quita líneas que solo tienen 2, 3 o 4
+          .replace(/5\^\^/g, '')
+          .replace(/3\^\^/g, '')
+          .replace(/^[234]\s*$/mg, '')
           .trim();
-
         if (dataLimpia !== '') {
           $('#mensajeventasoperaciones').html('<span style="color:red;">' + dataLimpia + '</span>').show().delay(4000).fadeOut();
         }
-		 $btn.prop('disabled', false);
-
+        $btn.prop('disabled', false);
       }
     }).fail(function () {
       console.error('[enviarVENTASOPERACIONES] Error en la petición AJAX.');
-	  $btn.prop('disabled', false);
-
+      $btn.prop('disabled', false);
     });
   });
 
 
   /* ---------------------------------------------------
-     BORRAR DOCUMENTO (SBborrar2)
-  --------------------------------------------------- */
- $(document).on('click', '.view_dataSBborrar2', function () {
-    var borra_id_sb = $(this).attr('id');
-    var $botonBorrar = $(this);
-    $('#dataModal3').modal('show');
+     Borrar documento adjunto
+    ------------------------------------------------------- */
+    $(document).on('click', '.view_dataSBborrar2', function () {
+        var borra_id_sb = $(this).attr('id');
+        var $documentoNodo = $(this);
+        $('#dataModal3').modal('show');
 
-    $('#btnYes').off('click').on('click', function () {
-      $.ajax({
-        url: 'ventasoperaciones/controladorVO.php',
-        method: 'POST',
-        data: { borra_id_sb: borra_id_sb, borrasbdoc: 'borrasbdoc' },
-        beforeSend: function () { $('#mensajeventasoperaciones').html('cargando...'); },
-      success: function (data) {
-          $('#dataModal3').modal('hide');
-          $('#mensajeventasoperaciones').html('<span id="ACTUALIZADO">' + data + '</span>');
-          // Oculta inmediatamente los controles del archivo borrado.
-          $botonBorrar.prev('ADJUNTAR_FACTURA_XML').remove();
-          $botonBorrar.prev('a').remove();
-          $botonBorrar.next('span').remove();
-          $botonBorrar.next('br').remove();
-          $botonBorrar.remove();
-          recargarTodosLosElementos();
-        }
-      });
+        $('#btnYes').off('click').on('click', function () {
+            $.ajax({
+                url: 'pagoproveedores/controladorPP.php',
+                method: 'POST',
+                data: { borra_id_sb: borra_id_sb, borrasbdoc: 'borrasbdoc' },
+                beforeSend: function () { $('#mensajepagoproveedores').html('cargando...'); },
+                success: function (data) {
+                    $('#dataModal3').modal('hide');
+                    $('#mensajepagoproveedores').html('<span id="ACTUALIZADO">' + data + '</span>');
+
+                    var $contenedorLinea = $documentoNodo.closest('p');
+                    if ($contenedorLinea.length) {
+                        $contenedorLinea.remove();
+                    } else {
+                        var $saltoLinea = $documentoNodo.nextAll('br:first');
+                        $documentoNodo.prev('a').remove();
+                        $documentoNodo.next('span').remove();
+                        $saltoLinea.remove();
+                        $documentoNodo.remove();
+                    }
+
+                    if (campoAdjunto !== '') {
+                        $('#' + campoAdjunto).val('');
+                    }
+
+                    recargarElemento('#' + borra_id_sb);
+                    recargarElemento('#A' + borra_id_sb);
+                }
+            });
+        });
     });
-
-  });
 
 
   /* ---------------------------------------------------
@@ -459,7 +496,7 @@ function limpiarFormularioVO() {
 
 
   /* ---------------------------------------------------
-     VER / MODIFICAR REGISTROS (modales de detalle)
+     VER / MODIFICAR REGISTROS
   --------------------------------------------------- */
   function bindVistaPrevia(selector, url) {
     $(document).on('click', selector, function () {
@@ -488,7 +525,6 @@ function limpiarFormularioVO() {
   --------------------------------------------------- */
   $('#enviarDATOSBANCARIOS1').on('click', function () {
     var formData = new FormData($('#DATOSBANCARIOS1form')[0]);
-
     $.ajax({
       url: 'ventasoperaciones/controladorVO.php',
       type: 'POST',
@@ -526,7 +562,6 @@ function limpiarFormularioVO() {
   $(document).on('click', '.view_databancario1borrar', function () {
     var borra_id_bancaP = $(this).attr('id');
     $('#dataModal3').modal('show');
-
     $('#btnYes').off('click').on('click', function () {
       $.ajax({
         url: 'ventasoperaciones/controladorVO.php',
@@ -549,7 +584,6 @@ function limpiarFormularioVO() {
   $(document).on('click', '#enviar_email_bancarios', function () {
     var DAbancaPRO_ENVIAR_IMAIL = $('#DAbancaPRO_ENVIAR_IMAIL').val();
     var dataString = $('#form_emai_DATOSBpro').serialize();
-
     $.ajax({
       url: 'ventasoperaciones/controladorVO.php',
       method: 'POST',

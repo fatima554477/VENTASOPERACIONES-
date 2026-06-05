@@ -860,12 +860,16 @@ var parametros = {
 
 
 
-  <div id="drop_file_zone" ondrop="upload_file(event,'ADJUNTAR_COTIZACION')" ondragover="return false" >
+ <!-- ADJUNTAR_COTIZACION -->
+<div id="drop_file_zone" ondrop="upload_file(event,'ADJUNTAR_COTIZACION')" ondragover="return false">
   <p>Suelta aquí o busca tu archivo</p>
-  <p><input class="form-control form-control-sm" id="ADJUNTAR_COTIZACION" type="text" onkeydown="return false" onclick="file_explorer('ADJUNTAR_COTIZACION');"  VALUE="<?php echo $ADJUNTAR_COTIZACION; ?>" required /></p>
+  <p><input class="form-control form-control-sm" id="ADJUNTAR_COTIZACION" type="text" 
+     onkeydown="return false" onclick="file_explorer('ADJUNTAR_COTIZACION');" 
+     VALUE="<?php echo $ADJUNTAR_COTIZACION; ?>" required /></p>
   <input type="file" name="ADJUNTAR_COTIZACION" id="nono"/>
-
-  </div>
+  <!-- AGREGAR ESTE DIV -->
+  <div id="1ADJUNTAR_COTIZACION"></div>
+</div>
   
 
          
@@ -1200,15 +1204,19 @@ echo $encabezadoA.$option2.'</select>';
                  <th scope="row"> <label for="validationCustom03" class="form-label">ADJUNTAR ARCHIVO RELACIONADO A ESTE GASTO: (CUALQUIER FORMATO)</label></th>
                  <td>
 
-		            <div id="drop_file_zone" ondrop="upload_file(event,'ADJUNTAR_ARCHIVO_1')" ondragover="return false" >
-	              	<p>Suelta aquí o busca tu archivo</p>
-		            <p><input class="form-control form-control-sm" id="ADJUNTAR_ARCHIVO_1" type="text" onkeydown="return false" onclick="file_explorer('ADJUNTAR_ARCHIVO_1');"  VALUE="<?php echo $ADJUNTAR_ARCHIVO_1; ?>" required /></p>
-		            <input type="file" name="ADJUNTAR_ARCHIVO_1" id="nono"/>
-		        
-		            </div>
+		<!-- ADJUNTAR_ARCHIVO_1 -->
+<div id="drop_file_zone" ondrop="upload_file(event,'ADJUNTAR_ARCHIVO_1')" ondragover="return false">
+  <p>Suelta aquí o busca tu archivo</p>
+  <p><input class="form-control form-control-sm" id="ADJUNTAR_ARCHIVO_1" type="text" 
+     onkeydown="return false" onclick="file_explorer('ADJUNTAR_ARCHIVO_1');"  
+     VALUE="<?php echo $ADJUNTAR_ARCHIVO_1; ?>" required /></p>
+  <input type="file" name="ADJUNTAR_ARCHIVO_1" id="nono"/>
+  <!-- AGREGAR ESTE DIV -->
+  <div id="1ADJUNTAR_ARCHIVO_1"></div>
+</div>
 
 			 	 
-				 <div id="2ADJUNTAR_ARCHIVO_1"><?php 
+    <?php 
 	           $listadosube = $ventasoperaciones->Listado_subefacturadocto('ADJUNTAR_ARCHIVO_1');
 
 	            while($rowsube=mysqli_fetch_array($listadosube)){

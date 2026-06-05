@@ -72,29 +72,210 @@ class accesoclase extends colaboradores{
 		}
 		return str_replace('_', ' ', $campo);
 	}
+	private function nombre_legible_adjunto($tipo){
+
+		$map = array(
+
+			'ADJUNTAR_FACTURA_XML'             => 'FACTURA XML',
+
+			'ADJUNTAR_FACTURA_PDF'             => 'FACTURA PDF',
+
+			'ADJUNTAR_COTIZACION'              => 'COTIZACIÓN',
+
+			'CONPROBANTE_TRANSFERENCIA'        => 'COMPROBANTE DE TRANSFERENCIA',
+
+			'ADJUNTAR_ARCHIVO_1'               => 'ARCHIVO ADICIONAL',
+
+			'FOTO_ESTADO_PROVEE11'             => 'ESTADO DE CUENTA DEL PROVEEDOR',
+
+			'COMPLEMENTOS_PAGO_PDF'            => 'COMPLEMENTO DE PAGO PDF',
+
+			'COMPLEMENTOS_PAGO_XML'            => 'COMPLEMENTO DE PAGO XML',
+
+			'CANCELACIONES_PDF'                => 'CANCELACIÓN PDF',
+
+			'CANCELACIONES_XML'                => 'CANCELACIÓN XML',
+
+			'ADJUNTAR_FACTURA_DE_COMISION_PDF' => 'FACTURA DE COMISIÓN PDF',
+
+			'ADJUNTAR_FACTURA_DE_COMISION_XML' => 'FACTURA DE COMISIÓN XML',
+
+			'CALCULO_DE_COMISION'              => 'CÁLCULO DE COMISIÓN',
+
+			'COMPROBANTE_DE_DEVOLUCION'        => 'COMPROBANTE DE DEVOLUCIÓN',
+
+			'NOTA_DE_CREDITO_COMPRA'           => 'NOTA DE CRÉDITO DE COMPRA',
+
+		);
+
+
+
+		return isset($map[$tipo]) ? $map[$tipo] : str_replace('_', ' ', $tipo);
+
+	}
+
+
+
+	private function columnas_adjuntos_bitacora(){
+
+		return array(
+
+			'ADJUNTAR_FACTURA_XML', 'ADJUNTAR_FACTURA_PDF',
+
+			'ADJUNTAR_COTIZACION', 'CONPROBANTE_TRANSFERENCIA',
+
+			'ADJUNTAR_ARCHIVO_1', 'FOTO_ESTADO_PROVEE11',
+
+			'COMPLEMENTOS_PAGO_PDF', 'COMPLEMENTOS_PAGO_XML',
+
+			'CANCELACIONES_PDF', 'CANCELACIONES_XML',
+
+			'ADJUNTAR_FACTURA_DE_COMISION_PDF', 'ADJUNTAR_FACTURA_DE_COMISION_XML',
+
+			'CALCULO_DE_COMISION', 'COMPROBANTE_DE_DEVOLUCION',
+
+			'NOTA_DE_CREDITO_COMPRA',
+
+		);
+
+	}
+
+
+
+	private function adjuntos_temporales_para_bitacora($conn, $idRelacion){
+
+		$idRelacion = mysqli_real_escape_string($conn, $idRelacion);
+
+		if($idRelacion === ''){ return array(); }
+
+
+
+		$filtroUsuario = '';
+
+		if(!empty($_SESSION['idem'])){
+
+			$idem = intval($_SESSION['idem']);
+
+			$filtroUsuario = " AND (idRelacionU = '".$idem."' OR idRelacionU = '' OR idRelacionU IS NULL)";
+
+		}
+
+
+
+		$query = mysqli_query($conn, "SELECT * FROM 02SUBETUFACTURADOCTOS WHERE idRelacion = '".$idRelacion."' AND idTemporal = 'si'".$filtroUsuario);
+
+		if(!$query){ return array(); }
+
+
+
+		$adjuntos = array();
+
+		while($row = mysqli_fetch_array($query, MYSQLI_ASSOC)){
+
+			foreach($this->columnas_adjuntos_bitacora() as $columna){
+
+				if(!empty($row[$columna])){
+
+					$adjuntos[] = $this->nombre_legible_adjunto($columna).': '.trim(urldecode($row[$columna]));
+
+				}
+
+			}
+
+		}
+
+
+
+		return array_values(array_unique($adjuntos));
+
+	}
+
+
+
+	private function registrar_bitacora_adjuntos_ingreso($conn, $idSubetufactura, $adjuntos, $usuarioBitacora){
+
+		if(empty($adjuntos)){ return; }
+
+
+
+		$detalle = 'Al ingresar el registro se adjuntaron archivos: '.implode(' | ', $adjuntos).'.';
+
+		$this->registrar_bitacora($conn, $idSubetufactura, 'INGRESO', $detalle, $usuarioBitacora, '');
+
+	}
+
 
 public function solocargartemp($archivo)
 {
-    $nombre_carpeta = __ROOT2__.'/includes/archivos';
-    $nombretemp    = $_FILES[$archivo]["tmp_name"];
+    $nombre_carpeta = __ROOT2__ . '/includes/archivos';
+
+    if (!isset($_FILES[$archivo]) || $_FILES[$archivo]['error'] !== UPLOAD_ERR_OK) {
+        return "ERROR_SUBIDA";
+    }
+
+    if ($_FILES[$archivo]['size'] === 0) {
+        return "VACIO";
+    }
+
+    $nombretemp = $_FILES[$archivo]["tmp_name"];
+
+    // Nombre original del archivo
     $nombrearchivo = basename($_FILES[$archivo]["name"]);
-    $extension     = explode('.', $nombrearchivo);
-    $cuenta        = count($extension) - 1;
-    $ext           = strtolower($extension[$cuenta]);
+
+    // Corregir caracteres codificados como %3F
+    $nombrearchivo = urldecode($nombrearchivo);
+
+    // Corregir problemas de codificación
+    if (function_exists('mb_check_encoding') && !mb_check_encoding($nombrearchivo, 'UTF-8')) {
+        $nombrearchivo = mb_convert_encoding($nombrearchivo, 'UTF-8', 'ISO-8859-1');
+    }
+
+    if (function_exists('iconv')) {
+        $nombrearchivo = iconv('UTF-8', 'UTF-8//IGNORE', $nombrearchivo);
+    }
+
+    $extension = explode('.', $nombrearchivo);
+    $cuenta = count($extension) - 1;
+    $ext = strtolower($extension[$cuenta]);
+
+    if ($cuenta === 0 || trim($ext) === '') {
+        return "SIN_EXTENSION";
+    }
 
     $extensionesPermitidas = array('pdf','gif','jpeg','jpg','png','mp4','docx','doc','xml');
-    if(!in_array($ext, $extensionesPermitidas)){
+
+    if (!in_array($ext, $extensionesPermitidas)) {
         return "2";
     }
 
-    // ✅ Nombre único para evitar sobreescribir archivos de otros registros
-    $nombrebase  = pathinfo($nombrearchivo, PATHINFO_FILENAME);
+    $nombrebase = pathinfo($nombrearchivo, PATHINFO_FILENAME);
+
+    // Importante: se agregó /u para respetar acentos y ñ
+    $nombrebase = preg_replace('/[^a-zA-Z0-9_\-áéíóúÁÉÍÓÚñÑüÜ]/u', '_', $nombrebase);
+    $nombrebase = preg_replace('/_+/', '_', $nombrebase);
+    $nombrebase = trim($nombrebase, '_');
+
+    if (function_exists('mb_strlen')) {
+        if (mb_strlen($nombrebase, 'UTF-8') > 60) {
+            $nombrebase = mb_substr($nombrebase, 0, 60, 'UTF-8');
+        }
+    } else {
+        if (strlen($nombrebase) > 60) {
+            $nombrebase = substr($nombrebase, 0, 60);
+        }
+    }
+
+    if ($nombrebase === '') {
+        $nombrebase = 'archivo';
+    }
+
     $nuevonombre = $nombrebase . '_' . uniqid() . '.' . $ext;
 
-    if(move_uploaded_file($nombretemp, $nombre_carpeta.'/'.$nuevonombre)){
-        chmod($nombre_carpeta.'/'.$nuevonombre, 0755);
+    if (move_uploaded_file($nombretemp, $nombre_carpeta . '/' . $nuevonombre)) {
+        chmod($nombre_carpeta . '/' . $nuevonombre, 0755);
         return trim($nuevonombre);
     }
+
     return "1";
 }
 
@@ -661,6 +842,8 @@ public function solocargartemp($archivo)
 
 				mysqli_query($conn,$var2) or die('P160'.mysqli_error($conn));
 				$ultimo_id = mysqli_insert_id($conn);
+				$adjuntosIngreso = $this->adjuntos_temporales_para_bitacora($conn, $_SESSION['idPROV']);
+
 
 				$this->registrar_bitacora(
 					$conn,
@@ -670,6 +853,8 @@ public function solocargartemp($archivo)
 					$usuarioBitacora,
 					''
 				);
+				$this->registrar_bitacora_adjuntos_ingreso($conn, $ultimo_id, $adjuntosIngreso, $usuarioBitacora);
+
 
 				$regresourl = $this->variable_SUBETUFACTURA2($_SESSION['idPROV']);
 				$url = __ROOT3__.'/includes/archivos/'.$regresourl['ADJUNTAR_FACTURA_XML'];
