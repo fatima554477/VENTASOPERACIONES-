@@ -329,7 +329,11 @@ public function solocargartemp($archivo)
 
 	public function variable_SUBETUFACTURA(){
 		$conn = $this->db();
-		$variablequery = "select * from 02SUBETUFACTURADOCTOS where idRelacion = '".$_SESSION['idPROV']."' and idTemporal = 'si' and (ADJUNTAR_FACTURA_XML is not null or ADJUNTAR_FACTURA_XML <> '') order by id desc ";
+		$idUsuario = isset($_SESSION['idem']) ? mysqli_real_escape_string($conn, $_SESSION['idem']) : '';
+
+		$filtroUsuario = ($idUsuario !== '') ? " and idRelacionU = '".$idUsuario."'" : '';
+
+		$variablequery = "select * from 02SUBETUFACTURADOCTOS where idRelacion = '".$_SESSION['idPROV']."' and idTemporal = 'si'".$filtroUsuario." and ADJUNTAR_FACTURA_XML is not null and ADJUNTAR_FACTURA_XML <> '' order by id desc ";
 		$arrayquery = mysqli_query($conn,$variablequery);
 		return $row = mysqli_fetch_array($arrayquery, MYSQLI_ASSOC);
 	}
@@ -457,10 +461,14 @@ public function solocargartemp($archivo)
 
 	public function variable_SUBETUFACTURA2($id12){
 		$conn = $this->db();
+		$idUsuario = isset($_SESSION['idem']) ? $_SESSION['idem'] : (isset($_SESSION['idempermiso']) ? $_SESSION['idempermiso'] : '');
+
 		$variablequery = "select * from 02SUBETUFACTURADOCTOS where
 		idRelacion = '".$id12."' and
-		idTemporal = 'si' and (ADJUNTAR_FACTURA_XML is not null or ADJUNTAR_FACTURA_XML <> '') and
-		idRelacionU = '".$_SESSION['idempermiso']."' and
+		idTemporal = 'si' and ADJUNTAR_FACTURA_XML is not null and ADJUNTAR_FACTURA_XML <> '' and
+
+		idRelacionU = '".mysqli_real_escape_string($conn, $idUsuario)."' and
+
 		TIPOARCHIVO = 'xml'
 		order by id desc ";
 		$arrayquery = mysqli_query($conn,$variablequery);
@@ -861,9 +869,14 @@ public function solocargartemp($archivo)
 				ob_start();
 				$this->guardarxmlDB2($ultimo_id,$_SESSION['idPROV'],'02XML',$url);
 				ob_end_clean();
+				$idUsuarioTemporal = isset($_SESSION['idem']) ? mysqli_real_escape_string($conn, $_SESSION['idem']) : '';
+
+				$filtroUsuarioTemporal = ($idUsuarioTemporal !== '') ? " and idRelacionU = '".$idUsuarioTemporal."'" : '';
+
 				mysqli_query($conn,
 					"UPDATE 02SUBETUFACTURADOCTOS SET idTemporal ='".$ultimo_id."'
-					where idRelacion = '".$_SESSION['idPROV']."' and idTemporal ='si' ");
+							where idRelacion = '".$_SESSION['idPROV']."' and idTemporal ='si'".$filtroUsuarioTemporal);
+
 				return "Ingresado";
 			}
 
@@ -997,18 +1010,49 @@ $variablequery = "SELECT
 
 	public function Listado_subefacturadocto($ADJUNTAR_COTIZACION){
 		$conn = $this->db();
+		$camposPermitidos = array(
+
+			'ADJUNTAR_FACTURA_XML',
+
+			'ADJUNTAR_FACTURA_PDF',
+
+			'ADJUNTAR_COTIZACION',
+
+			'CONPROBANTE_TRANSFERENCIA',
+
+			'COMPROBANTE_DE_DEVOLUCION',
+
+			'ADJUNTAR_ARCHIVO_1',
+
+		);
+
+		if(!in_array($ADJUNTAR_COTIZACION, $camposPermitidos)){
+
+			return mysqli_query($conn, "SELECT id FROM 02SUBETUFACTURADOCTOS WHERE 1 = 0");
+
+		}
+
 
 		$CIERRE_TOTAL11 = strtotime('-1 hours', strtotime(date("Y-m-d")));
 		$nuevafecha2    = date('Y-m-d', $CIERRE_TOTAL11);
+        $idProveedor    = isset($_SESSION['idPROV']) ? mysqli_real_escape_string($conn, $_SESSION['idPROV']) : '';
+
+		$idUsuario      = isset($_SESSION['idem']) ? mysqli_real_escape_string($conn, $_SESSION['idem']) : '';
+
+		$filtroUsuario  = ($idUsuario !== '') ? " and idRelacionU = '".$idUsuario."'" : '';
 
 		mysqli_query($conn,
 			"DELETE FROM 02SUBETUFACTURADOCTOS WHERE `fechaingreso` <= '".$nuevafecha2."'
-			and idRelacion = '".$_SESSION['idPROV']."' and idTemporal = 'si'");
+			and idRelacion = '".$idProveedor."' and idTemporal = 'si'".$filtroUsuario);
+
 
 		return mysqli_query($conn,
 			"select id,".$ADJUNTAR_COTIZACION.",fechaingreso from 02SUBETUFACTURADOCTOS
-			where idRelacion = '".$_SESSION['idPROV']."' and idTemporal = 'si'
-			and (".$ADJUNTAR_COTIZACION." is not null or ".$ADJUNTAR_COTIZACION." <> '')
+		where idRelacion = '".$idProveedor."' and idTemporal = 'si'".$filtroUsuario."
+
+			and ".$ADJUNTAR_COTIZACION." is not null and ".$ADJUNTAR_COTIZACION." <> ''
+
+
 			ORDER BY id DESC");
 	}
 
@@ -1055,6 +1099,8 @@ $variablequery = "SELECT
 		}
 		return $resultado2;
 	}
+	
+	
 
 	public function buscarrasonsocial($filtro){
 		$conn = $this->db();
@@ -1076,6 +1122,50 @@ $variablequery = "SELECT
 		$_SESSION['P_NOMBRE_COMERCIAL_EMPRESA12'] = $row2['P_NOMBRE_COMERCIAL_EMPRESA'];
 		return $row2['idusuario'].'^^^^'.$row2['P_NOMBRE_COMERCIAL_EMPRESA'];
 	}
+	public function reemplazarAdjuntoFacturaUnico($campo, $IPventasoperar, $idPROV, $nombreArchivo, $idUsuario){
+
+		$conn = $this->db();
+
+
+
+		$camposPermitidos = array(
+
+			'ADJUNTAR_FACTURA_XML' => 'xml',
+
+			'ADJUNTAR_FACTURA_PDF' => 'pdf',
+
+		);
+
+		if(!isset($camposPermitidos[$campo])){ return false; }
+
+
+
+		$IPventasoperar = mysqli_real_escape_string($conn, $IPventasoperar);
+
+		$idPROV         = mysqli_real_escape_string($conn, $idPROV);
+
+		$nombreArchivo  = mysqli_real_escape_string($conn, $nombreArchivo);
+
+		$idUsuario      = mysqli_real_escape_string($conn, $idUsuario);
+
+		$tipoArchivo    = $camposPermitidos[$campo];
+
+
+
+		$this->limpiarAdjuntoFacturaUnico($campo, $IPventasoperar, $idPROV);
+
+
+
+		$sql = "INSERT INTO 02SUBETUFACTURADOCTOS (".$campo.", idRelacion, idTemporal, idRelacionU, TIPOARCHIVO)
+
+			VALUES ('".$nombreArchivo."', '".$idPROV."', '".$IPventasoperar."', '".$idUsuario."', '".$tipoArchivo."')";
+
+
+
+		return mysqli_query($conn, $sql);
+
+	}
+
 	
 	public function limpiarAdjuntoFacturaUnico($campo, $IPventasoperar, $idPROV){
     $conn  = $this->db();

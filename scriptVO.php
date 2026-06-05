@@ -210,6 +210,16 @@ function ajax_file_upload1(file_obj, nombre) {
       // ── Éxito ───────────────────────────────────────────────────────────
       } else {
         $('#' + nombre).val(response);
+		  var nombreArchivoGuardado = resp;
+
+        if (nombre === 'ADJUNTAR_FACTURA_XML' && resp.indexOf('^^') !== -1) {
+
+          nombreArchivoGuardado = $.trim(resp.split('^^')[0]);
+
+        }
+
+        $('#' + nombre).val(nombreArchivoGuardado);
+
         $('#1' + nombre).html('<p style="color:green;">✅ ¡Archivo cargado con éxito!</p>');
         $('#mensajeADJUNTOCOL').html('<p style="color:green;">✅ ¡Actualizado!</p>');
         recargarElemento('#2ADJUNTAR_FACTURA_XML');
