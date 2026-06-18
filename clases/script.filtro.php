@@ -552,6 +552,7 @@ function LIMPIAR(){
 		if(el){ el.value = ''; }
 	});
 	$("#FECHA_DE_PAGO_VACIO").prop("checked", false);
+	$("#ADJUNTAR_FACTURA_XML_VACIO").prop("checked", false);
 	load(1);
 }
 
@@ -593,6 +594,7 @@ function load(page){
 	var FECHA_DE_PAGO=$("#FECHA_DE_PAGO").val();
 	var FECHA_DE_PAGO2a=$("#FECHA_DE_PAGO2a").val();
 	var FECHA_DE_PAGO_VACIO=$("#FECHA_DE_PAGO_VACIO").is(":checked") ? '1' : '';
+	var ADJUNTAR_FACTURA_XML_VACIO=$("#ADJUNTAR_FACTURA_XML_VACIO").is(":checked") ? 'si' : '';
 	var FECHA_A_DEPOSITAR=$("#FECHA_A_DEPOSITAR_2").val();
 	var STATUS_DE_PAGO=$("#STATUS_DE_PAGO_2").val();
 	var ACTIVO_FIJO=$("#ACTIVO_FIJO_2").val();
@@ -709,6 +711,7 @@ function load(page){
 		"UnidadConcepto":UnidadConcepto,"TUA":TUA,"TuaTotalCargos":TuaTotalCargos,
 		"Descuento":Descuento,"subTotal":subTotal,"propina":propina,
 		"P_TIPO_DE_MONEDA_1":P_TIPO_DE_MONEDA_1,
+		'ADJUNTAR_FACTURA_XML_VACIO':ADJUNTAR_FACTURA_XML_VACIO,	
 		"P_INSTITUCION_FINANCIERA_1":P_INSTITUCION_FINANCIERA_1,
 		"P_NUMERO_DE_CUENTA_DB_1":P_NUMERO_DE_CUENTA_DB_1,
 		"P_NUMERO_CLABE_1":P_NUMERO_CLABE_1,"P_NUMERO_IBAN_1":P_NUMERO_IBAN_1,

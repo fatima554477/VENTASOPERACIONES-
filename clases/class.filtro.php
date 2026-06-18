@@ -209,7 +209,6 @@ public function datos_bancarios_pagado($rfc, $nombreComercial = null, $fechaPago
    
 
 public function DOCUMENTOSFISCALES_PAGOA($idRelacion, $documento, $documento2 = FALSE){
-    // ✅ CACHÉ
     static $cache = [];
     $cacheKey = $idRelacion . '|' . $documento . '|' . $documento2;
     if (array_key_exists($cacheKey, $cache)) {
@@ -217,22 +216,27 @@ public function DOCUMENTOSFISCALES_PAGOA($idRelacion, $documento, $documento2 = 
     }
 
     $conn = $this->db();
-    $variable2 = "SELECT * FROM 02DOCUMENTOSFISCALES WHERE idRelacion = '".$idRelacion."' AND "
-        ."(DOCUMENTO_LEGAL = '".$documento."' OR DOCUMENTO_LEGAL = '".$documento2."') LIMIT 1";
+    
+    $variable2 = "SELECT * FROM 02DOCUMENTOSFISCALES 
+                  WHERE idRelacion = '".$idRelacion."' 
+                  AND (DOCUMENTO_LEGAL = '".$documento."' OR DOCUMENTO_LEGAL = '".$documento2."') 
+                  AND ADJUNTAR_DOCUMENTO_LEGAL != ''
+                  AND ADJUNTAR_DOCUMENTO_LEGAL != '1'
+                  AND ADJUNTAR_DOCUMENTO_LEGAL != '2'
+                  ORDER BY id DESC 
+                  LIMIT 1";
+
     $query2 = mysqli_query($conn, $variable2);
 
     $ADJUNTAR_DOCUMENTO_LEGAL = "";
-    while($row2 = mysqli_fetch_array($query2, MYSQLI_ASSOC)){
-        if($row2['ADJUNTAR_DOCUMENTO_LEGAL'] != 2 ||
-           $row2['ADJUNTAR_DOCUMENTO_LEGAL'] != '' ||
-           $row2['ADJUNTAR_DOCUMENTO_LEGAL'] != 1){
-            $ADJUNTAR_DOCUMENTO_LEGAL .= "<a target='_blank' href='includes/archivos/".$row2['ADJUNTAR_DOCUMENTO_LEGAL']."'>ver</a><br>";
-        } else {
-            $ADJUNTAR_DOCUMENTO_LEGAL .= "<br>";
+    $row2 = mysqli_fetch_array($query2, MYSQLI_ASSOC);
+    if($row2){
+        $archivo = trim((string)$row2['ADJUNTAR_DOCUMENTO_LEGAL']);
+        if($archivo !== ''){
+            $ADJUNTAR_DOCUMENTO_LEGAL = "<a target='_blank' href='includes/archivos/".$archivo."'>ver</a><br>";
         }
     }
 
-    // ✅ Guardar en caché antes de retornar
     $cache[$cacheKey] = $ADJUNTAR_DOCUMENTO_LEGAL;
     return $cache[$cacheKey];
 }
@@ -289,7 +293,14 @@ public function DOCUMENTOSFISCALES_PAGOA($idRelacion, $documento, $documento2 = 
 			
 		if($search['FECHA_FINAL_EVENTO']!=""){
 			$sWhere2.="  $tables5.FECHA_FINAL_EVENTO LIKE '%".$search['FECHA_FINAL_EVENTO']."%' and ";}			
-			
+		if(isset($search['ADJUNTAR_FACTURA_XML_VACIO']) 
+   && $search['ADJUNTAR_FACTURA_XML_VACIO'] == "si"){
+
+    $sWhere2 .= " (
+        02XML.UUID IS NULL
+        OR TRIM(02XML.UUID) = ''
+    ) and ";
+}	
 			
 		if($search['MOTIVO_GASTO']!=""){
 			$sWhere2.="  $tables.MOTIVO_GASTO LIKE '%".$search['MOTIVO_GASTO']."%' and ";}

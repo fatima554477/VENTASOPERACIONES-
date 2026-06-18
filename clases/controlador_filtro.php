@@ -66,6 +66,7 @@ if($action == "ajax"){
 	$PFORMADE_PAGO = isset($_POST["PFORMADE_PAGO"]) ? trim($_POST["PFORMADE_PAGO"]) : "";
 	$FECHA_DE_PAGO = isset($_POST["FECHA_DE_PAGO"]) ? trim($_POST["FECHA_DE_PAGO"]) : "";
 	$FECHA_DE_PAGO2a = isset($_POST["FECHA_DE_PAGO2a"]) ? trim($_POST["FECHA_DE_PAGO2a"]) : "";
+	$ADJUNTAR_FACTURA_XML_VACIO = isset($_POST["ADJUNTAR_FACTURA_XML_VACIO"]) ? trim($_POST["ADJUNTAR_FACTURA_XML_VACIO"]) : "";
 	$FECHA_DE_PAGO_VACIO = isset($_POST["FECHA_DE_PAGO_VACIO"]) ? trim($_POST["FECHA_DE_PAGO_VACIO"]) : "";
 	$FECHA_A_DEPOSITAR = isset($_POST["FECHA_A_DEPOSITAR"]) ? trim($_POST["FECHA_A_DEPOSITAR"]) : "";
 	$STATUS_DE_PAGO = isset($_POST["STATUS_DE_PAGO"]) ? trim($_POST["STATUS_DE_PAGO"]) : "";
@@ -220,6 +221,7 @@ if($action == "ajax"){
 		"P_NUMERO_CUENTA_SWIFT_1" => $P_NUMERO_CUENTA_SWIFT_1,
 		"FOTO_ESTADO_PROVEE" => $FOTO_ESTADO_PROVEE,
 		"ULTIMA_CARGA_DATOBANCA" => $ULTIMA_CARGA_DATOBANCA,
+		"ADJUNTAR_FACTURA_XML_VACIO" => $ADJUNTAR_FACTURA_XML_VACIO,	
 		"ID_RELACIONADO" => $ID_RELACIONADO,
 		"TImpuestosRetenidosIVA" => $TImpuestosRetenidosIVA,
 		"TImpuestosRetenidosISR" => $TImpuestosRetenidosISR,
@@ -526,7 +528,12 @@ if($action == "ajax"){
 <td style="background:#c9e8e8"></td>
 <?php } ?>
 
-<?php if($database->plantilla_filtro($nombreTabla,"ADJUNTAR_FACTURA_XML",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="background:#c9e8e8;text-align:center"><input type="text" class="form-control" id="ADJUNTAR_FACTURA_XML" value="<?php echo $ADJUNTAR_FACTURA_XML; ?>"></td>
+<?php if($database->plantilla_filtro($nombreTabla,"ADJUNTAR_FACTURA_XML",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="background:#c9e8e8;text-align:center">
+		<div class="form-check" style="margin:2; white-space:nowrap;">
+			<input class="form-check-input" type="checkbox" value="si" id="ADJUNTAR_FACTURA_XML_VACIO" <?php if($ADJUNTAR_FACTURA_XML_VACIO==='si'){echo 'checked';} ?>>
+			<label class="form-check-label" for="ADJUNTAR_FACTURA_XML_VACIO">VACÍOS</label>
+		</div>
+	</div></td>
 <?php } ?>
 <?php if($database->plantilla_filtro($nombreTabla,"ADJUNTAR_FACTURA_PDF",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="background:#c9e8e8;text-align:center"><input type="text" class="form-control" id="ADJUNTAR_FACTURA_PDF" value="<?php echo $ADJUNTAR_FACTURA_PDF; ?>"></td>
 <?php } ?>
@@ -942,33 +949,38 @@ while ($rowDOCTOS = mysqli_fetch_array($querycontrasDOCTOS)) {
 $statusRechazado = isset($row["STATUS_RECHAZADO"]) ? $row["STATUS_RECHAZADO"] : 'no';
 $numeroEventoRegistro = isset($row["NUMERO_EVENTO"]) ? strtoupper(trim((string)$row["NUMERO_EVENTO"])) : '';
 $tienePermisoVenta = $numeroEventoRegistro !== '' && isset($eventosAutorizadosVentas[$numeroEventoRegistro]);
+$esReembolso = isset($row["VIATICOSOPRO"]) && strtoupper(trim($row["VIATICOSOPRO"])) === 'REEMBOLSO';
 ?>
 <!-- VENTAS -->
 <td style="text-align:center; background:<?php echo ($row["STATUS_VENTAS"] == 'si') ? '#ceffcc' : '#e9d8ee'; ?>;"
-	id="color_VENTAS<?php echo $row["02SUBETUFACTURAid"]; ?>">
-	<input type="checkbox" style="width:30px;" class="form-check-input"
-		id="STATUS_VENTAS<?php echo $row["02SUBETUFACTURAid"]; ?>"
-		name="STATUS_VENTAS<?php echo $row["02SUBETUFACTURAid"]; ?>"
-		value="<?php echo $row["02SUBETUFACTURAid"]; ?>"
-		data-permiso-principal="<?php echo $tienePermisoVenta ? 'si' : 'no'; ?>"
-		onclick="STATUS_VENTAS(<?php echo $row["02SUBETUFACTURAid"]; ?>)"
-		<?php
-		$atributosVentas = [];
-		if ($row["STATUS_VENTAS"] === 'si') {
-			$atributosVentas[] = 'checked';
-			$atributosVentas[] = 'disabled';
-		} else {
-			if ($statusRechazado === 'si') {
-				$atributosVentas[] = 'disabled';
-				$atributosVentas[] = 'style="cursor:not-allowed;"';
-				$atributosVentas[] = 'title="No se puede autorizar por ventas: pago rechazado"';
-			} elseif (!$tienePermisoVenta) {
-				$atributosVentas[] = 'disabled';
-			}
-		}
-		echo implode(' ', $atributosVentas);
-		?> />
-	<?php $colspan += 1; ?>
+    id="color_VENTAS<?php echo $row["02SUBETUFACTURAid"]; ?>">
+    <input type="checkbox" style="width:30px;" class="form-check-input"
+        id="STATUS_VENTAS<?php echo $row["02SUBETUFACTURAid"]; ?>"
+        name="STATUS_VENTAS<?php echo $row["02SUBETUFACTURAid"]; ?>"
+        value="<?php echo $row["02SUBETUFACTURAid"]; ?>"
+        data-permiso-principal="<?php echo $tienePermisoVenta ? 'si' : 'no'; ?>"
+        onclick="STATUS_VENTAS(<?php echo $row["02SUBETUFACTURAid"]; ?>)"
+        <?php
+        $atributosVentas = [];
+        if ($row["STATUS_VENTAS"] === 'si') {
+            $atributosVentas[] = 'checked';
+            $atributosVentas[] = 'disabled';
+        } else {
+            if ($esReembolso) {
+                $atributosVentas[] = 'disabled';
+                $atributosVentas[] = 'title="No aplica para ventas: tipo REEMBOLSO"';
+                $atributosVentas[] = 'style="cursor:not-allowed;"';
+            } elseif ($statusRechazado === 'si') {
+                $atributosVentas[] = 'disabled';
+                $atributosVentas[] = 'style="cursor:not-allowed;"';
+                $atributosVentas[] = 'title="No se puede autorizar por ventas: pago rechazado"';
+            } elseif (!$tienePermisoVenta) {
+                $atributosVentas[] = 'disabled';
+            }
+        }
+        echo implode(' ', $atributosVentas);
+        ?> />
+    <?php $colspan += 1; ?>
 </td>
 
 <!-- CUENTAS POR PAGAR (AUDITORIA1) -->
