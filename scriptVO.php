@@ -219,8 +219,12 @@ function ajax_file_upload1(file_obj, nombre) {
         }
 
         $('#' + nombre).val(nombreArchivoGuardado);
-
-        $('#1' + nombre).html('<p style="color:green;">✅ ¡Archivo cargado con éxito!</p>');
+		   $('#1' + nombre)
+          .stop(true, true)
+          .show()
+          .html('<p style="color:green;">✅ ¡Archivo cargado con éxito!</p>')
+          .delay(2500)
+          .fadeOut(300, function () { $(this).html('').show(); });
         $('#mensajeADJUNTOCOL').html('<p style="color:green;">✅ ¡Actualizado!</p>');
         recargarElemento('#2ADJUNTAR_FACTURA_XML');
         if (nombre === 'ADJUNTAR_FACTURA_XML') {
@@ -385,10 +389,18 @@ $(document).ready(function () {
     var camposVacios = [
       '#RAZON_SOCIAL2', '#CONCEPTO_PROVEE', '#RFC_PROVEEDOR2',
       '#TIPO_DE_MONEDA', '#FECHA_DE_PAGO', '#NUMERO_CONSECUTIVO_PROVEE',
-      '#ADJUNTAR_FACTURA_XML', '#2MONTO_FACTURA', '#2MONTO_DEPOSITAR',
+      '#ADJUNTAR_FACTURA_XML', '#ADJUNTAR_FACTURA_PDF',
+      '#ADJUNTAR_COTIZACION', '#ADJUNTAR_ARCHIVO_1',
+      '#2MONTO_FACTURA', '#2MONTO_DEPOSITAR',
       '#2ADJUNTAR_FACTURA_PDF', '#2TImpuestosRetenidos'
     ];
     camposVacios.forEach(function (id) { $(id).val(''); });
+	   ['ADJUNTAR_COTIZACION', 'ADJUNTAR_ARCHIVO_1'].forEach(function (nombre) {
+      $('#' + nombre).val('');
+      $('input[type="file"][name="' + nombre + '"]').val('');
+      $('#1' + nombre).stop(true, true).html('').show();
+      $('#2' + nombre).html('');
+    });
 
     $('#NOMBRE_COMERCIAL').empty().trigger('change');
     recargarTodosLosElementos();
@@ -443,43 +455,55 @@ $(document).ready(function () {
   /* ---------------------------------------------------
      Borrar documento adjunto
     ------------------------------------------------------- */
-    $(document).on('click', '.view_dataSBborrar2', function () {
-        var borra_id_sb = $(this).attr('id');
-        var $documentoNodo = $(this);
-        $('#dataModal3').modal('show');
+/* ---------------------------------------------------
+   Borrar documento adjunto
+------------------------------------------------------- */
+$(document).on('click', '.view_dataSBborrar2', function () {
+    var borra_id_sb    = $(this).attr('id');
+    var $documentoNodo = $(this);
 
-        $('#btnYes').off('click').on('click', function () {
-            $.ajax({
-                url: 'pagoproveedores/controladorPP.php',
-                method: 'POST',
-                data: { borra_id_sb: borra_id_sb, borrasbdoc: 'borrasbdoc' },
-                beforeSend: function () { $('#mensajepagoproveedores').html('cargando...'); },
-                success: function (data) {
-                    $('#dataModal3').modal('hide');
-                    $('#mensajepagoproveedores').html('<span id="ACTUALIZADO">' + data + '</span>');
+    // ── Detectar si el botón está dentro del contenedor del XML ──────────
+    var esXML = $documentoNodo.closest('#2ADJUNTAR_FACTURA_XML').length > 0;
 
-                    var $contenedorLinea = $documentoNodo.closest('p');
-                    if ($contenedorLinea.length) {
-                        $contenedorLinea.remove();
-                    } else {
-                        var $saltoLinea = $documentoNodo.nextAll('br:first');
-                        $documentoNodo.prev('a').remove();
-                        $documentoNodo.next('span').remove();
-                        $saltoLinea.remove();
-                        $documentoNodo.remove();
-                    }
+    $('#dataModal3').modal('show');
 
-                    if (campoAdjunto !== '') {
-                        $('#' + campoAdjunto).val('');
-                    }
+    $('#btnYes').off('click').on('click', function () {
+        $.ajax({
+            url: 'ventasoperaciones/controladorVO.php',
+            method: 'POST',
+            data: { borra_id_sb: borra_id_sb, borrasbdoc: 'borrasbdoc' },
+            beforeSend: function () { 
+                $('#mensajeventasoperaciones').html('cargando...'); 
+            },
+            success: function (data) {
+                $('#dataModal3').modal('hide');
 
-                    recargarElemento('#' + borra_id_sb);
-                    recargarElemento('#A' + borra_id_sb);
+                // ── Si era un XML, recargar página completa ───────────────
+                if (esXML) {
+                    location.reload();
+                    return;
                 }
-            });
+                // ─────────────────────────────────────────────────────────
+
+                $('#mensajeventasoperaciones').html('<span id="ACTUALIZADO">' + data + '</span>');
+
+                var $contenedorLinea = $documentoNodo.closest('p');
+                if ($contenedorLinea.length) {
+                    $contenedorLinea.remove();
+                } else {
+                    var $saltoLinea = $documentoNodo.nextAll('br:first');
+                    $documentoNodo.prev('a').remove();
+                    $documentoNodo.next('span').remove();
+                    $saltoLinea.remove();
+                    $documentoNodo.remove();
+                }
+
+                recargarElemento('#' + borra_id_sb);
+                recargarElemento('#A' + borra_id_sb);
+            }
         });
     });
-
+});
 
   /* ---------------------------------------------------
      BORRAR VENTAS OPERACIONES

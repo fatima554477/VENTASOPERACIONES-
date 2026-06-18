@@ -1216,7 +1216,7 @@ echo $encabezadoA.$option2.'</select>';
 </div>
 
 			 	 
-    <?php 
+      <div id="2ADJUNTAR_ARCHIVO_1"><?php
 	           $listadosube = $ventasoperaciones->Listado_subefacturadocto('ADJUNTAR_ARCHIVO_1');
 
 	            while($rowsube=mysqli_fetch_array($listadosube)){

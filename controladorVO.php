@@ -413,7 +413,7 @@ if ($IPventasoperar != '' && $hayAlgunaSubida) {
                     continue;
                 }
 
-                $resultado = $ventasoperaciones->VALIDA02XMLUUID($regreso['UUID']);
+                $resultado = $ventasoperaciones->VALIDA02XMLUUID($regreso['UUID'], $IPventasoperar);
 
                 if ($resultado == 'S') {
                     echo $ADJUNTAR_FACTURA_XML . '^^' . $regreso['UUID'];
@@ -485,8 +485,8 @@ if ($IPventasoperar == '' && $hiddenVENTASOPERACIONES != 'hiddenVENTASOPERACIONE
         if ($errorArchivo !== UPLOAD_ERR_OK || $nombreArchivoOriginal == '') { continue; }
 
         if ($subidaFacturaXML) {
-            $ADJUNTAR_FACTURA_XML = $conexion->sologuardar6_usuario($ETQIETA, $ADJUNTAR_FACTURA_XML2, '02SUBETUFACTURADOCTOS', $idPROV, $IPventasoperar, $idem1, 'xml');
-        } else {
+    $ADJUNTAR_FACTURA_XML = $conexion->sologuardar6_usuario($ETQIETA, $ADJUNTAR_FACTURA_XML2, '02SUBETUFACTURADOCTOS', $idPROV, $IPventasoperar, $idem1, 'xml');
+}  else {
             // ── Interceptar errores de cargar() para campos no-XML ────────
             $resultadoCarga2 = $conexion->cargar($ETQIETA, '02SUBETUFACTURADOCTOS', '8', $idem1, 'si', '', $idem1);
 
@@ -503,52 +503,61 @@ if ($IPventasoperar == '' && $hiddenVENTASOPERACIONES != 'hiddenVENTASOPERACIONE
             $ADJUNTAR_FACTURA_XML = $resultadoCarga2;
         }
 
-        if ($subidaFacturaXML) {
-            $url = __ROOT1__ . '/includes/archivos/' . $ADJUNTAR_FACTURA_XML;
-            if (file_exists($url)) {
-                $regreso = $conexion2->lectorxml($url);
+   if ($subidaFacturaXML) {
+    $url = __ROOT1__ . '/includes/archivos/' . $ADJUNTAR_FACTURA_XML;
+    if (file_exists($url)) {
+        $regreso = $conexion2->lectorxml($url);
 
-                if (empty($regreso) || !isset($regreso['UUID']) || trim($regreso['UUID']) === '') {
-                    echo '5^^';
-                    UNLINK($url);
-                    $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
-                    continue;
-                }
+        if (empty($regreso) || !isset($regreso['UUID']) || trim($regreso['UUID']) === '') {
+            echo '5^^';
+            UNLINK($url);
+            $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
+            continue;
+        }
 
-                $nombreReceptor = isset($regreso['nombreR']) ? $regreso['nombreR'] : '';
-                if (!receptorCorporativoValidoVO($nombreReceptor)) {
-                    echo '6^^' . $nombreReceptor;
-                    UNLINK($url);
-                    $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
-                    continue;
-                }
+        $nombreReceptor = isset($regreso['nombreR']) ? $regreso['nombreR'] : '';
+        if (!receptorCorporativoValidoVO($nombreReceptor)) {
+            echo '6^^' . $nombreReceptor;
+            UNLINK($url);
+            $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
+            continue;
+        }
 
-                $resultado = $ventasoperaciones->VALIDA02XMLUUID($regreso['UUID']);
+        // ── FIX 2: se agrega $IPventasoperar como segundo parámetro ──────
+        $resultado = $ventasoperaciones->VALIDA02XMLUUID($regreso['UUID'], $IPventasoperar);
 
-                if ($resultado == 'S') {
-                    echo $ADJUNTAR_FACTURA_XML;
+        if ($resultado == 'S') {
 
-                } elseif (strpos($resultado, '3^^') === 0) {
-                    $datosDuplicado  = explode('^^', $resultado);
-                    $numeroSolicitud = isset($datosDuplicado[1]) ? $datosDuplicado[1] : '';
-                    $numeroEvento    = isset($datosDuplicado[2]) ? $datosDuplicado[2] : '';
-                    echo '3^^' . $numeroSolicitud . '^^' . $numeroEvento;
-                    UNLINK($url);
-                    $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
+            // ── FIX 3: guardarxmlDB2 hace echo interno, se suprime ───────
+            ob_start();
+            $ventasoperaciones->guardarxmlDB2($idem1, $idem1, '02XML', $url);
+            ob_end_clean();
+            // ─────────────────────────────────────────────────────────────
 
-                } elseif (strpos($resultado, '7^^^') === 0) {
-                    $numeroGasto = str_replace('7^^^', '', $resultado);
-                    echo '7^^^' . $numeroGasto;
-                    UNLINK($url);
-                    $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
+            // Este echo es el único que debe llegar al JS
+            echo $ADJUNTAR_FACTURA_XML;
 
-                } else {
-                    echo '3^^';
-                    UNLINK($url);
-                    $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
-                }
-            }
+        } elseif (strpos($resultado, '3^^') === 0) {
+            $datosDuplicado  = explode('^^', $resultado);
+            $numeroSolicitud = isset($datosDuplicado[1]) ? $datosDuplicado[1] : '';
+            $numeroEvento    = isset($datosDuplicado[2]) ? $datosDuplicado[2] : '';
+            echo '3^^' . $numeroSolicitud . '^^' . $numeroEvento;
+            UNLINK($url);
+            $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
+
+        } elseif (strpos($resultado, '7^^^') === 0) {
+            $numeroGasto = str_replace('7^^^', '', $resultado);
+            echo '7^^^' . $numeroGasto;
+            UNLINK($url);
+            $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
+
         } else {
+            echo '3^^';
+            UNLINK($url);
+            $ventasoperaciones->delete_subefactura2nombre($ADJUNTAR_FACTURA_XML);
+        }
+    }
+} else {
             echo $ADJUNTAR_FACTURA_XML;
         }
     }

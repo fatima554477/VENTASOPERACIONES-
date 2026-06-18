@@ -203,10 +203,16 @@ class accesoclase extends colaboradores{
 		$this->registrar_bitacora($conn, $idSubetufactura, 'INGRESO', $detalle, $usuarioBitacora, '');
 
 	}
+	
+	
+          public function delete_02XML($ultimo_id){
+    $conn = $this->db();
+    $ultimo_id = intval($ultimo_id);
+    mysqli_query($conn, "DELETE FROM 02XML WHERE ultimo_id = '".$ultimo_id."' ");
+    }
 
-
-public function solocargartemp($archivo)
-{
+    public function solocargartemp($archivo)
+    {
     $nombre_carpeta = __ROOT2__ . '/includes/archivos';
 
     if (!isset($_FILES[$archivo]) || $_FILES[$archivo]['error'] !== UPLOAD_ERR_OK) {
@@ -912,34 +918,57 @@ public function solocargartemp($archivo)
 		return $row['id'];
 	}
 
-	// ── ÚNICA definición de VALIDA02XMLUUID ──────────────────────────────
-public function VALIDA02XMLUUID($uuid){
+public function VALIDA02XMLUUID($uuid, $ultimoIdActual = ''){
     $conn = $this->db();
-    $uuid = mysqli_real_escape_string($conn, $uuid);
+    $uuid = mysqli_real_escape_string($conn, trim((string)$uuid));
+    $ultimoIdActual = intval($ultimoIdActual);
 
-    // ── Verificar en 02XML ──
-    $variablequery = "select 02XML.id, 02XML.UUID, 02SUBETUFACTURA.NUMERO_CONSECUTIVO_PROVEE, 02SUBETUFACTURA.NUMERO_EVENTO
-    from 02XML
-    left join 02SUBETUFACTURA on 02XML.ultimo_id = 02SUBETUFACTURA.id
-    where 02XML.UUID = '".$uuid."' ";
-    $arrayquery = mysqli_query($conn,$variablequery);
-    $row = mysqli_fetch_array($arrayquery, MYSQLI_ASSOC);
-    if($row['id']){
-        $numero = ($row['NUMERO_CONSECUTIVO_PROVEE'] != '') ? $row['NUMERO_CONSECUTIVO_PROVEE'] : $row['id'];
-        $numeroEvento = isset($row['NUMERO_EVENTO']) ? trim((string)$row['NUMERO_EVENTO']) : '';
+    if($uuid === ''){
+        return 'S';
+    }
+
+    $whereSolicitudActual = $ultimoIdActual > 0 
+        ? " AND 02XML.ultimo_id <> '".$ultimoIdActual."'" 
+        : '';
+
+    $query = mysqli_query($conn,
+        "SELECT 02XML.id, 02XML.UUID, 02XML.ultimo_id,
+            02SUBETUFACTURA.id AS idSolicitud,
+            02SUBETUFACTURA.NUMERO_CONSECUTIVO_PROVEE,
+            02SUBETUFACTURA.NUMERO_EVENTO
+        FROM 02XML
+        INNER JOIN 02SUBETUFACTURA ON 02XML.ultimo_id = 02SUBETUFACTURA.id
+        WHERE 02XML.UUID = '".$uuid."'".$whereSolicitudActual."
+        ORDER BY 02XML.id DESC
+        LIMIT 1");
+
+    $row = $query ? mysqli_fetch_array($query, MYSQLI_ASSOC) : null;
+
+    if(!empty($row['id'])){
+        $numero = !empty($row['NUMERO_CONSECUTIVO_PROVEE']) 
+            ? $row['NUMERO_CONSECUTIVO_PROVEE'] 
+            : $row['idSolicitud'];
+        $numeroEvento = isset($row['NUMERO_EVENTO']) 
+            ? trim((string)$row['NUMERO_EVENTO']) 
+            : '';
         return '3^^'.$numero.'^^'.$numeroEvento;
     }
 
-    // ── Verificar en 07XML (Comprobación de Gastos) ──
-    $query7 = mysqli_query($conn, "SELECT id, ultimo_id FROM 07XML WHERE UUID='".$uuid."'");
-    $row7 = mysqli_fetch_array($query7, MYSQLI_ASSOC);
-    if($row7['id']){
+    // Verificar en 07XML
+    $query7 = mysqli_query($conn, 
+        "SELECT id, ultimo_id FROM 07XML 
+         WHERE UUID = '".$uuid."' LIMIT 1");
+    $row7 = $query7 ? mysqli_fetch_array($query7, MYSQLI_ASSOC) : null;
+
+    if(!empty($row7['id'])){
         $numero7 = ($row7['ultimo_id'] != '') ? $row7['ultimo_id'] : $row7['id'];
         return '7^^^'.$numero7;
     }
 
     return 'S';
 }
+
+
 
 	public function Listado_ventasoperaciones(){
 		$conn = $this->db();
