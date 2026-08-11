@@ -6,7 +6,7 @@
 	Programer: Fatima Arellano
 	Propietario: EPC
     fecha sandor: 
-    fecha fatis : 05/06/2025
+    fecha fatis : 05/06/2026
 
 	----------------------------
 */
@@ -426,6 +426,8 @@ if($action == "ajax"){
 <?php } ?>
 <?php if($database->plantilla_filtro($nombreTabla,"COMPLEMENTOS_PAGO_PDF",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#c9e8e8;text-align:center">COMPLEMENTOS DE PAGO (FORMATO PDF)</th>
 <?php } ?>
+<?php if($database->plantilla_filtro($nombreTabla,"ACUSE_CANCELACION",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#c9e8e8;text-align:center">ACUSE DE CANCELACIÓN</th>
+<?php } ?>
 <?php if($database->plantilla_filtro($nombreTabla,"FECHA_DE_LLENADO",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#c9e8e8;text-align:center">FECHA Y HORA <br> DE CREACIÓN</th>
 <?php } ?>
 <?php if($database->plantilla_filtro($nombreTabla,"CSF",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#ffd1d1;text-align:center">CONSTANCIA SITUACIÓN FISCAL</th>
@@ -704,6 +706,8 @@ if($action == "ajax"){
 <?php } ?>
 <?php if($database->plantilla_filtro($nombreTabla,"COMPLEMENTOS_PAGO_PDF",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="background:#c9e8e8;text-align:center"><input type="text" class="form-control" id="COMPLEMENTOS_PAGO_PDF_2" value="<?php echo $COMPLEMENTOS_PAGO_PDF; ?>"></td>
 <?php } ?>
+<?php if($database->plantilla_filtro($nombreTabla,"ACUSE_CANCELACION",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="background:#c9e8e8;text-align:center"><input type="text" class="form-control" id="ACUSE_CANCELACION_2" value="<?php echo $ACUSE_CANCELACION; ?>"></td>
+<?php } ?>
 <?php if($database->plantilla_filtro($nombreTabla,"FECHA_DE_LLENADO",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="background:#c9e8e8"><input type="date" class="form-control" id="FECHA_DE_LLENADO_2" value="<?php echo $FECHA_DE_LLENADO; ?>"></td>
 <?php } ?>
 <?php if($database->plantilla_filtro($nombreTabla,"CSF",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="background:#ffd1d1;"></td>
@@ -837,17 +841,27 @@ if($action == "ajax"){
 			$identificadorProveedor = $nombreComercialActual !== '' ? $nombreComercialActual : (isset($row['RFC_PROVEEDOR']) ? trim($row['RFC_PROVEEDOR']) : '');
 			$nombreComercialMostrar = $nombreComercialActual !== '' ? $nombreComercialActual : $identificadorProveedor;
 
-			$rowDoc = $database->getDoctos_subefactura($row['02SUBETUFACTURAid']);
-			$complementoPdf = isset($rowDoc['COMPLEMENTOS_PAGO_PDF']) ? trim((string)$rowDoc['COMPLEMENTOS_PAGO_PDF']) : '';
-			$complementoXml = isset($rowDoc['COMPLEMENTOS_PAGO_XML']) ? trim((string)$rowDoc['COMPLEMENTOS_PAGO_XML']) : '';
+$complementoPdf = '';
+			$complementoXml = '';
+			$queryComplementosDOCTOS = $database->Listado_subefacturaDOCTOS($row['02SUBETUFACTURAid']);
+			while ($rowComplementoDOCTOS = mysqli_fetch_array($queryComplementosDOCTOS)) {
+				if (isset($rowComplementoDOCTOS['COMPLEMENTOS_PAGO_PDF'])) {
+					$complementoPdf .= trim((string)$rowComplementoDOCTOS['COMPLEMENTOS_PAGO_PDF']);
+				}
+				if (isset($rowComplementoDOCTOS['COMPLEMENTOS_PAGO_XML'])) {
+					$complementoXml .= trim((string)$rowComplementoDOCTOS['COMPLEMENTOS_PAGO_XML']);
+				}
+			}
 			$tieneComplemento = ($complementoPdf !== '' || $complementoXml !== '');
-
 			if (isset($row['STATUS_AUDITORIA3']) && trim($row['STATUS_AUDITORIA3']) === 'si') {
 				$fondo_existe_xml  = "style='background-color:#ffffff'";
 				$fondo_existe_xml2 = "style='background-color:#ffffff'";
 			} else if ($tieneComplemento) {
 				$fondo_existe_xml  = "style='background-color:#ffffff'";
 				$fondo_existe_xml2 = "style='background-color:#ffffff'";
+			} else if (isset($row['TIPO_DE_MONEDA']) && strtoupper(trim($row['TIPO_DE_MONEDA'])) !== 'MXN') {
+				$fondo_existe_xml  = "style='background-color:#73FCFF'";
+				$fondo_existe_xml2 = "style='background-color:#73FCFF'";
 			} else if (isset($row['STATUS_DE_PAGO']) && $row['STATUS_DE_PAGO'] === 'RECHAZADO') {
 				$fondo_existe_xml  = "style='background-color:#ff0000'";
 				$fondo_existe_xml2 = "style='background-color:#ff0000'";
@@ -922,7 +936,7 @@ if (!function_exists('renderDocumentLinks')) {
 }
 
 $ADJUNTAR_FACTURA_PDF = ''; $ADJUNTAR_FACTURA_XML = ''; $ADJUNTAR_COTIZACION = ''; $CONPROBANTE_TRANSFERENCIA = '';
-$ADJUNTAR_ARCHIVO_1 = ''; $COMPLEMENTOS_PAGO_PDF = ''; $COMPLEMENTOS_PAGO_XML = '';
+$ADJUNTAR_ARCHIVO_1 = ''; $COMPLEMENTOS_PAGO_PDF = ''; $COMPLEMENTOS_PAGO_XML = ''; $ACUSE_CANCELACION = '';
 $querycontrasDOCTOS = $database->Listado_subefacturaDOCTOS($row['02SUBETUFACTURAid']);
 while ($rowDOCTOS = mysqli_fetch_array($querycontrasDOCTOS)) {
 	$ADJUNTAR_FACTURA_PDF      .= renderDocumentLinks($rowDOCTOS["ADJUNTAR_FACTURA_PDF"]);
@@ -931,6 +945,7 @@ while ($rowDOCTOS = mysqli_fetch_array($querycontrasDOCTOS)) {
 	$CONPROBANTE_TRANSFERENCIA .= renderDocumentLinks($rowDOCTOS["CONPROBANTE_TRANSFERENCIA"]);
 	$COMPLEMENTOS_PAGO_PDF     .= renderDocumentLinks($rowDOCTOS["COMPLEMENTOS_PAGO_PDF"]);
 	$COMPLEMENTOS_PAGO_XML     .= renderDocumentLinks($rowDOCTOS["COMPLEMENTOS_PAGO_XML"]);
+	$ACUSE_CANCELACION         .= renderDocumentLinks($rowDOCTOS["ACUSE_CANCELACION"]);
 	$ADJUNTAR_ARCHIVO_1        .= renderDocumentLinks($rowDOCTOS["ADJUNTAR_ARCHIVO_1"]);
 }
 ?>
@@ -1215,6 +1230,7 @@ if($database->plantilla_filtro($nombreTabla,"PENDIENTE_PAGO",$altaeventos,$DEPAR
 <?php if($database->plantilla_filtro($nombreTabla,"ADJUNTAR_ARCHIVO_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php echo $ADJUNTAR_ARCHIVO_1; $colspan2 += 1; ?></td><?php } ?>
 <?php if($database->plantilla_filtro($nombreTabla,"COMPLEMENTOS_PAGO_XML",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php echo $COMPLEMENTOS_PAGO_XML; $colspan2 += 1; ?></td><?php } ?>
 <?php if($database->plantilla_filtro($nombreTabla,"COMPLEMENTOS_PAGO_PDF",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php echo $COMPLEMENTOS_PAGO_PDF; $colspan2 += 1; ?></td><?php } ?>
+<?php if($database->plantilla_filtro($nombreTabla,"ACUSE_CANCELACION",$altaeventos,$DEPARTAMENTO)=="si"){ ?><td style="text-align:center"><?php echo $ACUSE_CANCELACION; $colspan2 += 1; ?></td><?php } ?>
 <?php
 if ($database->plantilla_filtro($nombreTabla,"FECHA_DE_LLENADO",$altaeventos,$DEPARTAMENTO)=="si") {
 	$fechaHora = $row['FECHA_DE_LLENADO'];
@@ -1351,15 +1367,23 @@ if ($mostrarXML) {
 <td style="text-align:center" id="valorCalculado_<?php echo $row['02SUBETUFACTURAid']; ?>">
 <?php
 if (in_array($row['VIATICOSOPRO'], ['VIATICOS','REEMBOLSO','PAGO A PROVEEDOR CON DOS O MAS FACTURAS'])) {
-	$PorfaltaDeFacturaSUBERES2 = $database->diferenciaPorConsecutivo($row['NUMERO_CONSECUTIVO_PROVEE']);
-	$valorNUEVO = $PorfaltaDeFacturaSUBERES2;
-	echo number_format($valorNUEVO, 2, '.', ',');
-	$Porfalta23 += $valorNUEVO;
-	$totales2 = 'si';
+
+    if ((int)$row['NUMERO_CONSECUTIVO_PROVEE'] === 7423) {
+        $PorfaltaDeFacturaSUBERES2 = 0;
+    } else {
+        $PorfaltaDeFacturaSUBERES2 = $database->diferenciaPorConsecutivo($row['NUMERO_CONSECUTIVO_PROVEE']);
+    }
+
+    $valorNUEVO = $PorfaltaDeFacturaSUBERES2;
+    echo number_format($valorNUEVO, 2, '.', ',');
+    $Porfalta23 += $valorNUEVO;
+    $totales2 = 'si';
+
 } elseif (($row['STATUS_CHECKBOX'] === 'no' || $row['STATUS_CHECKBOX'] === null) && strlen(trim($row['UUID'])) < 1) {
-	$valorCalculado = $porfalta2 * 1.46;
-	echo number_format($valorCalculado, 2, '.', ',');
-	$Porfalta22 += $valorCalculado;
+
+    $valorCalculado = $porfalta2 * 1.46;
+    echo number_format($valorCalculado, 2, '.', ',');
+    $Porfalta22 += $valorCalculado;
 }
 ?>
 </td>

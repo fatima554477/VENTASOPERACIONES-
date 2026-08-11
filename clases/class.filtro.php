@@ -5,7 +5,7 @@
 	Programer: Fatima Arellano
 	Propietario: EPC
 	fecha sandor: 
-    fecha fatis : 05/04/2025
+    fecha fatis : 05/04/2026
 	----------------------------
  
 */
@@ -542,9 +542,16 @@ public function DOCUMENTOSFISCALES_PAGOA($idRelacion, $documento, $documento2 = 
 		if($search['NUMERO_EVENTO_orden']=="asc"){
 			$sWhere3campo.=" $tables.NUMERO_EVENTO asc, ";
 		}
-		if($sWhere3campo == ""){
-			$sWhere3campo.="  $tables.id desc ";		
-	}else{
+if($sWhere3campo == ""){
+    $sWhere3campo .= " CASE 
+        WHEN (
+            ($tables.FECHA_DE_PAGO IS NULL OR TRIM($tables.FECHA_DE_PAGO) = '' OR $tables.FECHA_DE_PAGO = '0000-00-00')
+            AND YEAR($tables.FECHA_DE_LLENADO) >= 2026
+        ) THEN 0 
+        ELSE 1 
+    END asc,
+    $tables.id desc ";
+}else{
 			$sWhere3campo = substr($sWhere3campo,0,-2);
 		}
 
@@ -566,8 +573,42 @@ public function DOCUMENTOSFISCALES_PAGOA($idRelacion, $documento, $documento2 = 
 		
 
 	}
+	
+	
 
+	public function getComplementosMasivo($ids) {
+    $conn = $this->db();
 
+    // Limpiar y normalizar el arreglo de IDs
+    $ids = array_filter(array_unique(array_map('intval', (array)$ids)));
+    if (empty($ids)) {
+        return [];
+    }
+
+    $idsStr = implode(',', $ids);
+
+    $q = mysqli_query(
+        $conn,
+        "SELECT idTemporal, COMPLEMENTOS_PAGO_PDF, COMPLEMENTOS_PAGO_XML
+         FROM 02SUBETUFACTURADOCTOS
+         WHERE idTemporal IN ({$idsStr})
+         ORDER BY id DESC"
+    );
+
+    $resultado = array();
+    if ($q) {
+        while ($row = mysqli_fetch_array($q, MYSQLI_ASSOC)) {
+            $key = $row['idTemporal'];
+            // Como viene ordenado DESC por id, la PRIMERA vez que vemos
+            // un idTemporal es la más reciente (igual que LIMIT 1 del original).
+            if (!isset($resultado[$key])) {
+                $resultado[$key] = $row;
+            }
+        }
+    }
+
+    return $resultado; // [ '02SUBETUFACTURAid' => ['COMPLEMENTOS_PAGO_PDF'=>..., 'COMPLEMENTOS_PAGO_XML'=>...], ... ]
+}
 
 public function obtener_rfc_a_id($valor, $nombreComercial = null) {
     $conn = $this->db();

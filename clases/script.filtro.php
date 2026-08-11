@@ -12,12 +12,12 @@
   vertical-align: middle;
   margin-right: 8px;
 }
-
+ 
 @keyframes spin {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-
+ 
 .msg-actualizando {
   font-weight: bold;
   font-size: 20px;
@@ -29,7 +29,7 @@
   align-items: center;
   box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
 }
-
+ 
 /* ── Bitácora Timeline ── */
 .badge-bitacora {
   font-size: 11px; font-weight: 500;
@@ -43,7 +43,7 @@
 .badge-adjunto       { background:#F3E8FF; color:#5B21B6; border:0.5px solid #C4B5FD; }
 .badge-rechazo       { background:#FEE2E2; color:#991B1B; border:0.5px solid #FCA5A5; }
 .badge-default       { background:#f1f3f5; color:#444;    border:0.5px solid #dee2e6; }
-
+ 
 .bitacora-timeline-wrap {
   max-height: 420px; overflow-y: auto; padding: 1.25rem 1.5rem;
 }
@@ -67,12 +67,12 @@
 }
 .bitacora-strip b { color: #0C447C; }
 </style>
-
+ 
 <!-- ===================== MODAL BITÁCORA TIMELINE ===================== -->
 <div class="modal fade" id="modalBitacoraPago" tabindex="-1" aria-labelledby="modalBitacoraPagoLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg overflow-hidden">
-
+ 
       <!-- Header azul -->
       <div class="modal-header border-0 px-4 py-3 text-white" style="background:#185FA5;">
         <div class="d-flex align-items-center gap-2">
@@ -89,32 +89,32 @@
         </div>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
-
+ 
       <!-- Strip info rápida -->
       <div id="bitacoraStrip" class="bitacora-strip" style="display:none;"></div>
-
+ 
       <!-- Body timeline -->
       <div class="modal-body p-0" id="bitacoraPagoBody" style="background:#f8fafc;">
         <div class="text-center py-4 text-muted">
           <span class="spinner-border spinner-border-sm me-2"></span>Cargando bitácora...
         </div>
       </div>
-
+ 
       <div class="modal-footer border-0 bg-white py-2">
         <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cerrar</button>
       </div>
-
+ 
     </div>
   </div>
 </div>
-
+ 
 <!-- ===================== SCRIPT ===================== -->
 <script type="text/javascript">
-
+ 
 /* ─────────────────────────────────────────────────────────────────────
    FUNCIONES EXISTENTES (sin cambios)
    ───────────────────────────────────────────────────────────────────── */
-
+ 
 function pasarpagado2(pasarpagado_id){
 	var checkBox = document.getElementById("pasarpagado1a"+pasarpagado_id);
 	var pasarpagado_text = checkBox.checked ? "si" : "no";
@@ -131,7 +131,7 @@ function pasarpagado2(pasarpagado_id){
 		}
 	});
 }
-
+ 
 function STATUS_RESPONSABLE_EVENTO(RESPONSABLE_EVENTO_id){
 	var checkBox = document.getElementById("STATUS_RESPONSABLE_EVENTO"+RESPONSABLE_EVENTO_id);
 	var RESPONSABLE_text = checkBox.checked ? "si" : "no";
@@ -148,7 +148,7 @@ function STATUS_RESPONSABLE_EVENTO(RESPONSABLE_EVENTO_id){
 		}
 	});
 }
-
+ 
 function STATUS_AUDITORIA1(AUDITORIA1_id){
 	var checkBox = document.getElementById("STATUS_AUDITORIA1"+AUDITORIA1_id);
 	var AUDITORIA1_text = checkBox.checked ? "si" : "no";
@@ -165,7 +165,7 @@ function STATUS_AUDITORIA1(AUDITORIA1_id){
 		}
 	});
 }
-
+ 
 function STATUS_CHECKBOX(CHECKBOX_id, permisoModificar) {
 	var checkBox = document.getElementById("STATUS_CHECKBOX" + CHECKBOX_id);
 	var CHECKBOX_text = checkBox.checked ? "si" : "no";
@@ -212,7 +212,7 @@ function STATUS_CHECKBOX(CHECKBOX_id, permisoModificar) {
 	});
 	recalcularTotal();
 }
-
+ 
 function recalcularTotal() {
 	let total = 0;
 	$('[id^=valorCalculado_]').each(function() {
@@ -222,7 +222,7 @@ function recalcularTotal() {
 	});
 	$('#totalCalculado').text('$' + total.toLocaleString('es-MX', {minimumFractionDigits:2,maximumFractionDigits:2}));
 }
-
+ 
 function STATUS_AUDITORIA3(id){
 	var $cb = $("#STATUS_AUDITORIA3" + id);
 	var permGuardar   = ($cb.data("perm-guardar")   == 1);
@@ -254,11 +254,11 @@ function STATUS_AUDITORIA3(id){
 		}
 	});
 }
-
+ 
 function showNotify(msg, ok){
 	$("#ajax-notification").stop(true,true).text(msg).css('background', ok ? '#4CAF50' : '#E53935').fadeIn(150).delay(1000).fadeOut(300);
 }
-
+ 
 function STATUS_SINXML(id){
 	var $cb = $("#STATUS_SINXML" + id);
 	var permGuardar2   = ($cb.data("perm-guardar2")   == 1);
@@ -290,11 +290,11 @@ function STATUS_SINXML(id){
 		}
 	});
 }
-
+ 
 function showNotify2(msg, ok){
 	$("#ajax-notification").stop(true,true).text(msg).css('background', ok ? '#4CAF50' : '#E53935').fadeIn(150).delay(1000).fadeOut(300);
 }
-
+ 
 function STATUS_AUDITORIA2(AUDITORIA2_id){
 	var checkBox = document.getElementById("STATUS_AUDITORIA2"+AUDITORIA2_id);
 	var AUDITORIA2_text = checkBox.checked ? "si" : "no";
@@ -312,7 +312,7 @@ function STATUS_AUDITORIA2(AUDITORIA2_id){
 		}
 	});
 }
-
+ 
 function STATUS_FINANZAS(FINANZAS_id){
 	var checkBox = document.getElementById("STATUS_FINANZAS"+FINANZAS_id);
 	var FINANZAS_text = checkBox.checked ? "si" : "no";
@@ -330,7 +330,7 @@ function STATUS_FINANZAS(FINANZAS_id){
 		}
 	});
 }
-
+ 
 function STATUS_RECHAZADO(RECHAZADO_id){
 	var checkBox = document.getElementById("STATUS_RECHAZADO"+RECHAZADO_id);
 	var $checkBox = $(checkBox);
@@ -338,7 +338,7 @@ function STATUS_RECHAZADO(RECHAZADO_id){
 	if(RECHAZADO_text === 'no'){ $checkBox.data('forzarAgregarMotivo', 'si'); }
 	else if(RECHAZADO_text === 'si' && $checkBox.data('forzarAgregarMotivo') !== 'si'){ $checkBox.removeData('forzarAgregarMotivo'); 
 	}
-
+ 
 	actualizarBotonesRechazo(RECHAZADO_id, RECHAZADO_text);
 	actualizarEstadoVentasPorRechazo(RECHAZADO_id, RECHAZADO_text);
 	load(obtenerPaginaActualFiltro());
@@ -362,8 +362,8 @@ function STATUS_RECHAZADO(RECHAZADO_id){
 		}
 	});
 }
-
-
+ 
+ 
 function actualizarEstadoVentasPorRechazo(RECHAZADO_id, statusRechazado){
 	var $ventas = $('#STATUS_VENTAS'+RECHAZADO_id);
 	if($ventas.length === 0){ return; }
@@ -390,14 +390,14 @@ function actualizarEstadoVentasPorRechazo(RECHAZADO_id, statusRechazado){
 			.attr('title', 'Sin permiso principal para autorizar por ventas');
 	}
 }
-
+ 
 function abrirFormularioRechazo(RECHAZADO_id){
 	var motivoActual = $('#motivo_rechazo_'+RECHAZADO_id).val() || '';
 	$('#modal_rechazo_id').val(RECHAZADO_id);
 	configurarModalRechazo('editar', motivoActual, 'Captura el motivo y presiona Guardar.');
 	$('#btn_guardar_rechazo_modal').off('click').on('click', function(){ guardarMotivoRechazoModal(); });
 }
-
+ 
 function guardarMotivoRechazoModal(){
 	var RECHAZADO_id = $('#modal_rechazo_id').val();
 	var motivo = ($('#modal_rechazo_texto').val() || '').trim();
@@ -419,7 +419,7 @@ function guardarMotivoRechazoModal(){
 		}
 	});
 }
-
+ 
 function verMotivoRechazo(RECHAZADO_id){
 	var motivoLocal = $('#motivo_rechazo_'+RECHAZADO_id).val() || '';
 	$('#modal_rechazo_id').val(RECHAZADO_id);
@@ -435,7 +435,7 @@ function verMotivoRechazo(RECHAZADO_id){
 		}
 	});
 }
-
+ 
 function configurarModalRechazo(modo, texto, mensaje){
 	var esVer = (modo === 'ver');
 	$('#modalRechazoPagoLabel').text(esVer ? 'Ver motivo del rechazo' : 'Agregar motivo del rechazo');
@@ -444,7 +444,7 @@ function configurarModalRechazo(modo, texto, mensaje){
 	$('#btn_guardar_rechazo_modal').toggle(!esVer);
 	mostrarModalRechazoPago();
 }
-
+ 
 function actualizarBotonesRechazo(RECHAZADO_id, statusRechazado){
 	var statusActual = statusRechazado;
 	if(typeof statusActual === 'undefined'){ statusActual = $('#STATUS_RECHAZADO'+RECHAZADO_id).is(':checked') ? 'si' : 'no'; }
@@ -456,21 +456,37 @@ function actualizarBotonesRechazo(RECHAZADO_id, statusRechazado){
 	$('#agregar_rechazo_'+RECHAZADO_id).toggle(mostrarAgregar);
 	$('#ver_rechazo_'+RECHAZADO_id).toggle(mostrarVer);
 }
-
+ 
 function mostrarModalRechazoPago(){
 	if($('#modalRechazoPago').length === 0){ return; }
 	if(typeof $('#modalRechazoPago').modal === 'function'){ $('#modalRechazoPago').modal('show'); }
 	else { $('#modalRechazoPago').show(); }
 }
-
+ 
 function cerrarModalRechazoPago(){
 	if($('#modalRechazoPago').length === 0){ return; }
 	if(typeof $('#modalRechazoPago').modal === 'function'){ $('#modalRechazoPago').modal('hide'); }
 	else { $('#modalRechazoPago').hide(); }
 }
-
+ 
 function STATUS_VENTAS(VENTAS_id){
 	var checkBox = document.getElementById("STATUS_VENTAS"+VENTAS_id);
+ 
+	if(checkBox.checked){
+		// Antes de autorizar por VENTAS, confirmar que el registro tiene los datos mínimos capturados.
+		var confirmarAutorizacion = confirm(
+			"Antes de autorizar, verifica que el registro tenga capturados los siguientes datos:\n\n" +
+			"- MOTIVO DEL GASTO\n" +
+			"- FECHA DE PROGRAMACIÓN DEL PAGO\n\n" +
+			"¿Deseas continuar con la autorización?"
+		);
+ 
+		if(!confirmarAutorizacion){
+			checkBox.checked = false;
+			return;
+		}
+	}
+ 
 	var VENTAS_text = checkBox.checked ? "si" : "no";
 	$.ajax({
 		url:'pagoproveedores/controladorPP.php',
@@ -494,15 +510,15 @@ function STATUS_VENTAS(VENTAS_id){
 		}
 	});
 }
-
+ 
 function obtenerPaginaActualFiltro(){
 	var paginaActual = parseInt($('.pagination li.active a').first().text(), 10);
 	if(isNaN(paginaActual) || paginaActual <= 0){ paginaActual = 1; }
 	return paginaActual;
 }
-
+ 
 function pad(n){ return n < 10 ? '0'+n : n; }
-
+ 
 function actualizarFechaHora(){
 	const now = new Date();
 	const fecha = pad(now.getDate()) + '-' + pad(now.getMonth() + 1) + '-' + now.getFullYear();
@@ -516,7 +532,7 @@ function actualizarFechaHora(){
 }
 actualizarFechaHora();
 setInterval(actualizarFechaHora, 1000);
-
+ 
 function LIMPIAR(){
 	var filtros = [
 		"NUMERO_CONSECUTIVO_PROVEE_2","NOMBRE_COMERCIAL_2","VIATICOSOPRO_2",
@@ -555,7 +571,7 @@ function LIMPIAR(){
 	$("#ADJUNTAR_FACTURA_XML_VACIO").prop("checked", false);
 	load(1);
 }
-
+ 
 $(function() {
 	const triggerSearch = () => load(1);
 	$('#target2').on('keydown', 'thead input, thead select', function(event) {
@@ -571,7 +587,7 @@ $(function() {
 	});
 	load(1);
 });
-
+ 
 function load(page){
 	var query=$("#NOMBRE_EVENTO").val();
 	var DEPARTAMENTO2=$("#DEPARTAMENTO2WE").val();
@@ -669,7 +685,7 @@ function load(page){
 	var FOTO_ESTADO_PROVEE=$("#FOTO_ESTADO_PROVEE").val();
 	var ULTIMA_CARGA_DATOBANCA=$("#ULTIMA_CARGA_DATOBANCA").val();
 	var per_page=$("#per_page").val();
-
+ 
 	var parametros = {
 		"action":"ajax","page":page,"query":query,"per_page":per_page,
 		"NUMERO_CONSECUTIVO_PROVEE":NUMERO_CONSECUTIVO_PROVEE,
@@ -719,7 +735,9 @@ function load(page){
 		"FOTO_ESTADO_PROVEE":FOTO_ESTADO_PROVEE,"ULTIMA_CARGA_DATOBANCA":ULTIMA_CARGA_DATOBANCA,
 		"TImpuestosRetenidos_3":TImpuestosRetenidos,"DEPARTAMENTO2":DEPARTAMENTO2
 	};
-
+	
+	window.ultimosParametrosFiltro = parametros;
+ 
 	$("#loader2").fadeIn('slow');
 	$.ajax({
 		url: 'ventasoperaciones/clases/controlador_filtro.php',
@@ -743,14 +761,44 @@ function load(page){
 		}
 	});
 }
-
+function exportarExcelFiltrado(){
+ 
+	var parametros = window.ultimosParametrosFiltro || null;
+ 
+	if(!parametros){
+ 
+		load(currentPage || 1);
+ 
+		parametros = window.ultimosParametrosFiltro || {};
+ 
+	}
+ 
+	parametros = $.extend({}, parametros, { action: 'exportar_excel', page: 1 });
+ 
+	// Enviar en la misma ventana fuerza la descarga y evita bloqueos de pop-up o pestañas en blanco.
+ 
+	var form = $('<form>', { method: 'POST', action: 'pagoproveedores/clases3/exportar_excel.php', target: '_self' });
+ 
+	$.each(parametros, function(key, value){
+ 
+		form.append($('<input>', { type: 'hidden', name: key, value: value == null ? '' : value }));
+ 
+	});
+ 
+	$('body').append(form);
+ 
+	form.trigger('submit');
+ 
+	form.remove();
+ 
+}
 /* ─────────────────────────────────────────────────────────────────────
    BITÁCORA TIMELINE — HELPERS
    Reutiliza la misma lógica visual que pagoproveedores.
    La URL apunta a ventasoperaciones/clases/controlador_filtro.php
    que tiene el endpoint action=bitacora_pago.
    ───────────────────────────────────────────────────────────────────── */
-
+ 
 function _bitacoraBadgeCfg(tipo) {
 	var t = (tipo || '').toLowerCase();
 	if (t.indexOf('ingres')   !== -1) return { cls:'badge-ingreso',       bg:'#E6F1FB', border:'#185FA5', iconPath:'M12 5v14M5 12l7-7 7 7' };
@@ -762,20 +810,20 @@ function _bitacoraBadgeCfg(tipo) {
 	if (t.indexOf('cancel')   !== -1) return { cls:'badge-cancelacion',   bg:'#FCEBEB', border:'#A32D2D', iconPath:'M18 6L6 18M6 6l12 12' };
 	return                                   { cls:'badge-default',        bg:'#f1f3f5', border:'#adb5bd', iconPath:'M12 12m-4 0a4 4 0 108 0 4 4 0 10-8 0' };
 }
-
+ 
 function _bitacoraInitials(name) {
 	if (!name || name === '-') return '?';
 	return (name.trim().split(/\s+/).slice(0, 2).map(function(n){ return n[0]; }).join('')).toUpperCase();
 }
-
+ 
 function _bitacoraIcon(path) {
 	return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="' + path + '"/></svg>';
 }
-
+ 
 /* ── Click en botón BITÁCORA ── */
 $(document).on('click', '.view_dataPAGOPROVEEbitacora', function () {
 	var idSubetufactura = $(this).attr('id');
-
+ 
 	// Resetear modal
 	$('#bitacoraSubLabel').html('Solicitud <b>#...</b>');
 	$('#bitacoraStrip').hide().html('');
@@ -784,14 +832,14 @@ $(document).on('click', '.view_dataPAGOPROVEEbitacora', function () {
 		'<span class="spinner-border spinner-border-sm me-2"></span>Cargando bitácora...</div>'
 	);
 	$('#modalBitacoraPago').modal('show');
-
+ 
 	$.ajax({
 		/* ── APUNTA AL CONTROLADOR DE VENTASOPERACIONES ── */
 		url: 'ventasoperaciones/clases/controlador_filtro.php',
 		method: 'POST',
 		dataType: 'json',
 		data: { action: 'bitacora_pago', idSubetufactura: idSubetufactura },
-
+ 
 		success: function (data) {
 			if (!data || data.length === 0) {
 				$('#bitacoraSubLabel').html('Solicitud <b>#' + idSubetufactura + '</b>');
@@ -800,7 +848,7 @@ $(document).on('click', '.view_dataPAGOPROVEEbitacora', function () {
 				);
 				return;
 			}
-
+ 
 			/* Cabecera */
 			var primerRegistro = data[0] || {};
 			var numeroSolicitud = primerRegistro.NUMERO_CONSECUTIVO_PROVEE || primerRegistro.numero_consecutivo_provee || idSubetufactura;
@@ -810,12 +858,12 @@ $(document).on('click', '.view_dataPAGOPROVEEbitacora', function () {
 				if (tipoTmp !== '') { tipoPago = tipoTmp; break; }
 			}
 			$('#bitacoraSubLabel').html('Solicitud <b>#' + numeroSolicitud + '</b>');
-
+ 
 			/* Strip informativo */
 			var strip = '';
 			if (tipoPago) strip += '<span><b>Tipo:</b> ' + tipoPago + '</span>';
 			if (strip !== '') $('#bitacoraStrip').html(strip).show();
-
+ 
 			/* Timeline */
 			var html = '<div class="bitacora-timeline-wrap"><div>';
 			for (var i = 0; i < data.length; i++) {
@@ -824,17 +872,17 @@ $(document).on('click', '.view_dataPAGOPROVEEbitacora', function () {
 				var usuario  = d.nombre_quien_actualizo || d.nombre_quien_ingreso || '-';
 				var isLast   = (i === data.length - 1);
 				var initials = _bitacoraInitials(usuario);
-
+ 
 				html +=
 					'<div style="display:flex;gap:12px;">' +
-
+ 
 						'<div style="display:flex;flex-direction:column;align-items:center;width:36px;">' +
 							'<div class="bitacora-dot" style="background:' + cfg.bg + ';border-color:' + cfg.border + ';color:' + cfg.border + '">' +
 								_bitacoraIcon(cfg.iconPath) +
 							'</div>' +
 							(!isLast ? '<div class="bitacora-line"></div>' : '') +
 						'</div>' +
-
+ 
 						'<div style="flex:1;padding-bottom:' + (isLast ? '0.25rem' : '1.1rem') + ';">' +
 							'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">' +
 								'<span class="badge-bitacora ' + cfg.cls + '">' + (d.tipo_movimiento || '-') + '</span>' +
@@ -846,13 +894,13 @@ $(document).on('click', '.view_dataPAGOPROVEEbitacora', function () {
 								'<small style="color:#6c757d;">' + usuario + '</small>' +
 							'</div>' +
 						'</div>' +
-
+ 
 					'</div>';
 			}
 			html += '</div></div>';
 			$('#bitacoraPagoBody').html(html);
 		},
-
+ 
 		error: function () {
 			$('#bitacoraSubLabel').html('Solicitud <b>#' + idSubetufactura + '</b>');
 			$('#bitacoraPagoBody').html(
@@ -861,5 +909,5 @@ $(document).on('click', '.view_dataPAGOPROVEEbitacora', function () {
 		}
 	});
 });
-
+ 
 </script>
