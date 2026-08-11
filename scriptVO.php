@@ -1,7 +1,7 @@
 <?php
 /*
 NOMBRE:scriptVO.php
-fecha sandor: 21/ABRIL/2025
+fecha sandor: 21/ABRIL/2023
 fecha fatis : 05/JUNIO/2025
 */
 ?>
@@ -84,6 +84,11 @@ function file_explorer(name) {
     fileobj = document.getElementsByName(name)[0].files[0];
     ajax_file_upload1(fileobj, name);
   };
+}
+function limpiarInputFileVO(nombre) {
+
+  $('input[type="file"][name="' + nombre + '"]').val('');
+
 }
 
 function ajax_file_upload1(file_obj, nombre) {
@@ -219,6 +224,8 @@ function ajax_file_upload1(file_obj, nombre) {
         }
 
         $('#' + nombre).val(nombreArchivoGuardado);
+		  limpiarInputFileVO(nombre);
+
 		   $('#1' + nombre)
           .stop(true, true)
           .show()
@@ -348,7 +355,19 @@ function recargarTodosLosElementos() {
 
 $(document).ready(function () {
 
-  activarTarget(null);
+  // Si venimos de guardar/borrar un archivo, abrir target2 automáticamente
+  // en vez de ocultar todos los targets.
+  var abrirTarget2 = sessionStorage.getItem('abrirTarget2');
+  if (abrirTarget2 === '1') {
+    sessionStorage.removeItem('abrirTarget2');
+    activarTarget(2);
+    setTimeout(function () {
+      var el = document.getElementById('target2');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
+  } else {
+    activarTarget(null);
+  }
 
   var allNums = [];
   for (var n = 1; n <= 15; n++) allNums.push(n);
@@ -414,6 +433,8 @@ $(document).ready(function () {
     var $btn = $(this);
     if ($btn.prop('disabled')) return;
     $btn.prop('disabled', true);
+   ['ADJUNTAR_FACTURA_XML', 'ADJUNTAR_FACTURA_PDF'].forEach(limpiarInputFileVO);
+
 
     var formData = new FormData($('#ventasoperacionesform')[0]);
 
@@ -428,12 +449,10 @@ $(document).ready(function () {
     }).done(function (data) {
       var respuesta = $.trim(data).replace(/[\r\n\t]/g, '');
       if (respuesta.indexOf('Ingresado') !== -1 || respuesta.indexOf('Actualizado') !== -1) {
-        $('#mensajeventasoperaciones').html('<span id="ACTUALIZADO">Ingresado</span>').fadeIn().delay(3000).fadeOut();
-        limpiarFormularioVO();
-        recargarElemento('#resettabla');
-        recargarElemento('#reset_totales');
-        $btn.prop('disabled', false);
-        setTimeout(function () { guardarYIrATarget2(); }, 600);
+        // Marcamos que al recargar la página debe abrirse target2 automáticamente
+        sessionStorage.setItem('abrirTarget2', '1');
+        location.reload();
+        return;
       } else {
         var dataLimpia = data
           .replace(/5\^\^/g, '')
