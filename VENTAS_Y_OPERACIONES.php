@@ -1,6 +1,6 @@
 <?php
 /*
-fecha sandor: 21/ABRIL/2025
+fecha sandor: 21/ABRIL/2023
 fecha fatis : 01/MAYO/2025
 */
 ?>
@@ -635,7 +635,8 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_FACTURA_PD
 				 
 				 
 				 
-				  <input type="hidden" name="ID_RELACIONADO" value="NUMERO_CONSECUTIVO_PROVEE">
+				    <input type="hidden" name="ID_RELACIONADO" value="<?php echo htmlspecialchars($NUMERO_CONSECUTIVO_PROVEE, ENT_QUOTES, 'UTF-8'); ?>">
+
 
                  <tr style="background: #d2faf1"> 
   <th scope="row"> <label  style="width:300px" for="validationCustom03" class="form-label"><span 

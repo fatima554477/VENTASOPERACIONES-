@@ -1,7 +1,7 @@
 <?php
 /*
 nombre:controladorVO.php
-fecha sandor: 21/ABRIL/2024
+fecha sandor: 21/ABRIL/2023
 fecha fatis : 16/04/2026
 */
 ?>
@@ -19,6 +19,46 @@ include_once (__ROOT1__."/ventasoperaciones/class.epcinnVO.php");
 $ventasoperaciones= NEW accesoclase();
 $conexion = NEW colaboradores();                            
 $conexion2 = new herramientas();
+
+// Correlaciona los eventos de una petición sin registrar el UUID en claro.
+
+$requestIdVO = bin2hex(random_bytes(16));
+
+header('X-Request-ID: '.$requestIdVO);
+
+$trazaVO = static function($evento, array $datos = array()) use ($requestIdVO) {
+
+    $registro = array(
+
+        'timestamp_utc' => gmdate('c'),
+
+        'request_id' => $requestIdVO,
+
+        'user_id' => isset($_SESSION['idem']) ? (string)$_SESSION['idem'] : '',
+
+        'endpoint' => basename(__FILE__),
+
+        'event' => (string)$evento
+
+    );
+
+    foreach(array('payment_id', 'provider_id', 'numero_consecutivo_provee',
+
+        'numero_evento', 'operation', 'result') as $campo){
+
+        if(array_key_exists($campo, $datos)){ $registro[$campo] = (string)$datos[$campo]; }
+
+    }
+
+    if(isset($datos['uuid']) && trim((string)$datos['uuid']) !== ''){
+
+        $registro['uuid_sha256'] = hash('sha256', strtoupper(trim((string)$datos['uuid'])));
+
+    }
+
+    error_log('[VENTAS_OPERACIONES] '.json_encode($registro, JSON_UNESCAPED_SLASHES));
+
+};
 
 $hiddenVENTASOPERACIONES = isset($_POST["hiddenVENTASOPERACIONES"])?$_POST["hiddenVENTASOPERACIONES"]:"";
 $borraventasoperaciones = isset($_POST["borraventasoperaciones"])?$_POST["borraventasoperaciones"]:"";
@@ -271,6 +311,8 @@ $regreso               = [];
 $idwebc                = '';
 
 if ($subidaFacturaXML) {
+	 $trazaVO('xml_upload_received');
+
 
     $ADJUNTAR_FACTURA_XML2 = $ventasoperaciones->solocargartemp('ADJUNTAR_FACTURA_XML');
 
@@ -295,6 +337,13 @@ if ($subidaFacturaXML) {
 
     $url    = __ROOT1__ . '/includes/archivos/' . $ADJUNTAR_FACTURA_XML2;
     $regreso = $conexion2->lectorxml($url);
+	
+    if(isset($regreso['UUID'])){
+
+        $trazaVO('xml_parsed', array('uuid' => $regreso['UUID'], 'result' => 'ok'));
+
+    }
+
 
     // ── XML vacío o sin UUID ──────────────────────────────────────────────
     if (empty($regreso) || !isset($regreso['UUID']) || trim($regreso['UUID']) === '') {
@@ -391,7 +440,7 @@ if ($IPventasoperar != '' && $hayAlgunaSubida) {
         if ($ETQIETA == 'ADJUNTAR_FACTURA_XML' && $subidaFacturaXML) {
 
             $ADJUNTAR_FACTURA_XML = $ADJUNTAR_FACTURA_XML2;
-            $ventasoperaciones->reemplazarAdjuntoFacturaUnico('ADJUNTAR_FACTURA_XML', $IPventasoperar, $idPROV, $ADJUNTAR_FACTURA_XML, $idem1);
+           
             $ventasoperaciones->delete_02XML($IPventasoperar);
 
             $url = __ROOT1__ . '/includes/archivos/' . $ADJUNTAR_FACTURA_XML;
@@ -416,6 +465,12 @@ if ($IPventasoperar != '' && $hayAlgunaSubida) {
                 $resultado = $ventasoperaciones->VALIDA02XMLUUID($regreso['UUID'], $IPventasoperar);
 
                 if ($resultado == 'S') {
+					     // Reemplazar solamente después de validar el UUID nuevo.
+
+                    $ventasoperaciones->reemplazarAdjuntoFacturaUnico('ADJUNTAR_FACTURA_XML', $IPventasoperar, $idPROV, $ADJUNTAR_FACTURA_XML, $idem1);
+
+                    $trazaVO('xml_associated', array('payment_id' => $IPventasoperar, 'provider_id' => $idPROV, 'uuid' => $regreso['UUID'], 'result' => 'ok'));
+
                     echo $ADJUNTAR_FACTURA_XML . '^^' . $regreso['UUID'];
                     ob_start();
                     $ventasoperaciones->guardarxmlDB2($IPventasoperar, $idPROV, '02XML', $url);
