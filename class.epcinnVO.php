@@ -3,7 +3,7 @@
 nombre:class.epecinnVO.php
 clase EPC INNOVA
 CREADO : 10/mayo/2023
-fecha sandor: 21/ABRIL/2023
+fecha sandor: 21/ABRIL/2024
 fecha fatis : 16/04/2026
 
 */
@@ -673,16 +673,6 @@ class accesoclase extends colaboradores{
 		}
 
 		            $conn = $this->db();
-					// Revalidar al guardar: el estado pudo cambiar desde la precarga AJAX.
-
-			if(trim((string)$UUID) !== ''){
-
-				$validacionUUID = $this->VALIDA02XMLUUID($UUID, $IPventasoperar);
-
-				if($validacionUUID !== 'S'){ return $validacionUUID; }
-
-			}
-
 
     // ESCAPAR TEXTOS
 
@@ -922,10 +912,7 @@ class accesoclase extends colaboradores{
 
 	public function select_02XML(){
 		$conn = $this->db();
-			// El folio pertenece al pago, no al registro XML.
-
-		$variablequery = "SELECT MAX(CAST(NUMERO_CONSECUTIVO_PROVEE AS UNSIGNED)) AS id FROM 02SUBETUFACTURA";
-
+		$variablequery = "select id from 02XML order by id desc ";
 		$arrayquery = mysqli_query($conn,$variablequery);
 		$row = mysqli_fetch_array($arrayquery, MYSQLI_ASSOC);
 		return $row['id'];
@@ -950,8 +937,7 @@ public function VALIDA02XMLUUID($uuid, $ultimoIdActual = ''){
             02SUBETUFACTURA.NUMERO_CONSECUTIVO_PROVEE,
             02SUBETUFACTURA.NUMERO_EVENTO
         FROM 02XML
-          LEFT JOIN 02SUBETUFACTURA ON 02XML.ultimo_id = 02SUBETUFACTURA.id
-
+        INNER JOIN 02SUBETUFACTURA ON 02XML.ultimo_id = 02SUBETUFACTURA.id
         WHERE 02XML.UUID = '".$uuid."'".$whereSolicitudActual."
         ORDER BY 02XML.id DESC
         LIMIT 1");
@@ -961,7 +947,7 @@ public function VALIDA02XMLUUID($uuid, $ultimoIdActual = ''){
     if(!empty($row['id'])){
         $numero = !empty($row['NUMERO_CONSECUTIVO_PROVEE']) 
             ? $row['NUMERO_CONSECUTIVO_PROVEE'] 
-              : (!empty($row['idSolicitud']) ? $row['idSolicitud'] : $row['ultimo_id']);
+            : $row['idSolicitud'];
         $numeroEvento = isset($row['NUMERO_EVENTO']) 
             ? trim((string)$row['NUMERO_EVENTO']) 
             : '';
