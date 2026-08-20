@@ -1,16 +1,21 @@
 <?php
 /*
-nombre:controladorVO.php
 fecha sandor: 21/ABRIL/2024
 fecha fatis : 16/04/2026
 */
-?>
-
-<?php
     if(!isset($_SESSION))
-    { 
-        session_start(); 
+    {
+        session_start();
     }
+
+// Las cargas llegan directamente a este controlador por AJAX. Si la sesion
+// termino, no se debe aceptar el archivo ni continuar usando datos por defecto.
+if (!empty($_FILES) && (!isset($_SESSION['logeado']) || !isset($_SESSION['idem']))) {
+    http_response_code(401);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo 'SESION_EXPIRADA';
+    exit;
+}
 
 define('__ROOT1__', dirname(dirname(__FILE__)));
 include_once (__ROOT1__."/includes/error_reporting.php");

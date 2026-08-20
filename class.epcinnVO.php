@@ -3,7 +3,7 @@
 nombre:class.epecinnVO.php
 clase EPC INNOVA
 CREADO : 10/mayo/2023
-fecha sandor: 21/ABRIL/2024
+fecha sandor: 21/ABRIL/2023
 fecha fatis : 16/04/2026
 
 */

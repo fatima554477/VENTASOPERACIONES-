@@ -91,8 +91,27 @@ function limpiarInputFileVO(nombre) {
 
 }
 
+function mostrarErrorCargaArchivo(nombre, mensaje) {
+  $('#1' + nombre).html(
+    '<p style="color:red;font-weight:600;">⚠️ ' + mensaje + '</p>'
+  );
+  $('#mensajeADJUNTOCOL').html(
+    '<p style="color:red;font-weight:600;">⚠️ ' + mensaje + '</p>'
+  );
+  limpiarInputFileVO(nombre);
+  alert(mensaje);
+}
+
 function ajax_file_upload1(file_obj, nombre) {
   if (!file_obj) return;
+
+  if (navigator.onLine === false) {
+    mostrarErrorCargaArchivo(
+      nombre,
+      'NO HAY CONEXIÓN A INTERNET. El archivo no se cargó; verifica tu conexión e intenta nuevamente.'
+    );
+    return;
+  }
 
   if (nombre === 'ADJUNTAR_FACTURA_XML' || nombre === 'ADJUNTAR_FACTURA_PDF') {
     var tipo = nombre === 'ADJUNTAR_FACTURA_XML' ? 'XML' : 'PDF';
@@ -115,8 +134,16 @@ function ajax_file_upload1(file_obj, nombre) {
       $('#1' + nombre).html('<p style="color:green;"><span class="spinner-border spinner-border-sm"></span>&nbsp;Cargando archivo...</p>');
       $('#mensajeADJUNTOCOL').html('<p style="color:green;"><span class="spinner-border spinner-border-sm"></span>&nbsp;Cargando archivo...</p>');
     },
-    success: function (response) {
+     success: function (response) {
       var resp = $.trim(response);
+
+      if (resp === 'SESION_EXPIRADA') {
+        mostrarErrorCargaArchivo(
+          nombre,
+          'TU SESIÓN HA TERMINADO. El archivo no se cargó. Inicia sesión nuevamente e inténtalo de nuevo.'
+        );
+        return;
+      }
 
       // ── Archivo vacío (0 bytes) ─────────────────────────────────────────
       if (resp.indexOf('VACIO^^') === 0) {
@@ -247,10 +274,30 @@ function ajax_file_upload1(file_obj, nombre) {
         recargarElemento('#2' + nombre);
         recargarElemento('#resettabla');
       }
+    },
+    error: function (xhr, textStatus) {
+      var sesionExpirada = xhr.status === 401 || $.trim(xhr.responseText || '') === 'SESION_EXPIRADA';
+      var sinConexion = navigator.onLine === false || xhr.status === 0 || textStatus === 'timeout';
+
+      if (sesionExpirada) {
+        mostrarErrorCargaArchivo(
+          nombre,
+          'TU SESIÓN HA TERMINADO. El archivo no se cargó. Inicia sesión nuevamente e inténtalo de nuevo.'
+        );
+      } else if (sinConexion) {
+        mostrarErrorCargaArchivo(
+          nombre,
+          'NO HAY CONEXIÓN A INTERNET O SE INTERRUMPIÓ LA COMUNICACIÓN. El archivo no se cargó; verifica tu conexión e intenta nuevamente.'
+        );
+      } else {
+        mostrarErrorCargaArchivo(
+          nombre,
+          'NO FUE POSIBLE CARGAR EL ARCHIVO. Intenta nuevamente o contacta a soporte técnico.'
+        );
+      }
     }
   });
 }
-
 
 /* -------------------------------------------------------
    HELPER: recarga un elemento por selector
