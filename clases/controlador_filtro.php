@@ -965,6 +965,9 @@ $statusRechazado = isset($row["STATUS_RECHAZADO"]) ? $row["STATUS_RECHAZADO"] : 
 $numeroEventoRegistro = isset($row["NUMERO_EVENTO"]) ? strtoupper(trim((string)$row["NUMERO_EVENTO"])) : '';
 $tienePermisoVenta = $numeroEventoRegistro !== '' && isset($eventosAutorizadosVentas[$numeroEventoRegistro]);
 $esReembolso = isset($row["VIATICOSOPRO"]) && strtoupper(trim($row["VIATICOSOPRO"])) === 'REEMBOLSO';
+$tieneMotivoGasto = isset($row["MOTIVO_GASTO"]) && trim((string)$row["MOTIVO_GASTO"]) !== '';
+$fechaProgramacionPago = isset($row["FECHA_DE_PAGO"]) ? trim((string)$row["FECHA_DE_PAGO"]) : '';
+$tieneFechaProgramacionPago = $fechaProgramacionPago !== '' && $fechaProgramacionPago !== '0000-00-00';
 ?>
 <!-- VENTAS -->
 <td style="text-align:center; background:<?php echo ($row["STATUS_VENTAS"] == 'si') ? '#ceffcc' : '#e9d8ee'; ?>;"
@@ -972,8 +975,10 @@ $esReembolso = isset($row["VIATICOSOPRO"]) && strtoupper(trim($row["VIATICOSOPRO
     <input type="checkbox" style="width:30px;" class="form-check-input"
         id="STATUS_VENTAS<?php echo $row["02SUBETUFACTURAid"]; ?>"
         name="STATUS_VENTAS<?php echo $row["02SUBETUFACTURAid"]; ?>"
-        value="<?php echo $row["02SUBETUFACTURAid"]; ?>"
+       value="<?php echo $row["02SUBETUFACTURAid"]; ?>"
         data-permiso-principal="<?php echo $tienePermisoVenta ? 'si' : 'no'; ?>"
+        data-tiene-motivo-gasto="<?php echo $tieneMotivoGasto ? 'si' : 'no'; ?>"
+        data-tiene-fecha-programacion-pago="<?php echo $tieneFechaProgramacionPago ? 'si' : 'no'; ?>"
         onclick="STATUS_VENTAS(<?php echo $row["02SUBETUFACTURAid"]; ?>)"
         <?php
         $atributosVentas = [];

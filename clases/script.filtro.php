@@ -470,19 +470,23 @@ function cerrarModalRechazoPago(){
 }
  
 function STATUS_VENTAS(VENTAS_id){
-	var checkBox = document.getElementById("STATUS_VENTAS"+VENTAS_id);
- 
+var checkBox = document.getElementById("STATUS_VENTAS"+VENTAS_id);
+
 	if(checkBox.checked){
-		// Antes de autorizar por VENTAS, confirmar que el registro tiene los datos mínimos capturados.
-		var confirmarAutorizacion = confirm(
-			"Antes de autorizar, verifica que el registro tenga capturados los siguientes datos:\n\n" +
-			"- MOTIVO DEL GASTO\n" +
-			"- FECHA DE PROGRAMACIÓN DEL PAGO\n\n" +
-			"¿Deseas continuar con la autorización?"
-		);
- 
-		if(!confirmarAutorizacion){
+		var datosFaltantes = [];
+		if(checkBox.getAttribute('data-tiene-motivo-gasto') !== 'si'){
+			datosFaltantes.push('MOTIVO DEL GASTO');
+		}
+		if(checkBox.getAttribute('data-tiene-fecha-programacion-pago') !== 'si'){
+			datosFaltantes.push('FECHA DE PROGRAMACIÓN DEL PAGO');
+		}
+
+		if(datosFaltantes.length > 0){
 			checkBox.checked = false;
+			alert(
+				'No se puede autorizar por VENTAS. Primero ingresa:\n\n- ' +
+				datosFaltantes.join('\n- ')
+			);
 			return;
 		}
 	}
