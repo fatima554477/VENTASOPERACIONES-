@@ -420,7 +420,8 @@ if($action == "ajax"){
 <?php } ?>
 <?php if($database->plantilla_filtro($nombreTabla,"OBSERVACIONES_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#c9e8e8;text-align:center;width:700px;min-width:700px;max-width:700px;">OBSERVACIONES 1</th>
 <?php } ?>
-<?php if($database->plantilla_filtro($nombreTabla,"ADJUNTAR_ARCHIVO_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#c9e8e8;text-align:center">ARCHIVO RELACIONADO A ESTE GASTO:</th>
+<?php if($database->plantilla_filtro($nombreTabla,"ADJUNTAR_ARCHIVO_1",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#c9e8e8;text-align:center">ARCHIVO RELACIONADO A ESTE GASTO <br>o 
+EVIDENCIA DEL SERVICIO OTORGADO:</th>
 <?php } ?>
 <?php if($database->plantilla_filtro($nombreTabla,"COMPLEMENTOS_PAGO_XML",$altaeventos,$DEPARTAMENTO)=="si"){ ?><th style="background:#c9e8e8;text-align:center">COMPLEMENTOS DE PAGO (FORMATO XML)</th>
 <?php } ?>
@@ -892,9 +893,9 @@ $complementoPdf = '';
 
 <?php
 if (!function_exists('renderDocumentLinks')) {
-	function renderDocumentLinks($rawValue) {
-		if (!isset($rawValue) || trim((string)$rawValue) === '') return '';
-		$links = '';
+	function documentFilePaths($rawValue) {
+		if (!isset($rawValue) || trim((string)$rawValue) === '') return array();
+		$filePaths = array();
 		$rawValue = html_entity_decode((string)$rawValue);
 		$chunks = preg_split('/\s*,\s*/', $rawValue, -1, PREG_SPLIT_NO_EMPTY);
 		$files = [];
@@ -929,14 +930,88 @@ if (!function_exists('renderDocumentLinks')) {
 				$filePath = implode('/', $partesPath);
 				if ($isAbsolutePath) $filePath = '/' . $filePath;
 			}
-			$links .= '<a href="' . $filePath . '" target="_blank">Ver!</a><br/>';
+			$filePaths[] = $filePath;
+		}
+		return $filePaths;
+	}
+
+	function renderDocumentLinks($rawValue) {
+		$links = '';
+		foreach ((array)documentFilePaths($rawValue) as $filePath) {
+			$links .= '<a href="' . htmlspecialchars($filePath, ENT_QUOTES, 'UTF-8') . '" target="_blank">Ver!</a><br/>';
 		}
 		return $links;
+	}
+
+	// Devuelve la extensión del archivo (sin query string / fragment), en minúsculas
+	function attachmentExtension($filePath) {
+		$clean = preg_replace('/[?#].*$/', '', $filePath);
+		$ext = pathinfo($clean, PATHINFO_EXTENSION);
+		return strtolower($ext);
+	}
+
+	// Construye el bloque HTML para un solo archivo dentro de la galería,
+	// según el tipo detectado por su extensión.
+	function renderAttachmentPreviewBlock($filePath) {
+		$safePath = htmlspecialchars($filePath, ENT_QUOTES, 'UTF-8');
+		$ext = attachmentExtension($filePath);
+
+		$imageExts = array('jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp');
+		$iframeExts = array('pdf', 'txt'); // el navegador puede renderizarlos directo en un iframe
+
+		if (in_array($ext, $imageExts, true)) {
+			return '<figure><a href="' . $safePath . '" target="_blank"><img src="' . $safePath . '" alt="Foto adjunta"></a></figure>';
+		}
+
+		if (in_array($ext, $iframeExts, true)) {
+			$label = ($ext === 'pdf') ? 'Vista previa PDF' : 'Vista previa TXT';
+			return '<figure class="preview-doc">'
+				. '<iframe src="' . $safePath . '" title="' . $label . '"></iframe>'
+				. '<figcaption><a href="' . $safePath . '" target="_blank">' . $label . ' &middot; Abrir en pestaña nueva</a></figcaption>'
+				. '</figure>';
+		}
+
+		// Cualquier otro formato (docx, xlsx, zip, etc.): sin vista previa embebida, solo descarga
+		$extLabel = $ext !== '' ? strtoupper($ext) : 'ARCHIVO';
+		return '<figure class="preview-file">'
+			. '<div class="file-icon">' . htmlspecialchars($extLabel, ENT_QUOTES, 'UTF-8') . '</div>'
+			. '<figcaption><a href="' . $safePath . '" target="_blank">Descargar / abrir</a></figcaption>'
+			. '</figure>';
+	}
+
+	function renderPhotoGalleryLink($rawValues) {
+		$filePaths = array();
+		foreach ($rawValues as $rawValue) {
+			$filePaths = array_merge($filePaths, (array)documentFilePaths($rawValue));
+		}
+		$filePaths = array_values(array_unique($filePaths));
+		if (empty($filePaths)) return '';
+
+		$galleryItems = '';
+		foreach ($filePaths as $filePath) {
+			$galleryItems .= renderAttachmentPreviewBlock($filePath);
+		}
+
+		$galleryHtml = '<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Archivos adjuntos</title><style>'
+			. 'body{font-family:Arial,sans-serif;margin:24px;background:#f4f4f4}h1{text-align:center}'
+			. '.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}'
+			. 'figure{margin:0;padding:12px;background:#fff;border-radius:8px;box-shadow:0 2px 8px #0002}'
+			. 'img{display:block;width:100%;height:auto;object-fit:contain}'
+			. '.preview-doc iframe{width:100%;height:320px;border:1px solid #ddd;border-radius:4px}'
+			. '.preview-file{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;text-align:center}'
+			. '.file-icon{font-weight:bold;font-size:14px;color:#666;background:#eee;border-radius:6px;padding:24px 12px;margin-bottom:8px;width:100%}'
+			. 'figcaption{margin-top:8px;text-align:center;font-size:14px}'
+			. '</style></head><body><h1>Archivos adjuntos</h1><div class="gallery">' . $galleryItems . '</div></body></html>';
+		$encodedGallery = base64_encode($galleryHtml);
+		$onclick = "var galeria=window.open('','_blank');if(!galeria){return true;}galeria.document.write(atob('" . $encodedGallery . "'));galeria.document.close();return false;";
+
+		return '<a href="' . htmlspecialchars($filePaths[0], ENT_QUOTES, 'UTF-8') . '" target="_blank" onclick="'
+			. htmlspecialchars($onclick, ENT_QUOTES, 'UTF-8') . '">Visualizar archivos</a>';
 	}
 }
 
 $ADJUNTAR_FACTURA_PDF = ''; $ADJUNTAR_FACTURA_XML = ''; $ADJUNTAR_COTIZACION = ''; $CONPROBANTE_TRANSFERENCIA = '';
-$ADJUNTAR_ARCHIVO_1 = ''; $COMPLEMENTOS_PAGO_PDF = ''; $COMPLEMENTOS_PAGO_XML = ''; $ACUSE_CANCELACION = '';
+$ADJUNTAR_ARCHIVO_1 = ''; $archivosAdjuntos1 = array(); $COMPLEMENTOS_PAGO_PDF = ''; $COMPLEMENTOS_PAGO_XML = ''; $ACUSE_CANCELACION = '';
 $querycontrasDOCTOS = $database->Listado_subefacturaDOCTOS($row['02SUBETUFACTURAid']);
 while ($rowDOCTOS = mysqli_fetch_array($querycontrasDOCTOS)) {
 	$ADJUNTAR_FACTURA_PDF      .= renderDocumentLinks($rowDOCTOS["ADJUNTAR_FACTURA_PDF"]);
@@ -946,10 +1021,10 @@ while ($rowDOCTOS = mysqli_fetch_array($querycontrasDOCTOS)) {
 	$COMPLEMENTOS_PAGO_PDF     .= renderDocumentLinks($rowDOCTOS["COMPLEMENTOS_PAGO_PDF"]);
 	$COMPLEMENTOS_PAGO_XML     .= renderDocumentLinks($rowDOCTOS["COMPLEMENTOS_PAGO_XML"]);
 	$ACUSE_CANCELACION         .= renderDocumentLinks($rowDOCTOS["ACUSE_CANCELACION"]);
-	$ADJUNTAR_ARCHIVO_1        .= renderDocumentLinks($rowDOCTOS["ADJUNTAR_ARCHIVO_1"]);
+$archivosAdjuntos1[]        = $rowDOCTOS["ADJUNTAR_ARCHIVO_1"];
 }
+$ADJUNTAR_ARCHIVO_1 = renderPhotoGalleryLink($archivosAdjuntos1);
 ?>
-
 <!-- SOLICITANTE -->
 <td style="text-align:center; background:#ceffcc">
 	<input type="checkbox" style="width:30px;" checked="checked" disabled="disabled" class="form-check-input"
