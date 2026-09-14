@@ -267,7 +267,9 @@ function ajax_file_upload1(file_obj, nombre) {
             '#TIPO_DE_MONEDA2', '#FECHA_DE_PAGO2', '#NUMERO_CONSECUTIVO_PROVEE2',
             '#2MONTO_FACTURA', '#2MONTO_DEPOSITAR', '#2PFORMADE_PAGO',
             '#2TImpuestosRetenidosIVA', '#2TImpuestosRetenidosISR',
-            '#2descuentos', '#2IVA', '#NOMBRE_COMERCIAL2'
+                        '#2descuentos', '#2IVA', '#NOMBRE_COMERCIAL2',
+
+            '#CALIFICACION_PROVEEDOR2'
           ];
           camposXML.forEach(recargarElemento);
         }
@@ -381,7 +383,8 @@ function recargarTodosLosElementos() {
       '2ADJUNTAR_COTIZACION', '2CONPROBANTE_TRANSFERENCIA', '2ADJUNTAR_ARCHIVO_1',
       'RAZON_SOCIAL2', 'RFC_PROVEEDOR2', 'CONCEPTO_PROVEE2',
       'TIPO_DE_MONEDA2', 'FECHA_DE_PAGO2', 'NUMERO_CONSECUTIVO_PROVEE2',
-      'NOMBRE_COMERCIAL2', '2MONTO_FACTURA', '2MONTO_DEPOSITAR',
+           'NOMBRE_COMERCIAL2', 'CALIFICACION_PROVEEDOR2', '2MONTO_FACTURA', '2MONTO_DEPOSITAR',
+
       '2PFORMADE_PAGO', '2TImpuestosRetenidosIVA', 'TImpuestosRetenidosIVA',
       '2TImpuestosRetenidosISR', 'TImpuestosRetenidosISR',
       '2descuentos', 'descuentos', '2IVA', 'IVA',

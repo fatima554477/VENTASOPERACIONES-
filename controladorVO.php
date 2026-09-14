@@ -45,6 +45,24 @@ if($q==true){
 
 $action = isset($_POST["action"])?$_POST["action"]:"";
 
+
+if($action === 'calificacion_proveedor'){
+
+    header('Content-Type: application/json; charset=utf-8');
+
+    $idProveedor = isset($_POST['idProveedor']) ? $_POST['idProveedor'] : '';
+
+    $rfcProveedor = isset($_POST['rfcProveedor']) ? $_POST['rfcProveedor'] : '';
+
+    echo json_encode($ventasoperaciones->obtenerCalificacionProveedor($idProveedor, $rfcProveedor));
+
+    exit;
+
+}
+
+
+
+
 if($action=='ultimopago'){
     $NUMERO_EVENTO = isset($_POST["NUMERO_EVENTO"])?$_POST["NUMERO_EVENTO"]:"";
     echo $resultado = $ventasoperaciones->ultimopago($NUMERO_EVENTO);

@@ -3,7 +3,7 @@
 nombre:class.epecinnVO.php
 clase EPC INNOVA
 CREADO : 10/mayo/2023
-fecha sandor: 21/ABRIL/2023
+fecha sandor: 21/ABRIL/2024
 fecha fatis : 16/04/2026
 
 */
@@ -1151,6 +1151,81 @@ $variablequery = "SELECT
 		$_SESSION['P_NOMBRE_COMERCIAL_EMPRESA12'] = $row2['P_NOMBRE_COMERCIAL_EMPRESA'];
 		return $row2['idusuario'].'^^^^'.$row2['P_NOMBRE_COMERCIAL_EMPRESA'];
 	}
+/**
+
+	 * Devuelve la clasificación y la última calificación registrada para un proveedor.
+
+	 * La clasificación vive en 02usuarios y la calificación sigue el mismo criterio
+
+	 * de la carpeta calificacion: el registro con el id más reciente.
+
+	 */
+
+	public function obtenerCalificacionProveedor($idProveedor = '', $rfc = ''){
+
+		$conn = $this->db();
+
+		$idProveedor = (int) $idProveedor;
+
+		$rfc = trim((string) $rfc);
+
+
+
+		if($idProveedor < 1 && $rfc !== ''){
+
+			$rfcSeguro = mysqli_real_escape_string($conn, $rfc);
+
+			$resultadoProveedor = mysqli_query($conn,
+
+				"SELECT idRelacion FROM 02direccionproveedor1 WHERE P_RFC_MTDP = '".$rfcSeguro."' LIMIT 1");
+
+			$proveedor = $resultadoProveedor ? mysqli_fetch_array($resultadoProveedor, MYSQLI_ASSOC) : null;
+
+			$idProveedor = $proveedor ? (int) $proveedor['idRelacion'] : 0;
+
+		}
+
+
+
+		if($idProveedor < 1){
+
+			return array('encontrado' => false, 'clasificacion' => '', 'calificacion' => '');
+
+		}
+
+
+
+		$resultado = mysqli_query($conn, "SELECT usuarios.EVALUACION,
+
+			(SELECT ADJUNTO_CALIFICACION FROM 02CALIFICACION
+
+			 WHERE idRelacion = usuarios.id ORDER BY id DESC LIMIT 1) AS CALIFICACION
+
+			FROM 02usuarios AS usuarios WHERE usuarios.id = '".$idProveedor."' LIMIT 1");
+
+		$row = $resultado ? mysqli_fetch_array($resultado, MYSQLI_ASSOC) : null;
+
+
+
+		$presentacionesClasificacion = array(
+			'DE_CASA' => 'DE CASA',
+			'SEGUNDA_OPCION' => 'SEGUNDA OPCIÓN',
+			'TERCERA_OPCION' => 'TERCERA OPCIÓN',
+			'VETADO' => 'VETADO'
+		);
+		$evaluacion = $row ? trim((string) $row['EVALUACION']) : '';
+
+		return array(
+			'encontrado' => (bool) $row,
+			'clasificacion' => isset($presentacionesClasificacion[$evaluacion])
+				? $presentacionesClasificacion[$evaluacion] : 'SIN CLASIFICAR',
+			'calificacion' => $row && trim((string) $row['CALIFICACION']) !== '' ? $row['CALIFICACION'] : 'SIN CALIFICAR'
+
+		);
+
+	}
+
+
 	public function reemplazarAdjuntoFacturaUnico($campo, $IPventasoperar, $idPROV, $nombreArchivo, $idUsuario){
 
 		$conn = $this->db();
