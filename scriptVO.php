@@ -61,6 +61,71 @@ fecha fatis : 05/JUNIO/2025
 <script>
 
 /* -------------------------------------------------------
+   VIGILANCIA DE SESION
+   La consulta es de solo lectura para no renovar la sesion por mantener
+   esta pantalla abierta. Si el servidor informa que termino, se regresa
+   al acceso aunque el usuario no haya realizado ninguna accion.
+------------------------------------------------------- */
+(function vigilarSesionVO() {
+  var consultaEnCurso = false;
+  var redireccionando = false;
+  var urlEstadoSesion = 'ventasoperaciones/estado_sesion.php';
+  var urlAcceso = 'index.php?salir=1';
+
+  function salirPorSesionTerminada() {
+    if (redireccionando) {
+      return;
+    }
+
+    redireccionando = true;
+    window.location.replace(urlAcceso);
+  }
+
+  function consultarSesion() {
+    if (consultaEnCurso || redireccionando || navigator.onLine === false) {
+      return;
+    }
+
+    consultaEnCurso = true;
+
+    fetch(urlEstadoSesion, {
+      method: 'GET',
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(function (respuesta) {
+      if (respuesta.status === 401 || respuesta.status === 403) {
+        salirPorSesionTerminada();
+        return null;
+      }
+
+      if (!respuesta.ok) {
+        return null;
+      }
+
+      return respuesta.json();
+    }).then(function (datos) {
+      if (datos && datos.sesionActiva !== true) {
+        salirPorSesionTerminada();
+      }
+    }).catch(function () {
+      // Una falla de red no equivale a cerrar sesion. Se reintentara para no
+      // expulsar al usuario por una interrupcion temporal de conectividad.
+    }).then(function () {
+      consultaEnCurso = false;
+    });
+  }
+
+  window.setInterval(consultarSesion, 15000);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) {
+      consultarSesion();
+    }
+  });
+  window.addEventListener('focus', consultarSesion);
+})();
+
+/* -------------------------------------------------------
    CARGA DE ARCHIVOS (DRAG & DROP + FILE EXPLORER)
 ------------------------------------------------------- */
 var fileobj;

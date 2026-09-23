@@ -2,15 +2,15 @@
 
 <div id="content">     
 			<hr/>
-		<strong>	  <p class="mb-0 text-uppercase" ><img src="includes/contraer31.png" id="mostrar5" style="cursor:pointer;"/>
-<img src="includes/contraer41.png" id="ocultar5" style="cursor:pointer;"/>&nbsp;&nbsp;&nbsp; FILTRO PAGO APROVEEDORES-VYO</p></strong></div>
+<strong><p class="mb-0 text-uppercase" ><img src="includes/contraer31.png" onclick="load(1);" id="mostrar2" style="cursor:pointer;"/>
+<img src="includes/contraer41.png" id="ocultar2" style="cursor:pointer;"/>&nbsp;&nbsp;&nbsp; FILTRO PAGO APROVEEDORES-VYO</p></strong></div>
 
 
 <div  id="mensajefiltro"></div>
 <div  id="pasarpagado2"></div>
  </div>
 							
-	        <div id="target5" style="display:block;" class="content2">
+	        <div id="target2" style="display:block;" class="content2">
         <div class="card">
           <div class="card-body">
       
@@ -21,7 +21,7 @@
 <tr>
 <td width="30%" align="center">
 	<span>Mostrar</span>
-	<select  class="form-select mb-3" id="per_page" onchange="load2(1);">
+	<select  class="form-select mb-3" id="per_page" onchange="load(1);">
 		<option value="7" <?php if(!empty($_REQUEST['per_page'])){echo 'selected';} ?>>7</option>
 		<option value="5" <?php if($_REQUEST['per_page']=='5'){echo 'selected';} ?>>5</option>
 		<option value="10" <?php if($_REQUEST['per_page']=='10'){echo 'selected';} ?>>10</option>
@@ -33,26 +33,23 @@
 </td>
 
 
-<td width="30%" align="center">					
-	<button  class="btn btn-sm btn-outline-success px-5" type="button" onclick="load2(1);" >BUSCAR/RESET</button>
+				<td width="30%" align="center">
+    <button class="btn btn-sm btn-outline-success px-5" type="button" onclick="load(1);">BUSCAR</button>
+    &nbsp;
+    <button class="btn btn-sm btn-outline-danger px-4" type="button" onclick="LIMPIAR();">🧹 LIMPIAR FILTRO</button>
+		   &nbsp;
+
+    <button class="btn btn-sm btn-outline-primary px-4" type="button" onclick="exportarExcelFiltrado();">📊 Exportar a Excel</button>
 </td>
 
 <td width="30%" align="center">
 	<span>PLANTILLA</span>
 	
-	<!--<select  class="form-select mb-3" id="DEPARTAMENTO2WE" onchange="load(1);">
-	
-	<option value="DEFAULT" <?php if($_SESSION['DEPARTAMENTO']=='DEFAULT'){echo 'selected';} ?>>DEFAULT</option>
-	
-	<option value="SANDOR" <?php if($_SESSION['DEPARTAMENTO']=='SANDOR'){echo 'selected';} ?>>SANDOR</option>
-	
-	<option value="SANDOR3" <?php if($_SESSION['DEPARTAMENTO']=='SANDOR3'){echo 'selected';} ?>>SANDOR3</option>
 
-	</select>-->
 
 
 <?php
-$encabezado = '<select class="form-select mb-3" id="DEPARTAMENTO2WE" required onchange="load2(1);">
+$encabezado = '<select class="form-select mb-3" id="DEPARTAMENTO2WE" required onchange="load(1);">
                 <option value="">SELECCIONA UNA OPCIÓN</option>';
 $options = '';
 
@@ -88,7 +85,7 @@ echo $encabezado . $options . '</select>';
         <p><strong style="background:#ffb6c1"> ROSA:</strong> 
         FORMAS DE PAGO DIFERENTES A (03 TRANSFERENCIA ELECTRONICA DE FONDOS)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
        <strong style="background:#fdfe87"> AMARILLO:</strong> 
-        PAGO A PROVEEDOR SIN XML
+        PAGO A PROVEEDOR SIN XML&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong style="background:#73FCFF"> TURQUESA:</strong>  MONEDA DIFERENTE A MXN (PESO MEXICANO) </p>
         </p>
 
 </tr>
