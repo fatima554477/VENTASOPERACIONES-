@@ -841,6 +841,7 @@ EVIDENCIA DEL SERVICIO OTORGADO:</th>
 			$nombreComercialActual = isset($row['NOMBRE_COMERCIAL']) ? trim($row['NOMBRE_COMERCIAL']) : '';
 			$identificadorProveedor = $nombreComercialActual !== '' ? $nombreComercialActual : (isset($row['RFC_PROVEEDOR']) ? trim($row['RFC_PROVEEDOR']) : '');
 			$nombreComercialMostrar = $nombreComercialActual !== '' ? $nombreComercialActual : $identificadorProveedor;
+/////pasar 1////
 
 $complementoPdf = '';
 			$complementoXml = '';
@@ -880,8 +881,10 @@ $complementoPdf = '';
 				$fondo_existe_xml2 = "style='background-color:#fdfe87'";
 			}
 		?>
+		
 
 <tr <?php echo $fondo_existe_xml2; ?>>
+///////termina pasar1 //////////
 <td>
 	<input type="checkbox" class="checkbox" data-id="<?php echo $row['02SUBETUFACTURAid']; ?>"
 		style="transform: scale(1.1); cursor: pointer;"
@@ -890,7 +893,7 @@ $complementoPdf = '';
 			else { fila.style.filter = 'none'; localStorage.removeItem('checkbox_' + id); }">
 </td>
 <td <?php echo $fondo_existe_xml; ?>><?php echo $row['02SUBETUFACTURAid']; $colspan += 1; ?></td>
-
+//////////pasar2//////////
 <?php
 if (!function_exists('renderDocumentLinks')) {
 	function documentFilePaths($rawValue) {
@@ -1025,6 +1028,7 @@ $archivosAdjuntos1[]        = $rowDOCTOS["ADJUNTAR_ARCHIVO_1"];
 }
 $ADJUNTAR_ARCHIVO_1 = renderPhotoGalleryLink($archivosAdjuntos1);
 ?>
+////////termina pasar2//////////////
 <!-- SOLICITANTE -->
 <td style="text-align:center; background:#ceffcc">
 	<input type="checkbox" style="width:30px;" checked="checked" disabled="disabled" class="form-check-input"
@@ -1595,7 +1599,7 @@ if ($fotoEstadoProvee==2 or $fotoEstadoProvee=='' or $fotoEstadoProvee==1) {
 		id="<?php echo $row['02SUBETUFACTURAid']; ?>"
 		class="btn btn-outline-primary btn-xs view_dataPAGOPROVEEbitacora" />
 </td>
-
+///////////////////pasar3//////////////////////////////
 
 <!-- MODIFICAR -->
 <td>
@@ -1631,7 +1635,7 @@ $ocultarSubirF      = ($esViaticoEspecial && $STATUS_DE_PAGO_row === 'PAGADO');
 	<?php endif; ?>
 <?php endif; ?>
 </td>
-
+////////////////////////termina pasar3///////////////////////
 <!-- BORRAR -->
 <td>
 <?php if ($p_pagoprov_borrar) { ?>
