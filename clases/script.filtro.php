@@ -781,7 +781,7 @@ function exportarExcelFiltrado(){
  
 	// Enviar en la misma ventana fuerza la descarga y evita bloqueos de pop-up o pestañas en blanco.
  
-	var form = $('<form>', { method: 'POST', action: 'pagoproveedores/clases3/exportar_excel.php', target: '_self' });
+    var form = $('<form>', { method: 'POST', action: 'ventasoperaciones/clases/exportar_excel.php', target: '_self' });
  
 	$.each(parametros, function(key, value){
  
@@ -789,19 +789,14 @@ function exportarExcelFiltrado(){
  
 	});
  
-	$('body').append(form);
- 
-	form.trigger('submit');
- 
-	form.remove();
+$('body').append(form);
+
+
+	form.get(0).submit();
+	setTimeout(function(){ form.remove(); }, 1000);
  
 }
-/* ─────────────────────────────────────────────────────────────────────
-   BITÁCORA TIMELINE — HELPERS
-   Reutiliza la misma lógica visual que pagoproveedores.
-   La URL apunta a ventasoperaciones/clases/controlador_filtro.php
-   que tiene el endpoint action=bitacora_pago.
-   ───────────────────────────────────────────────────────────────────── */
+
  
 function _bitacoraBadgeCfg(tipo) {
 	var t = (tipo || '').toLowerCase();
