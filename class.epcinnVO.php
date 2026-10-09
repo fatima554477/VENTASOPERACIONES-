@@ -11,6 +11,8 @@ fecha fatis : 16/04/2026
 	require __ROOT3__."/includes/class.epcinn.php";	
 	
 	
+require_once __ROOT3__."/includes/comprobante_pago_email.php";
+
 class accesoclase extends colaboradores{
 
 	private function nombre_usuario_bitacora(){
@@ -663,9 +665,12 @@ class accesoclase extends colaboradores{
 		$folio, $LugarExpedicion, $rfcE, $nombreE,
 		$regimenE, $rfcR, $nombreR, $UsoCFDI,
 		$DomicilioFiscalReceptor, $RegimenFiscalReceptor, $UUID, $TImpuestosRetenidos,
-		$TImpuestosTrasladados, $TuaTotalCargos, $Descuento, $Propina, $TUA, $actualiza)
+		$TImpuestosTrasladados, $TuaTotalCargos, $Descuento, $Propina, $TUA, $actualiza, $email_enviacomprobante = null)
 	{
-		// Sanitizar montos
+		if (!ComprobantePagoEmail::validarEmail($email_enviacomprobante)) {
+            return 'Escribe un email válido para el envío del comprobante de pago.';
+        }
+        // Sanitizar montos
 		foreach(array('MONTO_TOTAL_COTIZACION_ADEUDO','MONTO_DEPOSITAR','MONTO_FACTURA',
 			'MONTO_PROPINA','MONTO_DEPOSITADO','MONTO_DE_COMISION','PENDIENTE_PAGO',
 			'TOTAL_ENPESOS','TIPO_CAMBIOP','IMPUESTO_HOSPEDAJE','IVA') as $var){
@@ -679,6 +684,10 @@ class accesoclase extends colaboradores{
     $NOMBRE_COMERCIAL            = mysqli_real_escape_string($conn, $NOMBRE_COMERCIAL);
     $RAZON_SOCIAL                = mysqli_real_escape_string($conn, $RAZON_SOCIAL);
 	$OBSERVACIONES_1             = mysqli_real_escape_string($conn, $OBSERVACIONES_1);
+        $emailSQL = mysqli_real_escape_string($conn, $email_enviacomprobante === null ? '' : trim($email_enviacomprobante));
+        // Otros formularios que no incluyen el campo conservan el email existente.
+        $emailUpdate = $email_enviacomprobante === null ? '' : "email_enviacomprobante = '".$emailSQL."',";
+
 
 		$query_NOMBRE_COMERCIAL = mysqli_query($conn,
 			"SELECT * FROM `02direccionproveedor1` where idRelacion = '".$NOMBRE_COMERCIAL."' ")
@@ -707,6 +716,7 @@ class accesoclase extends colaboradores{
 		if($idem != ''){
 
 			$var1 = "update 02SUBETUFACTURA set
+            ".$emailUpdate."
 			NUMERO_CONSECUTIVO_PROVEE = '".$NUMERO_CONSECUTIVO_PROVEE."',
 			NOMBRE_COMERCIAL = '".$NOMBRE_COMERCIAL."',
 			RAZON_SOCIAL = '".$RAZON_SOCIAL."',
@@ -757,7 +767,7 @@ class accesoclase extends colaboradores{
 			CLASIFICACION_ESPECIFICA, PLACAS_VEHICULO, MONTO_DE_COMISION, POLIZA_NUMERO,
 			NOMBRE_DEL_EJECUTIVO, NOMBRE_DEL_AYUDO, OBSERVACIONES_1, TIPO_CAMBIOP,
 			TOTAL_ENPESOS, IMPUESTO_HOSPEDAJE, TImpuestosRetenidosIVA, TImpuestosRetenidosISR,
-			descuentos, IVA, idRelacion
+			descuentos, IVA, idRelacion, email_enviacomprobante
 			) values (
 			'".$NUMERO_CONSECUTIVO_PROVEE."', '".$NOMBRE_COMERCIAL2."', '".$RAZON_SOCIAL."', '".$VIATICOSOPRO."',
 			'".$RFC_PROVEEDOR."', '".$NUMERO_EVENTO."', '".$NOMBRE_EVENTO."', '".$MOTIVO_GASTO."', '".$CONCEPTO_PROVEE."',
@@ -768,7 +778,7 @@ class accesoclase extends colaboradores{
 			'".$CLASIFICACION_ESPECIFICA."', '".$PLACAS_VEHICULO."', '".$MONTO_DE_COMISION."', '".$POLIZA_NUMERO."',
 			'".$NOMBRE_DEL_EJECUTIVO."', '".$NOMBRE_DEL_AYUDO."', '".$OBSERVACIONES_1."', '".$TIPO_CAMBIOP."',
 			'".$TOTAL_ENPESOS."', '".$IMPUESTO_HOSPEDAJE."', '".$TImpuestosRetenidosIVA."', '".$TImpuestosRetenidosISR."',
-			'".$descuentos."', '".$IVA."', '".$session."'
+			'".$descuentos."', '".$IVA."', '".$session."', '".$emailSQL."'
 			);";
 
 			// ── ACTUALIZACIÓN ──────────────────────────────────────────────
@@ -791,7 +801,7 @@ class accesoclase extends colaboradores{
 						CLASIFICACION_GENERAL, CLASIFICACION_ESPECIFICA, MONTO_DE_COMISION,
 						POLIZA_NUMERO, NOMBRE_DEL_EJECUTIVO, NOMBRE_DEL_AYUDO, OBSERVACIONES_1,
 						TIPO_CAMBIOP, TOTAL_ENPESOS, IMPUESTO_HOSPEDAJE,
-						TImpuestosRetenidosIVA, TImpuestosRetenidosISR, descuentos, IVA, VIATICOSOPRO
+						TImpuestosRetenidosIVA, TImpuestosRetenidosISR, descuentos, IVA, VIATICOSOPRO, email_enviacomprobante
 					FROM 02SUBETUFACTURA WHERE id = '".intval($registroId)."' LIMIT 1");
 				$registroAnterior = $consultaAnterior ? mysqli_fetch_array($consultaAnterior, MYSQLI_ASSOC) : array();
 
@@ -831,6 +841,7 @@ class accesoclase extends colaboradores{
 					'descuentos'                    => $descuentos,
 					'IVA'                           => $IVA,
 					'VIATICOSOPRO'                  => $VIATICOSOPRO,
+                    'email_enviacomprobante' => $email_enviacomprobante === null ? (isset($registroAnterior['email_enviacomprobante']) ? $registroAnterior['email_enviacomprobante'] : '') : trim($email_enviacomprobante),
 				);
 
 				$cambiosDetectados = array();

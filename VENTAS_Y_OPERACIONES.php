@@ -1275,6 +1275,11 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
                  <th scope="row"> <label for="validationCustom03" class="form-label">OBSERVACIONES:</label></th>
                  <td style="background: #ee5330" ><input type="text" class="form-control" id="OBSERVACIONES_1" required=""  value="<?php echo $OBSERVACIONES_1; ?>" name="OBSERVACIONES_1"placeholder="OBSERVACIONES "></td>
                  </tr>
+<tr style="background:#d2faf1">
+<th scope="row"><label for="email_enviacomprobante">EMAIL PARA ENVÍO DE COMPROBANTE DE PAGO</label></th>
+<td><input type="email" class="form-control" id="email_enviacomprobante" name="email_enviacomprobante" value="<?php echo htmlspecialchars(isset($email_enviacomprobante) && is_string($email_enviacomprobante) ? $email_enviacomprobante : '', ENT_QUOTES, 'UTF-8'); ?>" placeholder="correo@proveedor.com" autocomplete="email"></td>
+</tr>
+
 				 
 				 
                  <!-- <tr  style="background: #d2faf1" id="row-comprobante-transferencia">

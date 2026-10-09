@@ -8,8 +8,6 @@ fecha fatis : 16/04/2026
         session_start();
     }
 
-// Las cargas llegan directamente a este controlador por AJAX. Si la sesion
-// termino, no se debe aceptar el archivo ni continuar usando datos por defecto.
 if (!empty($_FILES) && (!isset($_SESSION['logeado']) || !isset($_SESSION['idem']))) {
     http_response_code(401);
     header('Content-Type: text/plain; charset=utf-8');
@@ -119,6 +117,12 @@ $POLIZA_NUMERO = isset($_POST["POLIZA_NUMERO"])?$_POST["POLIZA_NUMERO"]:"";
 $NOMBRE_DEL_EJECUTIVO = isset($_POST["NOMBRE_DEL_EJECUTIVO"])?$_POST["NOMBRE_DEL_EJECUTIVO"]:"";
 $NOMBRE_DEL_AYUDO = isset($_POST["NOMBRE_DEL_AYUDO"])?$_POST["NOMBRE_DEL_AYUDO"]:"";
 $OBSERVACIONES_1 = isset($_POST["OBSERVACIONES_1"])?$_POST["OBSERVACIONES_1"]:"";
+$email_enviacomprobante = isset($_POST['email_enviacomprobante']) ? $_POST['email_enviacomprobante'] : null;
+if (!ComprobantePagoEmail::validarEmail($email_enviacomprobante)) {
+    echo 'Escribe un email válido para el envío del comprobante de pago.';
+    exit;
+}
+
 $hiddenVENTASOPERACIONES = isset($_POST["hiddenVENTASOPERACIONES"])?$_POST["hiddenVENTASOPERACIONES"]:""; 
 $IPventasoperar = isset($_POST["IPventasoperar"])?$_POST["IPventasoperar"]:""; 
 $TIPO_CAMBIOP = isset($_POST["TIPO_CAMBIOP"])?$_POST["TIPO_CAMBIOP"]:"";
@@ -171,7 +175,7 @@ if($NOMBRE_COMERCIAL == "" OR $NUMERO_EVENTO == "" OR $FECHA_DE_PAGO == ""){
         $folio, $LugarExpedicion, $rfcE, $nombreE, 
         $regimenE, $rfcR, $nombreR, $UsoCFDI, 
         $DomicilioFiscalReceptor, $RegimenFiscalReceptor, $UUID, $TImpuestosRetenidos, 
-        $TImpuestosTrasladados, $TuaTotalCargos, $Descuento,$Propina, $TUA,$actualiza  );
+        $TImpuestosTrasladados, $TuaTotalCargos, $Descuento,$Propina, $TUA,$actualiza, $email_enviacomprobante );
 }
 
 }	
