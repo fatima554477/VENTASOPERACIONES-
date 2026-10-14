@@ -118,7 +118,8 @@ $NOMBRE_DEL_EJECUTIVO = isset($_POST["NOMBRE_DEL_EJECUTIVO"])?$_POST["NOMBRE_DEL
 $NOMBRE_DEL_AYUDO = isset($_POST["NOMBRE_DEL_AYUDO"])?$_POST["NOMBRE_DEL_AYUDO"]:"";
 $OBSERVACIONES_1 = isset($_POST["OBSERVACIONES_1"])?$_POST["OBSERVACIONES_1"]:"";
 $email_enviacomprobante = isset($_POST['email_enviacomprobante']) ? $_POST['email_enviacomprobante'] : null;
-if (!ComprobantePagoEmail::validarEmail($email_enviacomprobante)) {
+if (!is_string($email_enviacomprobante) || trim($email_enviacomprobante) === '' ||
+    !ComprobantePagoEmail::validarEmail($email_enviacomprobante)) {
     echo 'Escribe un email válido para el envío del comprobante de pago.';
     exit;
 }

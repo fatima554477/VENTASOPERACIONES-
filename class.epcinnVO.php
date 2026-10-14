@@ -526,7 +526,7 @@ class accesoclase extends colaboradores{
 		$conexion2 = new herramientas();
 		if(!file_exists($url)){ return; }
 
-		$regreso = $conexion2->lectorxml($url);
+		$regreso = $conexion2->escapar_datos_xml_sql($conexion2->lectorxml($url), $conn);
 
 		$Version               = $regreso['Version'];
 		$tipoDeComprobante     = $regreso['tipoDeComprobante'];
@@ -684,6 +684,7 @@ class accesoclase extends colaboradores{
     $NOMBRE_COMERCIAL            = mysqli_real_escape_string($conn, $NOMBRE_COMERCIAL);
     $RAZON_SOCIAL                = mysqli_real_escape_string($conn, $RAZON_SOCIAL);
 	$OBSERVACIONES_1             = mysqli_real_escape_string($conn, $OBSERVACIONES_1);
+    $conceptoSQL                 = mysqli_real_escape_string($conn, $CONCEPTO_PROVEE);
         $emailSQL = mysqli_real_escape_string($conn, $email_enviacomprobante === null ? '' : trim($email_enviacomprobante));
         // Otros formularios que no incluyen el campo conservan el email existente.
         $emailUpdate = $email_enviacomprobante === null ? '' : "email_enviacomprobante = '".$emailSQL."',";
@@ -725,7 +726,7 @@ class accesoclase extends colaboradores{
 			NUMERO_EVENTO = '".$NUMERO_EVENTO."',
 			NOMBRE_EVENTO = '".$NOMBRE_EVENTO."',
 			MOTIVO_GASTO = '".$MOTIVO_GASTO."',
-			CONCEPTO_PROVEE = '".$CONCEPTO_PROVEE."',
+			CONCEPTO_PROVEE = '".$conceptoSQL."',
 			MONTO_TOTAL_COTIZACION_ADEUDO = '".$MONTO_TOTAL_COTIZACION_ADEUDO."',
 			MONTO_DEPOSITAR = '".$MONTO_DEPOSITAR."',
 			MONTO_PROPINA = '".$MONTO_PROPINA."',
@@ -770,7 +771,7 @@ class accesoclase extends colaboradores{
 			descuentos, IVA, idRelacion, email_enviacomprobante
 			) values (
 			'".$NUMERO_CONSECUTIVO_PROVEE."', '".$NOMBRE_COMERCIAL2."', '".$RAZON_SOCIAL."', '".$VIATICOSOPRO."',
-			'".$RFC_PROVEEDOR."', '".$NUMERO_EVENTO."', '".$NOMBRE_EVENTO."', '".$MOTIVO_GASTO."', '".$CONCEPTO_PROVEE."',
+			'".$RFC_PROVEEDOR."', '".$NUMERO_EVENTO."', '".$NOMBRE_EVENTO."', '".$MOTIVO_GASTO."', '".$conceptoSQL."',
 			'".$MONTO_TOTAL_COTIZACION_ADEUDO."', '".$MONTO_DEPOSITAR."', '".$MONTO_PROPINA."',
 			'".$FECHA_AUTORIZACION_RESPONSABLE."', '".$FECHA_AUTORIZACION_AUDITORIA."', '".$FECHA_DE_LLENADO."',
 			'".$MONTO_FACTURA."', '".$TIPO_DE_MONEDA."', '".$PFORMADE_PAGO."', '".$FECHA_DE_PAGO."', '".$FECHA_A_DEPOSITAR."',

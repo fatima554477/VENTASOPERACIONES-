@@ -547,6 +547,8 @@ $(document).ready(function () {
   $('#enviarVENTASOPERACIONES').on('click', function () {
     var $btn = $(this);
     if ($btn.prop('disabled')) return;
+    var emailComprobante = document.getElementById('email_enviacomprobante');
+    if (!emailComprobante || !emailComprobante.reportValidity()) return;
     $btn.prop('disabled', true);
    ['ADJUNTAR_FACTURA_XML', 'ADJUNTAR_FACTURA_PDF'].forEach(limpiarInputFileVO);
 
