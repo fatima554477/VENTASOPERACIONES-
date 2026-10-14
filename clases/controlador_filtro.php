@@ -939,10 +939,10 @@ if (!function_exists('renderDocumentLinks')) {
 		return $filePaths;
 	}
 
-	function renderDocumentLinks($rawValue) {
+	function renderDocumentLinks($rawValue, $separador = '<br/>') {
 		$links = '';
 		foreach ((array)documentFilePaths($rawValue) as $filePath) {
-			$links .= '<a href="' . htmlspecialchars($filePath, ENT_QUOTES, 'UTF-8') . '" target="_blank">Ver!</a><br/>';
+			$links .= '<a href="' . htmlspecialchars($filePath, ENT_QUOTES, 'UTF-8') . '" target="_blank">Ver!</a>'.$separador;
 		}
 		return $links;
 	}
@@ -1016,12 +1016,18 @@ if (!function_exists('renderDocumentLinks')) {
 
 $ADJUNTAR_FACTURA_PDF = ''; $ADJUNTAR_FACTURA_XML = ''; $ADJUNTAR_COTIZACION = ''; $CONPROBANTE_TRANSFERENCIA = '';
 $ADJUNTAR_ARCHIVO_1 = ''; $archivosAdjuntos1 = array(); $COMPLEMENTOS_PAGO_PDF = ''; $COMPLEMENTOS_PAGO_XML = ''; $ACUSE_CANCELACION = '';
+require_once dirname(dirname(__DIR__)).'/includes/comprobante_pago_email.php';
+$historialComprobante = ComprobantePagoEmail::historial($database->mysqli, $row['02SUBETUFACTURAid']);
 $querycontrasDOCTOS = $database->Listado_subefacturaDOCTOS($row['02SUBETUFACTURAid']);
 while ($rowDOCTOS = mysqli_fetch_array($querycontrasDOCTOS)) {
 	$ADJUNTAR_FACTURA_PDF      .= renderDocumentLinks($rowDOCTOS["ADJUNTAR_FACTURA_PDF"]);
 	$ADJUNTAR_FACTURA_XML      .= renderDocumentLinks($rowDOCTOS["ADJUNTAR_FACTURA_XML"]);
 	$ADJUNTAR_COTIZACION       .= renderDocumentLinks($rowDOCTOS["ADJUNTAR_COTIZACION"]);
-	$CONPROBANTE_TRANSFERENCIA .= renderDocumentLinks($rowDOCTOS["CONPROBANTE_TRANSFERENCIA"]);
+	$nombreComprobante = trim((string)$rowDOCTOS['CONPROBANTE_TRANSFERENCIA']);
+    if ($nombreComprobante !== '') {
+        $CONPROBANTE_TRANSFERENCIA .= '<div style="display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap">'.renderDocumentLinks($nombreComprobante, ' ')
+            .ComprobantePagoEmail::estadoArchivo($nombreComprobante, dirname(dirname(__DIR__)).'/includes/archivos', $historialComprobante).'</div>';
+    }
 	$COMPLEMENTOS_PAGO_PDF     .= renderDocumentLinks($rowDOCTOS["COMPLEMENTOS_PAGO_PDF"]);
 	$COMPLEMENTOS_PAGO_XML     .= renderDocumentLinks($rowDOCTOS["COMPLEMENTOS_PAGO_XML"]);
 	$ACUSE_CANCELACION         .= renderDocumentLinks($rowDOCTOS["ACUSE_CANCELACION"]);
