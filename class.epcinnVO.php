@@ -668,7 +668,7 @@ class accesoclase extends colaboradores{
 		$TImpuestosTrasladados, $TuaTotalCargos, $Descuento, $Propina, $TUA, $actualiza, $email_enviacomprobante = null)
 	{
 		if (!ComprobantePagoEmail::validarEmail($email_enviacomprobante)) {
-            return 'Escribe un email válido para el envío del comprobante de pago.';
+            return 'Escribe correos válidos separados por comas para el envío del comprobante de pago.';
         }
         // Sanitizar montos
 		foreach(array('MONTO_TOTAL_COTIZACION_ADEUDO','MONTO_DEPOSITAR','MONTO_FACTURA',

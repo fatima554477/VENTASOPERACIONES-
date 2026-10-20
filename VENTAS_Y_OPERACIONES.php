@@ -1277,7 +1277,7 @@ echo "<a target='_blank' href='includes/archivos/".$rowsube['ADJUNTAR_COTIZACION
                  </tr>
 <tr style="background:#d2faf1">
 <th scope="row"><label for="email_enviacomprobante">EMAIL PARA ENVÍO DE COMPROBANTE DE PAGO<br><a style="color:red;font-size:11px">OBLIGATORIO</a></label></th>
-<td><input type="email" class="form-control" id="email_enviacomprobante" name="email_enviacomprobante" value="<?php echo htmlspecialchars(isset($email_enviacomprobante) && is_string($email_enviacomprobante) ? $email_enviacomprobante : '', ENT_QUOTES, 'UTF-8'); ?>" placeholder="correo@proveedor.com" autocomplete="email" required></td>
+<td><input type="email" multiple class="form-control" id="email_enviacomprobante" name="email_enviacomprobante" value="<?php echo htmlspecialchars(isset($email_enviacomprobante) && is_string($email_enviacomprobante) ? $email_enviacomprobante : '', ENT_QUOTES, 'UTF-8'); ?>" placeholder="uno@proveedor.com, dos@proveedor.com" autocomplete="email" required><small class="form-text text-muted">Separa los correos con comas.</small></td>
 </tr>
 
 				 
